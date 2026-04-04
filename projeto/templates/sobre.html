@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block titulo %}Sobre - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Sobre o HiddenTreasures</h1>
+        <p class="text-muted">Descobrindo o que o mundo esconde</p>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h3><strong>Nosso propósito</strong></h3>
+            <p>
+                O <strong>HiddenTreasures</strong> é uma plataforma criada com o objetivo de
+                divulgar pontos turísticos que muitas vezes passam despercebidos.
+                Enquanto destinos famosos recebem grande atenção, diversos lugares
+                incríveis permanecem escondidos, verdadeiros tesouros. Obiviamente, também queremos destacar os pontos
+                turísticos mais conhecidos, afinal, quem não gosta de visitar um lugar famoso de vez em quando? Porém,
+                nosso foco é justamente ajudar a revelar aqueles cantinhos especiais que não estão no radar de todo
+                mundo, mas que oferecem experiências únicas e memoráveis.
+            </p>
+
+            <p>
+                Nosso foco é ajudar você a descobrir experiências únicas, explorando
+                locais autênticos, pouco conhecidos e cheios de história, cultura
+                e beleza natural.
+            </p>
+        </div>
+
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='img/default/hidden_treasures_logo.png') }}"
+                class="img-fluid rounded shadow">
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4 text-center">
+            <h4><strong>Explorar</strong></h4>
+            <p>Encontre destinos únicos e pouco ou muito conhecidos. Vivencie aventuras inesquecíveis e descubra
+                tesouros escondidos.</p>
+        </div>
+
+        <div class="col-md-4 text-center">
+            <h4><strong>Avaliar</strong></h4>
+            <p>Compartilhe sua experiência com outros usuários. Comente, avalie e se divirta! Suas avaliações ajudam
+                outros viajantes a descobrir novos destinos.</p>
+        </div>
+
+        <div class="col-md-4 text-center">
+            <h4><strong>Salvar</strong></h4>
+            <p>Guarde seus lugares favoritos para visitar depois. Sempre bom manter no coração e na memória onde você já
+                esteve.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock conteudo %}

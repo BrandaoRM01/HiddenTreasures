@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block titulo %}Gerenciar Promoções - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Gerenciar Promoções</h1>
+    </div>
+
+    <div class="card p-4 mb-4 shadow">
+
+        <form method="POST" action="{{ url_for('promocoes.cadastrar_promocao') }}">
+
+            <div class="mb-3">
+                <label for="titulo" class="form-label">
+                    Título da Promoção <span class="text-danger">*</span>
+                </label>
+                <input id="titulo" name="titulo" type="text" class="form-control"
+                    placeholder="Digite o título da promoção" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">
+                    Descrição
+                </label>
+                <textarea id="descricao" name="descricao" class="form-control" rows="3"
+                    placeholder="Descreva a promoção"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="desconto" class="form-label">
+                    Desconto (%) <span class="text-danger">*</span>
+                </label>
+                <input id="desconto" name="desconto" type="number" step="0.01" class="form-control" placeholder="Ex: 10"
+                    required>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="data_inicio" class="form-label">
+                            Data de Início <span class="text-danger">*</span>
+                        </label>
+                        <input id="data_inicio" name="data_inicio" type="date" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="data_fim" class="form-label">
+                            Data de Fim <span class="text-danger">*</span>
+                        </label>
+                        <input id="data_fim" name="data_fim" type="date" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Adicionar
+            </button>
+
+        </form>
+    </div>
+
+    <div class="card p-3 shadow">
+        {% if lista_promocoes %}
+        {% for promocao in lista_promocoes %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+            <div>
+                <strong>{{ promocao.titulo }}</strong><br>
+
+                <small class="text-muted">
+                    {{ promocao.descricao }}
+                </small><br>
+
+                <small class="text-muted">
+                    {{ promocao.desconto }}% de desconto
+                </small><br>
+
+                <small class="text-muted">
+                    {{ promocao.data_inicio.strftime('%d/%m/%Y') }} até
+                    {{ promocao.data_fim.strftime('%d/%m/%Y') }}
+                </small>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a href="{{ url_for('promocoes.editar_promocao', id=promocao.id) }}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil"></i>
+                </a>
+
+                <form action="{{ url_for('promocoes.remover_promocao', id=promocao.id) }}" method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir a promoção {{ promocao.titulo }}?');"
+                    style="margin: 0;">
+
+                    <button type="submit"
+                        class="btn btn-danger btn-sm d-flex align-items-center justify-content-center">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+        {% endfor %}
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <div class="mb-3">
+                <i class="bi bi-tags" style="font-size: 50px; color: #6c757d;"></i>
+            </div>
+
+            <h4 class="mb-2">Nenhuma promoção cadastrada</h4>
+
+            <p class="text-muted">
+                Comece cadastrando uma promoção para aplicar aos pontos turísticos.
+            </p>
+
+            <a href="#" class="btn btn-primary mt-3">
+                Cadastrar primeira promoção
+            </a>
+
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock conteudo %}

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block titulo %}Gerenciar Pontos Turísticos - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Gerenciar Pontos Turísticos</h1>
+    </div>
+    <div class="card p-4 mb-4 shadow">
+
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('pontos.cadastrar_ponto') }}">
+
+            <div class="text-center mb-3">
+                <img id="previewImagem" src="{{ url_for('static', filename='img/default/hidden_treasures_logo.png') }}"
+                    class="rounded shadow" style="width: 150px; height: 150px; object-fit: cover;">
+            </div>
+
+            <div class="mb-3">
+                <label for="foto" class="form-label">
+                    Foto do Ponto
+                </label>
+                <input id="foto" name="foto" type="file" class="form-control" accept="image/*"
+                    onchange="preview(event)">
+            </div>
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">
+                    Nome do Ponto <span class="text-danger">*</span>
+                </label>
+                <input id="nome" name="nome" type="text" class="form-control" placeholder="Digite o nome" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="localizacao" class="form-label">
+                    Localização <span class="text-danger">*</span>
+                </label>
+                <input id="localizacao" name="localizacao" type="text" class="form-control"
+                    placeholder="Digite a localização" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">
+                    Descrição <span class="text-danger">*</span>
+                </label>
+                <textarea id="descricao" name="descricao" class="form-control" rows="3"
+                    placeholder="Descreva o ponto turístico" required></textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="horario_funcionamento" class="form-label">
+                            Horário de Funcionamento
+                        </label>
+                        <input id="horario_funcionamento" name="horario_funcionamento" type="text" class="form-control"
+                            placeholder="Ex: 08:00 às 18:00">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="custo_entrada" class="form-label">
+                            Custo de Entrada (R$)
+                        </label>
+                        <input id="custo_entrada" name="custo_entrada" type="text" class="form-control"
+                            placeholder="Ex: 20,00">
+                    </div>
+                </div>
+            </div>
+            {% if lista_promocoes %}
+
+            <div class="mb-3">
+                <label for="promocao" class="form-label">
+                    Promoção
+                </label>
+                <select id="promocao" name="promocao" class="form-control">
+                    <option value="">Nenhuma</option>
+                    {% for promocao in lista_promocoes %}
+                    <option value="{{ promocao.id }}">{{ promocao.titulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% endif %}
+
+            {% if lista_categorias %}
+
+            <div class="mb-3">
+                <label for="categoria" class="form-label">
+                    Categoria <span class="text-danger">*</span>
+                </label>
+                <select id="categoria" name="categoria" class="form-control" required>
+                    <option value="">Selecione a categoria</option>
+                    {% for categoria in lista_categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Adicionar
+            </button>
+
+            {% else %}
+
+            <div class="alert alert-info text-center">
+                Você precisa cadastrar uma categoria antes de criar um ponto turístico.
+            </div>
+
+            <a href="{{ url_for('categorias.gerenciar_categorias') }}" class="btn btn-primary w-100 mb-3">
+                Cadastrar Categoria
+            </a>
+
+            {% endif %}
+
+        </form>
+    </div>
+
+    <div class="card p-3 shadow">
+        {% if lista_pontos %}
+        {% for ponto in lista_pontos %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+            <div class="d-flex align-items-center gap-3">
+                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="rounded"
+                    style="width: 70px; height: 70px; object-fit: cover;">
+
+                <div>
+                    <strong>{{ ponto.nome }}</strong><br>
+                    <small class="text-muted">{{ ponto.localizacao }}</small><br>
+                    <small class="text-muted">{{ ponto.categoria.nome }}</small><br>
+
+                    {% if ponto.promocao.titulo %}
+                    <small class="text-muted">{{ ponto.promocao.titulo }}</small><br>
+                    {% else %}
+                    <small class="text-muted">Nenhuma promoção para esse ponto</small><br>
+                    {% endif %}
+
+                    {% if ponto.media_avaliacao is not none %}
+                    <small class="text-warning">⭐ {{ "%.1f"|format(ponto.media_avaliacao) }}</small>
+                    {% else %}
+                    <small class="text-warning">⭐ Nenhuma avaliação</small>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a href="{{ url_for('pontos.editar_ponto', id=ponto.id) }}" class="btn btn-warning btn-sm"><i
+                        class="bi bi-pencil"></i></a>
+
+                <form action="{{ url_for('pontos.remover_ponto', id=ponto.id) }}" method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir o ponto turístico {{ ponto.nome }}?');"
+                    style="margin: 0;">
+
+                    <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                        title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+        {% endfor %}
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <div class="mb-3">
+                <i class="bi bi-tags" style="font-size: 50px; color: #6c757d;"></i>
+            </div>
+
+            <h4 class="mb-2">Nenhum ponto cadastrado</h4>
+
+            <p class="text-muted">
+                Comece cadastrando um ponto para organizar os pontos turísticos.
+            </p>
+
+            <a href="#" class="btn btn-primary mt-3">
+                Cadastrar primeiro ponto
+            </a>
+
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock conteudo %}

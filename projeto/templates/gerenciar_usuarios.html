@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block titulo %}Gerenciar Usuários - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Gerenciar Usuários</h1>
+    </div>
+    <div class="card p-3 shadow">
+        {% for usuario in usuarios %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+            <div class="d-flex align-items-center">
+                <img src="{{ url_for('static', filename=usuario.url_foto) }}" width="40" height="40"
+                    style="object-fit: cover;" class="rounded-circle me-2">
+                <div>
+                    <strong>{{ usuario.username }}</strong><br>
+                    <small>{{ usuario.email }}</small><br>
+                    <span class="badge bg-secondary">{{ usuario.tipo_usuario }}</span>
+                </div>
+            </div>
+
+            {% if session['usuario']['tipo_usuario'] == 'superadmin' and usuario.tipo_usuario != 'superadmin' %}
+            <div class="d-flex gap-2">
+                {% if usuario.tipo_usuario == 'admin' %}
+                <a href="{{ url_for('user.alterar_permissao', email=usuario.email) }}"
+                    class="btn btn-secondary btn-sm flex-fill">Remover Admin</a>
+                {% else %}
+                <a href="{{ url_for('user.alterar_permissao', email=usuario.email) }}"
+                    class="btn btn-warning btn-sm flex-fill">Tornar Admin</a>
+                {% endif %}
+
+                <a onclick="return confirm('Tem certeza que deseja excluir o usuário {{ usuario.username }}?');"
+                    href="{{ url_for('user.excluir_usuario', email=usuario.email) }}" class="btn btn-danger flex-fill"
+                    title="Excluir">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock conteudo %}

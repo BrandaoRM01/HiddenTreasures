@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block titulo %}Resultados da Busca - HiddenTreasures{% endblock titulo %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pontos.css') }}">
+{% endblock css %}
+
+{% block conteudo %}
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Resultados da Busca</h1>
+        {% if filtro %}
+        <p class="text-muted">Buscando por "{{ filtro }}"</p>
+        {% endif %}
+    </div>
+
+    {% if not lista_pontos %}
+    <div class="alert alert-secondary text-center">
+        Nenhum ponto turístico encontrado.
+    </div>
+    {% else %}
+    <div class="row">
+        {% for ponto in lista_pontos %}
+        <div class="col-md-4 mb-4 d-flex">
+            <div class="card shadow-sm card-hover card-ponto w-100 position-relative">
+
+                {% if ponto.promocao %}
+                <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
+                {% endif %}
+
+                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top"
+                    style="height: 300px; object-fit: cover;">
+
+                <div class="card-body">
+                    <div>
+                        <h5>{{ ponto.nome }}</h5>
+                        <p class="text-muted localizacao">{{ ponto.localizacao }}</p>
+                        <p class="text-muted">{{ ponto.categoria.nome }}</p>
+
+                        {% if ponto.media_avaliacao is not none %}
+                        <p class="text-warning">⭐ {{ "%.1f"|format(ponto.media_avaliacao) }}</p>
+                        {% else %}
+                        <p class="text-warning">⭐ Nenhuma avaliação</p>
+                        {% endif %}
+
+                        <p class="preco">
+                            {% if ponto.custo_entrada %}
+                            {% if ponto.promocao %}
+                            <span class="preco-antigo">R$ {{ "%.2f"|format(ponto.custo_entrada) }}</span>
+                            <span class="preco-promocao">R$ {{ "%.2f"|format(ponto.custo_entrada * (1 -
+                                ponto.promocao.desconto / 100)) }}</span>
+                            {% else %}
+                            R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                            {% endif %}
+                            {% else %}
+                            <span class="preco-promocao">Gratuito</span>
+                            {% endif %}
+                        </p>
+
+                    </div>
+                    <a href="{{ url_for('pontos.detalhes_ponto', id=ponto.id) }}" class="btn btn-primary w-100 mt-2">Ver
+                        detalhes</a>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock conteudo %}

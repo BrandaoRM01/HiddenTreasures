@@ -1,0 +1,92 @@
+.card-ponto {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-ponto img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-ponto .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.card-ponto h5 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-ponto .localizacao {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-ponto .preco {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+.card-ponto .preco-antigo {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 0.5rem;
+}
+
+.card-ponto .preco-promocao {
+    color: #d63384;
+    font-weight: bold;
+}
+
+.secao-titulo {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-ponto .preco {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+.card-ponto .preco-antigo {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 0.5rem;
+}
+
+.card-ponto .preco-promocao {
+    color: #d63384;
+    font-weight: bold;
+}
+
+.badge-desconto {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #d63384;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 2;
+}
+
+.card-ponto:hover .badge-desconto {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block titulo %}Login - HiddenTreasures{% endblock titulo %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock css %}
+
+{% block conteudo %}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow p-4">
+            <h3 class="text-center mb-4">Login</h3>
+
+            <form method="POST" action="{{ url_for('user.login') }}">
+                <div class="mb-3">
+                    <label>Email <span class="text-danger">*</span></label>
+                    <input name="email" type="email" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Senha <span class="text-danger">*</span></label>
+                    <input name="senha" type="password" class="form-control">
+                </div>
+
+                <button class="btn btn-primary w-100">Entrar</button>
+            </form>
+
+            <p class="text-center mt-3">
+                Não tem conta? <a href="{{ url_for('user.cadastro') }}">Cadastre-se</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock conteudo %}

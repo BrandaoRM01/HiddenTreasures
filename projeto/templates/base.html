@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block titulo %}HiddenTreasures{% endblock titulo %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    {% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% endblock css %}
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('pontos.index') }}">HiddenTreasures</a>
+
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menu">
+
+                <ul class="navbar-nav me-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pontos.index') }}">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pontos.pontos') }}">Pontos Turísticos</a>
+                    </li>
+
+                    {% if session.get('usuario') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.favoritos') }}">Favoritos</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pontos.sobre') }}">Sobre</a>
+                    </li>
+
+                    {% if session.get('usuario') and session['usuario']['tipo_usuario'] in ['superadmin', 'admin'] %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-semibold" href="{{ url_for('user.painel_admin') }}">Painel
+                            Admin</a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+                <form class="d-flex align-items-center me-3" method="POST"
+                    action="{{ url_for('pontos.buscar_pontos') }}">
+                    <select class="form-select form-select-sm me-1" name="filtro"
+                        style="width: 85px; font-size: 0.7rem; height: 32px; padding: 0.2rem 0.3rem;">
+                        <option value="nome" selected>Nome</option>
+                        <option value="categoria">Categoria</option>
+                        <option value="localizacao">Local</option>
+                    </select>
+
+                    <input class="form-control form-control-sm me-1" type="search" name="escrita"
+                        placeholder="Buscar..."
+                        style="width: 140px; font-size: 0.7rem; height: 32px; padding: 0.2rem 0.4rem;">
+
+                    <button class="btn btn-primary btn-sm" type="submit" style="padding: 0.2rem 0.4rem; height: 30px;">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+                {% if not session.get('usuario') %}
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('user.login') }}" class="btn btn-outline-primary">Login</a>
+                    <a href="{{ url_for('user.cadastro') }}" class="btn btn-primary">Cadastrar</a>
+                </div>
+                {% else %}
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                        data-bs-toggle="dropdown">
+                        <img src="{{ url_for('static', filename=session['usuario']['url_foto']) }}" alt="Foto de perfil"
+                            class="rounded-circle" width="38" height="38" style="object-fit: cover;">
+                        <span class="ms-2">{{ session['usuario']['username'] }}</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ url_for('user.logout') }}">Logout</a></li>
+                        <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
+                        {% if not session['usuario']['tipo_usuario'] == 'superadmin' %}
+                        <li><a class="dropdown-item text-danger"
+                                onclick="return confirm('Tem certeza que deseja excluir seu perfil?');"
+                                href="{{ url_for('user.apagar_perfil', email=session['usuario']['email']) }}">Excluir
+                                Perfil</a></li>
+                        {% endif %}
+                    </ul>
+
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container mt-3">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+                role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block conteudo %}
+
+        {% endblock conteudo %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block js %}
+
+    {% endblock js %}
+
+</body>
+
+</html>

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block titulo %}Gerenciar Categorias - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Gerenciar Categorias</h1>
+    </div>
+
+    <div class="card p-3 mb-4 shadow">
+        <form method="POST" action="{{ url_for('categorias.cadastrar_categoria') }}">
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">
+                    Nome da Categoria <span class="text-danger">*</span>
+                </label>
+                <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome da categoria"
+                    required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">
+                    Descrição
+                </label>
+                <textarea id="descricao" name="descricao" class="form-control"
+                    placeholder="Digite uma descrição"></textarea>
+            </div>
+
+            <button class="btn btn-primary w-100">
+                Adicionar
+            </button>
+
+        </form>
+    </div>
+
+    <div class="card p-4 shadow">
+        {% if lista %}
+
+        {% for categoria in lista %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+            <div>
+                <strong>{{ categoria.nome }}</strong><br>
+                <small class="text-muted">{{ categoria.descricao }}</small>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a href="{{ url_for('categorias.atualizar_categoria', id=categoria.id) }}"
+                    class="btn btn-warning btn-sm"> <i class="bi bi-pencil"></i></a>
+
+                <form action="{{ url_for('categorias.remover_categoria', id=categoria.id) }}" method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir a categoria {{ categoria.nome }}?');"
+                    style="margin: 0;">
+
+                    <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                        title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <div class="mb-3">
+                <i class="bi bi-tags" style="font-size: 50px; color: #6c757d;"></i>
+            </div>
+
+            <h4 class="mb-2">Nenhuma categoria cadastrada</h4>
+
+            <p class="text-muted">
+                Comece criando uma categoria para organizar os pontos turísticos.
+            </p>
+
+            <a href="#" class="btn btn-primary mt-3">
+                Criar primeira categoria
+            </a>
+
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock conteudo %}

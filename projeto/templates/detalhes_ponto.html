@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ ponto.nome }} - HiddenTreasures{% endblock titulo %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detalhes_ponto.css') }}">
+{% endblock css %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="position-relative">
+                {% if ponto.promocao %}
+                <span
+                    style="position:absolute; top:10px; left:10px; background-color:#d63384; color:white; padding:5px 10px; border-radius:8px; font-weight:bold; z-index:2;">
+                    -{{ ponto.promocao.desconto|int }}%
+                </span>
+                {% endif %}
+                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="img-fluid">
+            </div>
+        </div>
+
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+            <h2><strong>{{ ponto.nome }}</strong></h2>
+            <p><strong>Localização:</strong> {{ ponto.localizacao }}</p>
+            <p><strong>Descrição:</strong> {{ ponto.descricao }}</p>
+
+            {% if ponto.horario_funcionamento %}
+            <p><strong>Horário de Funcionamento:</strong> {{ ponto.horario_funcionamento }}</p>
+            {% endif %}
+
+            <p><strong>Categoria:</strong> {{ ponto.categoria.nome }}</p>
+
+            {% if ponto.promocao %}
+            <div class="mt-2 p-3" style="background-color:#f8f9fa; border-left:4px solid #d63384; border-radius:8px;">
+
+                <h5 class="mb-1"><strong>{{ ponto.promocao.titulo }}</strong></h5>
+                {% if ponto.promocao.descricao %}
+                <p class="mb-1">{{ ponto.promocao.descricao }}</p>
+                {% else %}
+                <p class="mb-1">Sem descrição</p>
+                {% endif %}
+                <p style="font-size:0.9rem; color:#555; margin-top:4px;">
+                    Promoção válida de {{ ponto.promocao.data_inicio.strftime('%d/%m/%Y') }} até {{
+                    ponto.promocao.data_fim.strftime('%d/%m/%Y') }}
+                </p>
+
+                <p class="mb-0">
+                    {% if ponto.custo_entrada %}
+                    <span style="text-decoration: line-through; color:#999;">R$ {{ "%.2f"|format(ponto.custo_entrada)
+                        }}</span>
+                    <span style="color:#d63384; font-weight:bold;">R$ {{ "%.2f"|format(ponto.custo_entrada * (1 -
+                        ponto.promocao.desconto / 100)) }}</span>
+                    {% else %}
+                    <span style="color:#d63384; font-weight:bold;">Gratuito</span>
+                    {% endif %}
+                </p>
+
+            </div>
+            {% else %}
+
+            <p><strong>Custo de Entrada:</strong>
+                {% if ponto.custo_entrada and ponto.custo_entrada > 0 %}
+                R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                {% else %}
+                Gratuito
+                {% endif %}
+            </p>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% if session.get('usuario') %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Avaliar este lugar</h5>
+
+            <form method="POST" action="{{ url_for('avaliacoes.avaliar_ponto', id=ponto.id) }}">
+                <div class="mb-3">
+                    <label class="form-label">Nota <span class="text-danger">*</span></label>
+                    <div class="stars">
+                        <i class="star" data-value="1">★</i>
+                        <i class="star" data-value="2">★</i>
+                        <i class="star" data-value="3">★</i>
+                        <i class="star" data-value="4">★</i>
+                        <i class="star" data-value="5">★</i>
+                    </div>
+                    <input type="hidden" name="nota" id="nota" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Comentário</label>
+                    <textarea name="comentario" class="form-control" rows="3"
+                        placeholder="Compartilhe sua experiência..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Enviar avaliação
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mb-4">
+        Faça <a class="alert-link" href="{{ url_for('user.login') }}">login</a> para avaliar este lugar.
+    </div>
+    {% endif %}
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold">Avaliações</h4>
+        {% if quantidade >= 5 %}
+        <a href="{{ url_for('avaliacoes.avaliacoes_ponto', id=ponto.id) }}" class="btn btn-outline-primary btn-sm">
+            Ver mais
+        </a>
+        {% endif %}
+    </div>
+
+    {% if avaliacao_usuario %}
+    <div class="card shadow-sm mb-3 border-primary">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex align-items-center mb-2">
+                    <img src="{{ url_for('static', filename=avaliacao_usuario.usuario.url_foto) }}"
+                        class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+                    <div>
+                        <strong>{{ avaliacao_usuario.usuario.username }} (Você)</strong><br>
+                        <small class="text-muted">
+                            {{ avaliacao_usuario.data_avaliacao.strftime('%d/%m/%Y %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('avaliacoes.editar_avaliacao', id=ponto.id) }}"
+                        class="btn btn-warning btn-sm d-flex align-items-center justify-content-center" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+
+                    <form method="POST"
+                        action="{{ url_for('avaliacoes.excluir_avaliacao', id=ponto.id, usuario_email=session['usuario']['email']) }}"
+                        onsubmit="return confirm('Tem certeza que deseja excluir sua avaliação?');">
+
+                        <button type="submit"
+                            class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                            title="Excluir">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <p class="text-warning mb-1">
+                {% for i in range(avaliacao_usuario.nota) %}⭐{% endfor %}
+            </p>
+
+            {% if avaliacao_usuario.comentario %}
+            <p>{{ avaliacao_usuario.comentario }}</p>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not avaliacoes and not avaliacao_usuario %}
+    <div class="alert alert-secondary text-center">
+        Nenhuma avaliação ainda. Seja o primeiro!
+    </div>
+    {% else %}
+    {% for avaliacao in avaliacoes %}
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex align-items-center mb-2">
+                    <img src="{{ url_for('static', filename=avaliacao.usuario.url_foto) }}" class="rounded-circle me-2"
+                        width="40" height="40" style="object-fit: cover;">
+                    <div>
+                        <strong>{{ avaliacao.usuario.username }}</strong><br>
+                        <small class="text-muted">
+                            {{ avaliacao.data_avaliacao.strftime('%d/%m/%Y %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+
+                {% if session.get('usuario') and session['usuario']['tipo_usuario'] in ['admin', 'superadmin'] %}
+                <form method="POST"
+                    action="{{ url_for('avaliacoes.excluir_avaliacao', id=ponto.id, usuario_email=avaliacao.usuario.email) }}"
+                    onsubmit="return confirm('Tem certeza que deseja excluir a avaliação de {{ avaliacao.usuario.username }}?');">
+
+                    <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                        title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+                {% endif %}
+
+            </div>
+
+            <p class="text-warning mb-1">
+                {% for i in range(avaliacao.nota) %}⭐{% endfor %}
+            </p>
+
+            {% if avaliacao.comentario %}
+            <p>{{ avaliacao.comentario }}</p>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+</div>
+
+{% endblock conteudo %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/detalhes_ponto.js') }}"></script>
+{% endblock js %}

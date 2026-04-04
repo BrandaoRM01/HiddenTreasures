@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block titulo %}Painel Admin - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Painel Administrativo</h1>
+    </div>
+
+    <div class="row align-items-stretch">
+
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Categorias</h3>
+                <p>Gerencie as categorias dos pontos turísticos</p>
+                <a href="{{ url_for('categorias.gerenciar_categorias') }}" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Pontos Turísticos</h3>
+                <p>Adicione ou edite destinos</p>
+                <a href="{{ url_for('pontos.gerenciar_pontos') }}" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Promoções</h3>
+                <p>Crie e gerencie descontos para os pontos turísticos</p>
+                <a href="{{ url_for('promocoes.gerenciar_promocoes') }}" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Usuários</h3>
+                <p>Gerencie os usuários do sistema</p>
+                <a href="{{ url_for('user.gerenciar_usuarios') }}" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock conteudo %}

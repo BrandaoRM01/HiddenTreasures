@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block titulo %}Favoritos - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Meus Favoritos</h2>
+    </div>
+
+    <!-- LISTA MOCKADA -->
+    {% set favoritos = [
+    {'nome': 'Praia Secreta', 'localizacao': 'Bahia', 'imagem': 'https://source.unsplash.com/400x300/?beach', 'media':
+    4.5},
+    {'nome': 'Lago Cristalino', 'localizacao': 'Santa Catarina', 'imagem': 'https://source.unsplash.com/400x300/?lake',
+    'media': 4.9},
+    {'nome': 'Cachoeira Escondida', 'localizacao': 'Minas Gerais', 'imagem':
+    'https://source.unsplash.com/400x300/?waterfall', 'media': 4.8}
+    ] %}
+
+    <div class="row">
+
+        {% for lugar in favoritos %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm card-hover">
+
+                <img src="{{ lugar.imagem }}" class="card-img-top">
+
+                <div class="card-body">
+                    <h5>{{ lugar.nome }}</h5>
+                    <p class="text-muted">{{ lugar.localizacao }}</p>
+
+                    <p class="text-warning">⭐ {{ lugar.media }}</p>
+
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-primary w-100">Ver</a>
+                        <button class="btn btn-outline-danger">❤️</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock conteudo %}

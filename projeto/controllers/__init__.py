@@ -1,0 +1,5 @@
+from .categoriaController import CategoriaController
+from .pontoTuristicoController import PontoTuristicoController
+from .userController import UserController
+from .avaliacaoController import AvaliacaoController
+from .promocaoController import PromocaoController

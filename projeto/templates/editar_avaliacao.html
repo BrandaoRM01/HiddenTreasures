@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block titulo %}Editar Avaliação - {{ ponto.nome }}{% endblock titulo %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/avaliacoes.css') }}">
+{% endblock css %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="mb-3">Editar Avaliação de <strong>{{ ponto.nome }}</strong></h4>
+
+            <form method="POST" action="{{ url_for('avaliacoes.editar_avaliacao', id=ponto.id) }}">
+
+                <div class="mb-3">
+                    <label class="form-label">Nota <span class="text-danger">*</span></label>
+                    <div class="stars">
+                        {% for i in range(1, 6) %}
+                        <i class="star {% if i <= avaliacao.nota %}selected{% endif %}" data-value="{{ i }}">★</i>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="nota" id="nota" value="{{ avaliacao.nota }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Comentário</label>
+                    <textarea name="comentario" class="form-control" rows="3">{{ avaliacao.comentario }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary me-2">Salvar</button>
+                <a href="{{ url_for('pontos.detalhes_ponto', id=ponto.id) }}" class="btn btn-secondary">Cancelar</a>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock conteudo %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/editar_avaliacao.js') }}"></script>
+{% endblock js %}

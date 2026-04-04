@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block titulo %}Erro - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="text-center mt-5">
+    <h1 class="display-4 text-danger">Erro</h1>
+    <p class="lead">Você não tem permissão para acessar essa página.</p>
+    <a href="{{ url_for('pontos.index') }}" class="btn btn-primary">Voltar para Home</a>
+</div>
+
+{% endblock conteudo %}

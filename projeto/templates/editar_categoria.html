@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block titulo %}Editar Categoria - HiddenTreasures{% endblock titulo %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Editar Categoria</h2>
+
+    <div class="card shadow p-4">
+
+        <form method="POST" action="{{ url_for('categorias.atualizar_categoria', id=categoria.id) }}">
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">
+                    Nome da Categoria <span class="text-danger">*</span>
+                </label>
+                <input type="text" id="nome" name="nome" class="form-control" value="{{ categoria.nome }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">
+                    Descrição
+                </label>
+                <textarea id="descricao" name="descricao" class="form-control"
+                    rows="3">{{ categoria.descricao }}</textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Salvar Alterações
+                </button>
+
+                <a href="{{ url_for('categorias.gerenciar_categorias') }}" class="btn btn-secondary w-100">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock conteudo %}
