@@ -43,7 +43,7 @@ def editar_ponto(id):
 def detalhes_ponto(id):
     return controller.preparar_detalhes_ponto(id)
 
-@pontos_bp.route('/buscar-pontos', methods=['POST'])
+@pontos_bp.route('/buscar-pontos', methods=['GET', 'POST'])
 def buscar_pontos():
     if request.method == 'POST':
         return controller.listar_pontos_busca()

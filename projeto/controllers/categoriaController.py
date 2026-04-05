@@ -30,14 +30,14 @@ class CategoriaController:
 
         nomes_categorias = self.__dao.pegar_nomes_categorias()
 
+        if not nome:
+            flash('O campo nome da categoria é obrigatório.', 'danger')
+            return redirect(url_for('categorias.gerenciar_categorias'))
+
         if nome.capitalize().strip() in nomes_categorias:
             flash('Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'danger')
             return redirect(url_for('categorias.gerenciar_categorias'))
 
-        if not nome:
-            flash('O campo nome da categoria é obrigatório.', 'danger')
-            return redirect(url_for('categorias.gerenciar_categorias'))
-        
         if not descricao:
             descricao = "Sem descrição"
 
@@ -48,6 +48,7 @@ class CategoriaController:
 
         self.__dao.cadastrar_categoria(nova_categoria)
 
+        flash('Categoria cadastrada com sucesso', 'success')
         return redirect(url_for('categorias.gerenciar_categorias'))
     
     def remover_categoria(self, id_categoria):
@@ -79,12 +80,12 @@ class CategoriaController:
 
         categoria_atual = self.__dao.buscar_categoria_por_id(id_categoria)
 
-        if nome.capitalize().strip() in nomes_categorias and nome.capitalize().strip() != categoria_atual['nome']:
-            flash('Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('categorias.atualizar_categoria', id=id_categoria))
-
         if not nome:
             flash('O campo nome da categoria é obrigatório.', 'danger')
+            return redirect(url_for('categorias.atualizar_categoria', id=id_categoria))
+        
+        if nome.capitalize().strip() in nomes_categorias and nome.capitalize().strip() != categoria_atual['nome']:
+            flash('Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'danger')
             return redirect(url_for('categorias.atualizar_categoria', id=id_categoria))
         
         if not descricao:

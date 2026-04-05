@@ -44,16 +44,16 @@ class UserController:
 
         lista_usernames = self.__dao.pegar_usernames()
 
-        if username.capitalize().strip() in lista_usernames:
-            flash('Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('user.cadastro'))
-
         if usuario:
             flash('Email já cadastrado. Por favor, use outro email ou faça login.', 'danger')
             return redirect(url_for('user.cadastro'))
 
         if not email or not senha or not confirmar_senha or not username:
             flash('Informe os campos que são obrigatórios.', 'danger')
+            return redirect(url_for('user.cadastro'))
+        
+        if username.capitalize().strip() in lista_usernames:
+            flash('Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'danger')
             return redirect(url_for('user.cadastro'))
 
         if senha != confirmar_senha:
@@ -110,6 +110,10 @@ class UserController:
         return redirect(url_for('user.login'))
     
     def logout_usuario(self):
+        if 'usuario' not in session:
+            flash('Você precisa estar logado para sair de sua conta!', 'danger')
+            return redirect(url_for('pontos.index'))
+        
         session.pop('usuario', None)
         flash('Logout realizado com sucesso.', 'success')
         return redirect(url_for('pontos.index'))

@@ -28,9 +28,10 @@ class PontoTuristicoController:
         if not top_pontos:
             top_pontos = None
 
-        for ponto in pontos:
-            if ponto.promocao != None:
-                pontos_promocao.append(ponto)
+        if pontos:
+            for ponto in pontos:
+                if ponto.promocao != None:
+                    pontos_promocao.append(ponto)
 
         return render_template('index.html', pontos_promocao=pontos_promocao, top_pontos=top_pontos)
     
@@ -72,7 +73,7 @@ class PontoTuristicoController:
 
         if not ponto:
             flash('Ponto turístico não encontrado.', 'danger')
-            return redirect(url_for('pontos.pontos_turisticos'))
+            return redirect(url_for('pontos.pontos'))
         
         if 'usuario' in session:
             usuario_email = session['usuario']['email']
@@ -281,6 +282,7 @@ class PontoTuristicoController:
 
         if not escrita or not filtro:
             flash('Para pesquisar um ponto turístico é necessário informar o filtro e a escrita', 'danger')
+            return redirect(url_for('pontos.index'))
 
         if escrita:
             escrita = escrita.capitalize().strip()
