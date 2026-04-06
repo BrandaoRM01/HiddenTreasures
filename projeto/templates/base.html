@@ -37,7 +37,8 @@
 
                     {% if session.get('usuario') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('user.favoritos') }}">Favoritos</a>
+                        <a class="nav-link"
+                            href="{{ url_for('favoritos.favoritos', email=session['usuario']['email']) }}">Favoritos</a>
                     </li>
                     {% endif %}
 

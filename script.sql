@@ -57,3 +57,16 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
     FOREIGN KEY (ponto_id) REFERENCES pontos_turisticos(id)
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS favoritos (
+    usuario_email VARCHAR(150) NOT NULL,
+    ponto_id INT NOT NULL,
+
+    PRIMARY KEY (usuario_email, ponto_id),
+
+    FOREIGN KEY (usuario_email) REFERENCES usuarios(email)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (ponto_id) REFERENCES pontos_turisticos(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;

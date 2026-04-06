@@ -65,7 +65,7 @@ class PromocaoDAO:
                 data_inicio,
                 data_fim
             FROM promocoes
-            WHERE (data_inicio IS NULL OR data_inicio <= CURDATE())AND (data_fim IS NULL OR data_fim >= CURDATE())
+            WHERE (data_inicio IS NULL OR data_inicio <= CURDATE()) AND (data_fim IS NULL OR data_fim >= CURDATE())
             ORDER BY data_inicio DESC
         """
         lista_promocoes = []

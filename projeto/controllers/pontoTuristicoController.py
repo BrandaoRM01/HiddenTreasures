@@ -1,5 +1,5 @@
 from flask import flash, render_template, redirect, url_for, request, session
-from projeto.dao import PontoTuristicoDAO, CategoriaDAO, AvaliacaoDAO, PromocaoDAO
+from projeto.dao import PontoTuristicoDAO, CategoriaDAO, AvaliacaoDAO, PromocaoDAO, FavoritoDAO
 from projeto.models import PontoTuristico, Categoria, Promocao
 from projeto.config import Config
 from werkzeug.utils import secure_filename
@@ -12,6 +12,7 @@ class PontoTuristicoController:
         self.__dao_categorias = CategoriaDAO()
         self.__dao_avaliacoes = AvaliacaoDAO()
         self.__dao_promocoes = PromocaoDAO()
+        self.__dao_favoritos = FavoritoDAO()
 
     def __listar_pontos(self):
         return self.__dao_pontos.listar_pontos()
@@ -32,6 +33,22 @@ class PontoTuristicoController:
             for ponto in pontos:
                 if ponto.promocao != None:
                     pontos_promocao.append(ponto)
+
+            if 'usuario' in session:
+                usuario_email = session['usuario']['email']
+
+                lista_favoritos = self.__dao_favoritos.listar_favoritos_por_usuario(usuario_email)
+                
+                ids_favoritos = set()
+
+                for favorito in lista_favoritos:
+                    ids_favoritos.add(favorito.ponto_turistico.id)
+
+                for ponto in top_pontos:
+                    ponto.favorito = ponto.id in ids_favoritos
+
+                for ponto in pontos_promocao:
+                    ponto.favorito = ponto.id in ids_favoritos
 
         return render_template('index.html', pontos_promocao=pontos_promocao, top_pontos=top_pontos)
     
@@ -65,6 +82,20 @@ class PontoTuristicoController:
     
     def preparar_pontos_turisticos(self):
         lista_pontos = self.__listar_pontos()
+
+        if 'usuario' in session:
+            usuario_email = session['usuario']['email']
+
+            lista_favoritos = self.__dao_favoritos.listar_favoritos_por_usuario(usuario_email)
+            
+            ids_favoritos = set()
+
+            for favorito in lista_favoritos:
+                ids_favoritos.add(favorito.ponto_turistico.id)
+                    
+            for ponto in lista_pontos:
+                ponto.favorito = ponto.id in ids_favoritos
+
         return render_template('pontos.html', lista_pontos=lista_pontos)
     
     def preparar_detalhes_ponto(self, id_ponto):
@@ -288,5 +319,18 @@ class PontoTuristicoController:
             escrita = escrita.capitalize().strip()
 
         lista_pontos = self.__dao_pontos.buscar_pontos(escrita, filtro)
+
+        if 'usuario' in session:
+            usuario_email = session['usuario']['email']
+
+            lista_favoritos = self.__dao_favoritos.listar_favoritos_por_usuario(usuario_email)
+
+            ids_favoritos = set()
+
+            for favorito in lista_favoritos:
+                ids_favoritos.add(favorito.ponto_turistico.id)
+
+            for ponto in lista_pontos:
+                ponto.favorito = ponto.id in ids_favoritos
 
         return render_template('pontos_busca.html', lista_pontos=lista_pontos)

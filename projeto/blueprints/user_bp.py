@@ -25,10 +25,6 @@ def logout():
 def apagar_perfil(email):
     return controller.apagar_perfil(email)
 
-@user_bp.route('/favoritos')
-def favoritos():
-    return controller.preparar_favoritos()
-
 @user_bp.route('/admin/painel-admin')
 def painel_admin():
     return controller.preparar_painel_admin()

@@ -176,7 +176,7 @@ class AvaliacaoDAO:
         sql = """
             DELETE 
             FROM avaliacoes
-            WHERE usuario_email = %sAND ponto_id = %s
+            WHERE usuario_email = %s AND ponto_id = %s
         """
         valor = [usuario_email, ponto_id]
 

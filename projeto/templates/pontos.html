@@ -3,7 +3,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pontos.css') }}">
-
 {% endblock css %}
 
 {% block conteudo %}
@@ -23,6 +22,26 @@
         {% for ponto in lista_pontos %}
         <div class="col-md-4 mb-4 d-flex">
             <div class="card shadow-sm card-hover card-ponto w-100 position-relative">
+
+                {% if session.get('usuario') %}
+                <form method="POST" action="{{ url_for('favoritos.alterar_favorito') }}"
+                    class="position-absolute bottom-50 start-0 m-2">
+
+                    <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+
+                    <button type="submit"
+                        class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 45px;">
+
+                        {% if ponto.favorito %}
+                        <span style="color: red; font-size: 20px;">❤️</span>
+                        {% else %}
+                        <span style="color: gray; font-size: 20px;">🤍</span>
+                        {% endif %}
+
+                    </button>
+                </form>
+                {% endif %}
 
                 {% if ponto.promocao %}
                 <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
@@ -46,9 +65,12 @@
                         <p class="preco">
                             {% if ponto.custo_entrada %}
                             {% if ponto.promocao %}
-                            <span class="preco-antigo">R$ {{ "%.2f"|format(ponto.custo_entrada) }}</span>
-                            <span class="preco-promocao">R$ {{ "%.2f"|format(ponto.custo_entrada * (1 -
-                                ponto.promocao.desconto / 100)) }}</span>
+                            <span class="preco-antigo">
+                                R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                            </span>
+                            <span class="preco-promocao">
+                                R$ {{ "%.2f"|format(ponto.custo_entrada * (1 - ponto.promocao.desconto / 100)) }}
+                            </span>
                             {% else %}
                             R$ {{ "%.2f"|format(ponto.custo_entrada) }}
                             {% endif %}
@@ -58,8 +80,10 @@
                         </p>
 
                     </div>
-                    <a href="{{ url_for('pontos.detalhes_ponto', id=ponto.id) }}" class="btn btn-primary w-100 mt-2">Ver
-                        detalhes</a>
+
+                    <a href="{{ url_for('pontos.detalhes_ponto', id=ponto.id) }}" class="btn btn-primary w-100 mt-2">
+                        Ver detalhes
+                    </a>
                 </div>
 
             </div>

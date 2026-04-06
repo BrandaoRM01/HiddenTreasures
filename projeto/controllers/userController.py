@@ -21,11 +21,6 @@ class UserController:
             return render_template('erro.html')
         return render_template('painel_admin.html')
     
-    def preparar_favoritos(self):
-        if 'usuario' not in session:
-            return render_template('erro.html')
-        return render_template('favoritos.html')
-    
     def preparar_gerenciar_usuarios(self):
         if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['superadmin', 'admin']:
             return render_template('erro.html')
