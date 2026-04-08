@@ -19,6 +19,8 @@ def cadastro():
 
 @user_bp.route('/editar-perfil', methods=['POST', 'GET'])
 def editar_perfil():
+    if request.method == 'POST':
+        return controller.editar_perfil()
     return controller.preparar_editar_perfil()
 
 @user_bp.route('/logout')

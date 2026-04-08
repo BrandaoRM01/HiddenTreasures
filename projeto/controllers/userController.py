@@ -17,10 +17,14 @@ class UserController:
         return render_template('login.html')
     
     def preparar_editar_perfil(self):
+        if 'usuario' not in session:
+            return render_template('erro.html')
+        
         return render_template('editar_perfil.html')
     
     def preparar_painel_admin(self):
         if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+
             return render_template('erro.html')
         return render_template('painel_admin.html')
     
@@ -159,3 +163,70 @@ class UserController:
             
             flash('Permissão alterada com sucesso', 'success')
             return redirect(url_for('user.gerenciar_usuarios'))
+        
+    def editar_perfil(self):
+        if 'usuario' not in session:
+            return render_template('erro.html')
+        
+        email = session['usuario']['email']
+        username = request.form.get('username')
+        senha = request.form.get('senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        foto = request.files.get('foto')
+
+        usuario = self.__dao.buscar_usuario_por_email(email)
+        lista_usernames = self.__dao.pegar_usernames()
+
+        if not username:
+            flash('Informe o campo obrigatório.', 'danger')
+            return redirect(url_for('user.editar_perfil'))
+        
+        if not senha:
+            senha_hash = session['usuario']['senha_hash']
+
+        if not usuario:
+            flash('Usuário não encontrado no sistema.', 'danger')
+            return redirect(url_for('pontos.index'))
+
+        if username.capitalize().strip() in lista_usernames and username != session['usuario']['username']:
+            flash('Username já está em uso por outro usuário. Tente outro nome. ', 'danger')
+            return redirect(url_for('user.editar_perfil'))
+        
+        if senha and confirmar_senha:
+            if senha != confirmar_senha:
+                flash('As senhas não coincidem. Por favor, tente novamente.', 'danger')
+                return redirect(url_for('user.editar_perfil'))
+            
+            senha_hash = generate_password_hash(senha)
+
+        if senha and not confirmar_senha:
+            flash('Se você quer mudar sua senha, informe também a confirmação de senha.', 'danger')
+            return redirect(url_for('user.editar_perfil'))
+
+        if not foto or foto.filename == "":
+            nome_arquivo = usuario.url_foto
+        else:
+            extensao = os.path.splitext(foto.filename)[1]
+            nome_ajustado = secure_filename(username.lower().replace(" ", "_"))
+            
+            nome_arquivo = f"uploads/user/{nome_ajustado}{extensao}"
+
+            caminho = os.path.join(Config.UPLOAD_USER, f"{nome_ajustado}{extensao}")
+
+            foto.save(caminho)
+
+        usuario_atualizado = User(
+            email=email,
+            senha_hash=senha_hash,
+            url_foto=nome_arquivo,
+            username=username.capitalize().strip()
+        )
+
+        imagem_antiga = usuario.url_foto
+
+        self.__dao.editar_usuario(usuario_atualizado, imagem_antiga)
+
+        session['usuario'] = usuario_atualizado.to_dict()
+
+        flash('Usuário atualizado com sucesso!', 'success')
+        return redirect(url_for('pontos.index'))

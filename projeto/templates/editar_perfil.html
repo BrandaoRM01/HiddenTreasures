@@ -21,7 +21,7 @@
                 </p>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" action="#">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('user.editar_perfil') }}">
 
                 <div class="text-center mb-4">
                     <img id="preview-imagem" src="{{ url_for('static', filename=session['usuario']['url_foto']) }}"
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Username</label>
+                    <label class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
                     <input name="username" type="text" class="form-control"
                         value="{{ session['usuario']['username'] }}">
                 </div>

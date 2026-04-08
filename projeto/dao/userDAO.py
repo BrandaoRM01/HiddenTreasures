@@ -224,3 +224,35 @@ class UserDAO:
         finally:
             cursor.close()
             conexao.close()
+
+    def editar_usuario(self, usuario_atualizado, imagem_antiga):
+        sql = '''
+            UPDATE usuarios
+            SET 
+                username = %s,
+                senha_hash = %s,
+                url_foto = %s
+            WHERE email = %s
+        '''
+        valores = [
+            usuario_atualizado.username,
+            usuario_atualizado.senha_hash,
+            usuario_atualizado.url_foto,
+            usuario_atualizado.email
+        ]
+
+        conexao = self.__get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valores)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+
+        if imagem_antiga != usuario_atualizado.url_foto:
+            if imagem_antiga != "img/default/user_foto.webp":
+                caminho = os.path.join(Config.BASE_DIR, "static", imagem_antiga)
+                if os.path.exists(caminho):
+                    os.remove(caminho)
