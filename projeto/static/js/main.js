@@ -6,7 +6,7 @@ preview_imagem.addEventListener('click', () => {
 });
 
 input_foto.addEventListener('change', (event) => {
-    const file = event.target.files[0];
+    let file = event.target.files[0];
     if (file) {
         preview_imagem.src = URL.createObjectURL(file);
     }

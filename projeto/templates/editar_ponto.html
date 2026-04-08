@@ -4,24 +4,26 @@
 {% block conteudo %}
 
 <div class="container mt-4">
-    <h2 class="mb-4">Editar Ponto Turístico</h2>
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Editar Ponto Turístico</h1>
+    </div>
 
     <div class="card p-4 mb-4 shadow">
 
         <form method="POST" enctype="multipart/form-data" action="{{ url_for('pontos.editar_ponto', id=ponto.id) }}">
 
-            <div class="text-center mb-3">
-                <img id="previewImagem"
+            <div class="text-center mb-4">
+                <img id="preview-imagem"
                     src="{{ url_for('static', filename=ponto.url_imagem or 'img/default/hidden_treasures_logo.png') }}"
-                    class="rounded shadow" style="width: 150px; height: 150px; object-fit: cover;">
-            </div>
+                    class="rounded shadow" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
 
-            <div class="mb-3">
-                <label for="foto" class="form-label">
-                    Foto do Ponto
-                </label>
-                <input id="foto" name="foto" type="file" class="form-control" accept="image/*"
-                    onchange="preview(event)">
+                <input name="foto" type="file" hidden id="foto-imagem" accept="image/*">
+
+                <div class="mt-2">
+                    <label class="btn btn-outline-primary btn-sm mt-2" for="foto-imagem">
+                        <i class="bi bi-upload"></i> Trocar foto
+                    </label>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -112,3 +114,7 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock js %}
