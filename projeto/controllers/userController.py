@@ -16,6 +16,9 @@ class UserController:
     def preparar_login(self):
         return render_template('login.html')
     
+    def preparar_editar_perfil(self):
+        return render_template('editar_perfil.html')
+    
     def preparar_painel_admin(self):
         if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
             return render_template('erro.html')

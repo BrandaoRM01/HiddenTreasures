@@ -87,7 +87,7 @@
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ url_for('user.logout') }}">Logout</a></li>
-                        <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('user.editar_perfil') }}">Editar Perfil</a></li>
                         {% if not session['usuario']['tipo_usuario'] == 'superadmin' %}
                         <li><a class="dropdown-item text-danger"
                                 onclick="return confirm('Tem certeza que deseja excluir seu perfil?');"

@@ -17,6 +17,10 @@ def cadastro():
         return controller.cadastrar_usuario()
     return controller.preparar_cadastro()
 
+@user_bp.route('/editar-perfil', methods=['POST', 'GET'])
+def editar_perfil():
+    return controller.preparar_editar_perfil()
+
 @user_bp.route('/logout')
 def logout():
     return controller.logout_usuario()
