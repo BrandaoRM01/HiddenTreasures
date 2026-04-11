@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, session
 from projeto.config import Config
 from projeto.dao import UserDAO, HistoricoSenhaDAO
 from projeto.models import User, HistoricoSenha
@@ -58,9 +58,13 @@ class HistoricoSenhaController:
             return False
 
     def preparar_recuperar_senha(self):
+        if 'usuario' in session:
+            return render_template('erro.html')
         return render_template('recuperar_senha.html')
 
     def preparar_redefinir_senha(self, token):
+        if 'usuario' in session:
+            return render_template('erro.html')
         usuario = self.__dao.buscar_por_token(token)
 
         if not usuario:

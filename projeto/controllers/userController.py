@@ -29,9 +29,13 @@ class UserController:
         return True
 
     def preparar_cadastro(self):
+        if 'usuario' in session:
+            return render_template('erro.html')
         return render_template('cadastro.html')
     
     def preparar_login(self):
+        if 'usuario' in session:
+            return render_template('erro.html')
         return render_template('login.html')
     
     def preparar_editar_perfil(self):
