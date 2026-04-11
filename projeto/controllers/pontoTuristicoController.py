@@ -203,6 +203,7 @@ class PontoTuristicoController:
 
         self.__dao_pontos.cadastrar_ponto(novo_ponto)
 
+        flash('Ponto turístico cadastrado com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()
     
     def remover_ponto(self, id_ponto):
@@ -210,6 +211,7 @@ class PontoTuristicoController:
                 return render_template('erro.html')
         
         self.__dao_pontos.excluir_ponto(id_ponto)
+        flash('Ponto turístico excluído com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()
     
     def editar_ponto(self, id_ponto):
@@ -340,6 +342,7 @@ class PontoTuristicoController:
 
         self.__dao_pontos.atualizar_ponto(ponto_atualizado, imagem_antiga)
 
+        flash('Ponto turístico atualizado com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()
     
     def listar_pontos_busca(self):

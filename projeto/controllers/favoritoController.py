@@ -66,5 +66,5 @@ class FavoritoController:
 
         self.__dao_favoritos.adicionar_favorito(novo_favorito)
 
-        flash('Ponto turístico favoritado com sucesso', 'success')
+        flash('Ponto turístico favoritado com sucesso!', 'success')
         return redirect(request.referrer or url_for('pontos.index'))

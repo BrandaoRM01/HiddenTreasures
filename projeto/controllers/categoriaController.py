@@ -48,7 +48,7 @@ class CategoriaController:
 
         self.__dao.cadastrar_categoria(nova_categoria)
 
-        flash('Categoria cadastrada com sucesso', 'success')
+        flash('Categoria cadastrada com sucesso!', 'success')
         return redirect(url_for('categorias.gerenciar_categorias'))
     
     def remover_categoria(self, id_categoria):
@@ -56,6 +56,8 @@ class CategoriaController:
             return render_template('erro.html')
         
         self.__dao.remover_categoria(id_categoria)
+
+        flash('Categoria removida com sucesso!', 'success')
         return redirect(url_for('categorias.gerenciar_categorias'))
     
     def preparar_editar_categoria(self, id_categoria):
@@ -99,4 +101,5 @@ class CategoriaController:
 
         self.__dao.atualizar_categoria(categoria_atualizada)
 
+        flash('Categoria atualizada com sucesso!', 'success')
         return redirect(url_for('categorias.gerenciar_categorias'))
