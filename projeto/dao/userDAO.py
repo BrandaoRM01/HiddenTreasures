@@ -225,7 +225,7 @@ class UserDAO:
             cursor.close()
             conexao.close()
 
-    def editar_usuario(self, usuario_atualizado, imagem_antiga):
+    def editar_usuario(self, usuario_atualizado):
         sql = '''
             UPDATE usuarios
             SET 
@@ -250,9 +250,3 @@ class UserDAO:
         finally:
             cursor.close()
             conexao.close()
-
-        if imagem_antiga != usuario_atualizado.url_foto:
-            if imagem_antiga != "img/default/user_foto.webp":
-                caminho = os.path.join(Config.BASE_DIR, "static", imagem_antiga)
-                if os.path.exists(caminho):
-                    os.remove(caminho)

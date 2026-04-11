@@ -270,12 +270,6 @@ class PontoTuristicoDAO:
             cursor.close()
             conexao.close()
 
-        if imagem_antiga != ponto_atualizado.url_imagem:
-            if imagem_antiga != "img/default/hidden_treasures_logo.png":
-                caminho = os.path.join(Config.BASE_DIR, "static", imagem_antiga)
-                if os.path.exists(caminho):
-                    os.remove(caminho)
-
     def excluir_ponto(self, id_ponto):
         sql =  '''
                 DELETE 

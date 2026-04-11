@@ -247,17 +247,52 @@ class PontoTuristicoController:
             flash('Ponto turístico não encontrado.', 'danger')
             return redirect(url_for('pontos.gerenciar_pontos'))
 
+        nome_antigo = os.path.basename(ponto_existente.url_imagem)
+        nome_antigo_ponto = ponto_existente.nome
+
+        nome_ajustado = nome.capitalize().strip()
+
         if not foto or foto.filename == "":
-            nome_arquivo = ponto_existente.url_imagem
+            
+            if nome_antigo_ponto != nome_ajustado:
+
+                if ponto_existente.url_imagem and "default" not in ponto_existente.url_imagem:
+                    extensao = os.path.splitext(nome_antigo)[1]
+                    nome_base = secure_filename(nome_ajustado.lower().replace(" ", "_"))
+
+                    novo_nome = f"{nome_base}{extensao}"
+
+                    caminho_antigo = os.path.join(Config.UPLOAD_PONTOS, nome_antigo)
+                    caminho_novo = os.path.join(Config.UPLOAD_PONTOS, novo_nome)
+
+                    if os.path.exists(caminho_antigo):
+                        if os.path.exists(caminho_novo):
+                            os.remove(caminho_novo)
+
+                        os.rename(caminho_antigo, caminho_novo)
+
+                    nome_arquivo = f"uploads/pontos/{novo_nome}"
+                else:
+                    nome_arquivo = ponto_existente.url_imagem
+            else:
+                nome_arquivo = ponto_existente.url_imagem
+
         else:
             extensao = os.path.splitext(foto.filename)[1]
-            nome_ajustado = secure_filename(nome.lower().replace(" ", "_"))
-            
-            nome_arquivo = f"uploads/pontos/{nome_ajustado}{extensao}"
+            nome_base = secure_filename(nome_ajustado.lower().replace(" ", "_"))
 
-            caminho = os.path.join(Config.UPLOAD_PONTOS, f"{nome_ajustado}{extensao}")
+            novo_nome = f"{nome_base}{extensao}"
+            caminho = os.path.join(Config.UPLOAD_PONTOS, novo_nome)
 
+            if ponto_existente.url_imagem and "default" not in ponto_existente.url_imagem:
+                caminho_antigo = os.path.join(Config.UPLOAD_PONTOS, nome_antigo)
+                if os.path.exists(caminho_antigo):
+                    os.remove(caminho_antigo)
+
+            foto.stream.seek(0)
             foto.save(caminho)
+
+            nome_arquivo = f"uploads/pontos/{novo_nome}"
 
         categoria_dados = self.__dao_categorias.buscar_categoria_por_id(categoria_id)
 

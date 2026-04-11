@@ -10,6 +10,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
     tipo_usuario ENUM('user', 'admin', 'superadmin') DEFAULT 'user' NOT NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS historico_senhas (
+    usuario_email VARCHAR(255) NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (usuario_email, senha_hash),
+    FOREIGN KEY (usuario_email) REFERENCES usuarios(email) 
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,

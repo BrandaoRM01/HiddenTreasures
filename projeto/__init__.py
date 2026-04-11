@@ -1,6 +1,8 @@
 from flask import Flask
 from projeto.config import Config
-from projeto.dao import UserDAO, PromocaoDAO
+from projeto.models import HistoricoSenha
+from projeto.dao import UserDAO, PromocaoDAO, HistoricoSenhaDAO
+from werkzeug.security import generate_password_hash
 
 def create_app():
     app = Flask(__name__)
@@ -18,8 +20,20 @@ def create_app():
     with app.app_context():
         user_dao = UserDAO()
         promocao_dao = PromocaoDAO()
+        historico_senha_dao = HistoricoSenhaDAO()
 
         user_dao.criar_usuario_superadmin()
+
+        usuario = user_dao.buscar_usuario_por_email(Config.SUPERADMIN_EMAIL)
+        senha = Config.SUPERADMIN_PASSWORD
+
+        if not historico_senha_dao.senha_existe(usuario, senha):
+            senha_hash = generate_password_hash(Config.SUPERADMIN_PASSWORD)
+
+            historico = HistoricoSenha(usuario, senha_hash)
+    
+            historico_senha_dao.inserir_nova_senha(historico)
+
         promocao_dao.deletar_promocoes_expiradas()
 
     return app
