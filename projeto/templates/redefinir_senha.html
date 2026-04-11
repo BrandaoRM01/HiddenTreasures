@@ -13,16 +13,34 @@
 
             <h3 class="text-center mb-3">Redefinir Senha</h3>
 
-            <form method="POST">
+            <form method="POST" action="{{ url_for('historico_senhas.redefinir_senha', token=token) }}">
 
                 <div class="mb-3">
                     <label>Nova senha <span class="text-danger">*</span></label>
-                    <input name="senha" type="password" class="form-control" required>
+
+                    <div class="input-group">
+                        <input name="senha" type="password" class="form-control" id="reset_senha">
+
+                        <span class="input-group-text toggle-password" data-target="reset_senha"
+                            style="cursor:pointer;">
+                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-reset_senha"
+                                width="20">
+                        </span>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label>Confirmar senha <span class="text-danger">*</span></label>
-                    <input name="confirmar_senha" type="password" class="form-control" required>
+
+                    <div class="input-group">
+                        <input name="confirmar_senha" type="password" class="form-control" id="reset_confirmar_senha">
+
+                        <span class="input-group-text toggle-password" data-target="reset_confirmar_senha"
+                            style="cursor:pointer;">
+                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
+                                id="eye-reset_confirmar_senha" width="20">
+                        </span>
+                    </div>
                 </div>
 
                 <button class="btn btn-primary w-100">

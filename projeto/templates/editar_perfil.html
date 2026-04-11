@@ -46,12 +46,31 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Nova senha</label>
-                        <input name="senha" type="password" class="form-control">
+
+                        <div class="input-group">
+                            <input name="senha" type="password" class="form-control" id="perfil_senha">
+
+                            <span class="input-group-text toggle-password" data-target="perfil_senha"
+                                style="cursor:pointer;">
+                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
+                                    id="eye-perfil_senha" width="20">
+                            </span>
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Confirmar senha</label>
-                        <input name="confirmar_senha" type="password" class="form-control">
+
+                        <div class="input-group">
+                            <input name="confirmar_senha" type="password" class="form-control"
+                                id="perfil_confirmar_senha">
+
+                            <span class="input-group-text toggle-password" data-target="perfil_confirmar_senha"
+                                style="cursor:pointer;">
+                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
+                                    id="eye-perfil_confirmar_senha" width="20">
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -64,7 +83,3 @@
 </div>
 
 {% endblock conteudo %}
-
-{% block js %}
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-{% endblock js %}

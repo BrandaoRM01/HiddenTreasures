@@ -20,7 +20,16 @@
 
                 <div class="mb-3">
                     <label>Senha <span class="text-danger">*</span></label>
-                    <input name="senha" type="password" class="form-control">
+
+                    <div class="input-group">
+                        <input name="senha" type="password" class="form-control" id="login_senha">
+
+                        <span class="input-group-text toggle-password" data-target="login_senha"
+                            style="cursor:pointer;">
+                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-login_senha"
+                                width="20">
+                        </span>
+                    </div>
                 </div>
 
                 <button class="btn btn-primary w-100">Entrar</button>

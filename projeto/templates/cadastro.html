@@ -46,14 +46,31 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3 position-relative">
                         <label>Senha <span class="text-danger">*</span></label>
-                        <input name="senha" type="password" class="form-control">
+
+                        <div class="input-group">
+                            <input name="senha" type="password" class="form-control" id="senha">
+
+                            <span class="input-group-text toggle-password" data-target="senha" style="cursor:pointer;">
+                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-senha"
+                                    width="20">
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3 position-relative">
                         <label>Confirmar senha <span class="text-danger">*</span></label>
-                        <input name="confirmar_senha" type="password" class="form-control">
+
+                        <div class="input-group">
+                            <input name="confirmar_senha" type="password" class="form-control" id="confirmar_senha">
+
+                            <span class="input-group-text toggle-password" data-target="confirmar_senha"
+                                style="cursor:pointer;">
+                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
+                                    id="eye-confirmar_senha" width="20">
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -70,7 +87,3 @@
 </div>
 
 {% endblock conteudo %}
-
-{% block js %}
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-{% endblock js %}
