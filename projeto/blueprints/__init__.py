@@ -4,3 +4,4 @@ from .categorias_bp import categorias_bp
 from .avaliacoes_bp import avaliacoes_bp
 from .promocoes_bp import promocoes_bp
 from .favoritos_bp import favoritos_bp
+from .historico_senhas_bp import historico_senhas_bp

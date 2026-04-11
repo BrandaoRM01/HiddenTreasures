@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     username VARCHAR(100) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
     url_foto VARCHAR(500) DEFAULT 'img/default/user_foto.webp',
-    tipo_usuario ENUM('user', 'admin', 'superadmin') DEFAULT 'user' NOT NULL
+    tipo_usuario ENUM('user', 'admin', 'superadmin') DEFAULT 'user' NOT NULL,
+    token_recuperacao VARCHAR(255) NULL,
+    token_expiracao DATETIME NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS historico_senhas (

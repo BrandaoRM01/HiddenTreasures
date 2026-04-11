@@ -210,9 +210,6 @@ class UserController:
             flash('Informe o campo obrigatório.', 'danger')
             return redirect(url_for('user.editar_perfil'))
         
-        if not senha:
-            senha_hash = usuario.senha_hash
-
         if not usuario:
             flash('Usuário não encontrado no sistema.', 'danger')
             return redirect(url_for('pontos.index'))
@@ -220,35 +217,41 @@ class UserController:
         username_ajustado = username.capitalize().strip()
 
         if username_ajustado in lista_usernames and username_ajustado != session['usuario']['username']:
-            flash('Username já está em uso por outro usuário. Tente outro nome. ', 'danger')
+            flash('Username já está em uso por outro usuário. Tente outro nome.', 'danger')
             return redirect(url_for('user.editar_perfil'))
         
+        senha_hash = usuario.senha_hash
+        senha_alterada = False
+
         if senha and confirmar_senha:
             if senha != confirmar_senha:
-                flash('As senhas não coincidem. Por favor, tente novamente.', 'danger')
+                flash('As senhas não coincidem.', 'danger')
+                return redirect(url_for('user.editar_perfil'))
+
+            senha_hash_nova = generate_password_hash(senha)
+
+            if not self.__verificar_senha(usuario, senha, senha_hash_nova):
                 return redirect(url_for('user.editar_perfil'))
             
-            senha_hash = generate_password_hash(senha)
-
-            if not self.__verificar_senha(usuario, senha, senha_hash):
-                return redirect(url_for('user.editar_perfil'))
+            senha_hash = senha_hash_nova
+            senha_alterada = True
 
         if senha and not confirmar_senha:
             flash('Se você quer mudar sua senha, informe também a confirmação de senha.', 'danger')
             return redirect(url_for('user.editar_perfil'))
-        
+
         username_antigo = usuario.username
         nome_antigo = os.path.basename(usuario.url_foto)
 
         if not foto or foto.filename == "":
             
             if username_antigo != username_ajustado:
-    
+
                 if "default" not in usuario.url_foto:
                     extensao = os.path.splitext(nome_antigo)[1]
-                    nome_ajustado = secure_filename(username_ajustado.lower().replace(" ", "_"))
+                    nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
 
-                    novo_nome = f"{nome_ajustado}{extensao}"
+                    novo_nome = f"{nome_ajustado_file}{extensao}"
 
                     caminho_antigo = os.path.join(Config.UPLOAD_USER, nome_antigo)
                     caminho_novo = os.path.join(Config.UPLOAD_USER, novo_nome)
@@ -267,9 +270,9 @@ class UserController:
 
         else:
             extensao = os.path.splitext(foto.filename)[1]
-            nome_ajustado = secure_filename(username_ajustado.lower().replace(" ", "_"))
+            nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
 
-            novo_nome = f"{nome_ajustado}{extensao}"
+            novo_nome = f"{nome_ajustado_file}{extensao}"
             caminho = os.path.join(Config.UPLOAD_USER, novo_nome)
 
             if "default" not in usuario.url_foto:
@@ -277,7 +280,7 @@ class UserController:
                 if os.path.exists(caminho_antigo):
                     os.remove(caminho_antigo)
 
-            foto.stream.seek(0)  
+            foto.stream.seek(0)
             foto.save(caminho)
 
             nome_arquivo = f"uploads/user/{novo_nome}"
@@ -293,6 +296,10 @@ class UserController:
         )
 
         self.__dao_usuario.editar_usuario(usuario_atualizado)
+
+        if senha_alterada:
+            historico = HistoricoSenha(usuario_atualizado, senha_hash)
+            self.__dao_historico_senha.inserir_nova_senha(historico)
 
         session['usuario'] = usuario_atualizado.to_dict()
 

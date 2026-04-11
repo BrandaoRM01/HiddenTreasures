@@ -26,6 +26,12 @@
                 <button class="btn btn-primary w-100">Entrar</button>
             </form>
 
+            <div class="text-center mt-2">
+                <a href="{{ url_for('historico_senhas.recuperar_senha') }}" class="text-decoration-none">
+                    Esqueceu a senha?
+                </a>
+            </div>
+
             <p class="text-center mt-3">
                 Não tem conta? <a href="{{ url_for('user.cadastro') }}">Cadastre-se</a>
             </p>

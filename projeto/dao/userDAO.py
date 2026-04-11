@@ -250,3 +250,68 @@ class UserDAO:
         finally:
             cursor.close()
             conexao.close()
+
+    def salvar_token_recuperacao(self, email, token, expiracao):
+        sql = '''
+            UPDATE usuarios
+            SET token_recuperacao = %s,
+                token_expiracao = %s
+            WHERE email = %s
+        '''
+
+        valores = [token, expiracao, email]
+
+        conexao = self.__get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valores)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+
+    def buscar_por_token(self, token):
+        sql = '''
+            SELECT *
+            FROM usuarios
+            WHERE token_recuperacao = %s
+        '''
+        valor = [token]
+
+        conexao = self.__get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        usuario = None
+
+        try:
+            cursor.execute(sql, valor)
+            resultado = cursor.fetchone()
+
+            if resultado:
+                usuario = self.__criar_usuario(resultado)
+
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return usuario
+    
+    def limpar_token(self, email):
+        sql = '''
+            UPDATE usuarios
+            SET token_recuperacao = NULL,
+                token_expiracao = NULL
+            WHERE email = %s
+        '''
+        valor = [email]
+
+        conexao = self.__get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valor)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()

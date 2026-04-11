@@ -4,3 +4,4 @@ from .userController import UserController
 from .avaliacaoController import AvaliacaoController
 from .promocaoController import PromocaoController
 from .favoritoController import FavoritoController
+from .historicoSenhaController import HistoricoSenhaController

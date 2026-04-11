@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from pathlib import Path
+import sib_api_v3_sdk
 import os
 
 load_dotenv()
@@ -27,5 +28,8 @@ class Config:
     SUPERADMIN_PASSWORD = os.getenv('SUPERADMIN_PASSWORD')
     SUPERADMIN_USERNAME = os.getenv('SUPERADMIN_USERNAME')
 
-    # Chaves API
+    # Configurações API Brevo
     BREVO_API_KEY = os.getenv('BREVO_API_KEY')
+
+    BREVO_CONFIG = sib_api_v3_sdk.Configuration()
+    BREVO_CONFIG.api_key['api-key'] = BREVO_API_KEY

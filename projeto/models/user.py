@@ -1,11 +1,13 @@
 class User:
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, tipo_usuario=None):
+    def __init__(self, email, username, senha_hash=None, url_foto=None, tipo_usuario=None, token_recuperacao=None, token_expiracao=None):
         self.__email = email
         self.__senha_hash = senha_hash
         self.__url_foto = url_foto
         self.__username = username
         self.__tipo_usuario = tipo_usuario
+        self.__token_recuperacao = token_recuperacao
+        self.__token_expiracao = token_expiracao
 
     @property
     def email(self):
@@ -27,6 +29,14 @@ class User:
     def tipo_usuario(self):
         return self.__tipo_usuario
     
+    @property
+    def token_recuperacao(self):
+        return self.__token_recuperacao
+    
+    @property
+    def token_expiracao(self):
+        return self.__token_expiracao
+    
     @email.setter
     def email(self, valor):
         self.__email = valor
@@ -47,11 +57,21 @@ class User:
     def tipo_usuario(self, valor):
         self.__tipo_usuario = valor
 
+    @token_recuperacao.setter
+    def token_recuperacao(self, valor):
+        self.__token_recuperacao = valor
+
+    @token_expiracao.setter
+    def token_expiracao(self, valor):
+        self.__token_expiracao = valor
+
     def to_dict(self):
         return {
             'email': self.__email,
             'senha_hash': self.__senha_hash,
             'url_foto': self.__url_foto,
             'username': self.__username,
-            'tipo_usuario': self.__tipo_usuario
+            'tipo_usuario': self.__tipo_usuario,
+            'token_recuperacao': self.__token_recuperacao,
+            'token_expiracao': self.__token_expiracao      
         }
