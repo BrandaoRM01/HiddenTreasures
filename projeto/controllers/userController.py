@@ -4,6 +4,7 @@ from projeto.models import User, HistoricoSenha
 from projeto.config import Config
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from email_validator import validate_email, EmailNotValidError
 import os
 
 class UserController:
@@ -27,6 +28,15 @@ class UserController:
             self.__dao_historico_senha.remover_senha_antiga(usuario.email)
 
         return True
+    
+    def __validar_email(self, email):
+        try:
+            validate_email(email)
+            return False
+        except EmailNotValidError as e:
+            print(f'Email inválido: {str(e)}')
+            flash('Informe um tipo de email válido!', 'danger')
+            return True
 
     def preparar_cadastro(self):
         if 'usuario' in session:
@@ -74,6 +84,9 @@ class UserController:
 
         if not email or not senha or not confirmar_senha or not username:
             flash('Informe os campos que são obrigatórios.', 'danger')
+            return redirect(url_for('user.cadastro'))
+        
+        if self.__validar_email(email):
             return redirect(url_for('user.cadastro'))
         
         if username.capitalize().strip() in lista_usernames:
@@ -129,7 +142,10 @@ class UserController:
         if not email or not senha:
             flash('Todos os campos são obrigatórios.', 'danger')
             return redirect(url_for('user.login'))
-
+        
+        if self.__validar_email(email):
+            return redirect(url_for('user.login'))
+     
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:

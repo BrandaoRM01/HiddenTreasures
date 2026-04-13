@@ -5,6 +5,7 @@ from projeto.models import User, HistoricoSenha
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from sib_api_v3_sdk import ApiClient, TransactionalEmailsApi, SendSmtpEmail
+from email_validator import validate_email, EmailNotValidError
 import secrets
 
 class HistoricoSenhaController:
@@ -29,6 +30,15 @@ class HistoricoSenhaController:
             self.__dao_historico.remover_senha_antiga(usuario.email)
 
         return True
+    
+    def __validar_email(self, email):
+        try:
+            validate_email(email)
+            return False
+        except EmailNotValidError as e:
+            print(f'Email inválido: {str(e)}')
+            flash('Informe um tipo de email válido!', 'danger')
+            return True
 
     def __enviar_email_brevo(self, email_destino, link):
 
@@ -79,6 +89,9 @@ class HistoricoSenhaController:
 
     def enviar_recuperacao(self):
         email = request.form.get('email')
+
+        if self.__validar_email(email):
+            return redirect(url_for('historico_senhas.recuperar_senha'))
 
         usuario = self.__dao.buscar_usuario_por_email(email)
 
