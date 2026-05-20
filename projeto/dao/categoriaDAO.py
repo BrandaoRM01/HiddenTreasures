@@ -1,22 +1,13 @@
 from projeto.models import Categoria
+from . import BaseDAO
 from projeto.config import Config
-import mysql.connector
 import os
 
-class CategoriaDAO:
+class CategoriaDAO(BaseDAO):
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
+        super().__init__()
 
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
-    
     def __criar_categoria(self, linha):
         return Categoria(
             nome=linha['nome'],
@@ -42,7 +33,7 @@ class CategoriaDAO:
         """
         lista_categorias = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -70,7 +61,7 @@ class CategoriaDAO:
             nova_categoria.descricao
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -95,7 +86,7 @@ class CategoriaDAO:
 
         valor = [id_categoria]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -125,7 +116,7 @@ class CategoriaDAO:
             categoria_atualizada.id
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -145,7 +136,7 @@ class CategoriaDAO:
 
         categoria = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -165,7 +156,7 @@ class CategoriaDAO:
         """
         nomes_categorias = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:

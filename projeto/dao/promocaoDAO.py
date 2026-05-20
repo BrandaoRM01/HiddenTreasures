@@ -1,20 +1,10 @@
 from projeto.models import Promocao
-from projeto.config import Config
-import mysql.connector
+from . import BaseDAO
 
-class PromocaoDAO:  
+class PromocaoDAO(BaseDAO):  
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
-
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
+        super().__init__()
     
     def __criar_promocao(self, linha):
         return Promocao(
@@ -45,7 +35,7 @@ class PromocaoDAO:
             nova_promocao.data_fim
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -70,7 +60,7 @@ class PromocaoDAO:
         """
         lista_promocoes = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -99,7 +89,7 @@ class PromocaoDAO:
         """
         lista_promocoes = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -129,7 +119,7 @@ class PromocaoDAO:
         valor = [promocao_id]
         promocao_encontrada = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -150,7 +140,7 @@ class PromocaoDAO:
         """
         valor = [promocao_id]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -180,7 +170,7 @@ class PromocaoDAO:
             promocao_atualizada.id
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -197,7 +187,7 @@ class PromocaoDAO:
             WHERE data_fim < CURDATE()
         """
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -222,7 +212,7 @@ class PromocaoDAO:
         valor = [titulo]
         promocao_encontrada = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:

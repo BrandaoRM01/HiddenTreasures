@@ -1,22 +1,13 @@
 from projeto.models import PontoTuristico, Categoria, Promocao
+from . import BaseDAO
 from projeto.config import Config
-import mysql.connector
 import os
 
-class PontoTuristicoDAO:
+class PontoTuristicoDAO(BaseDAO):
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
+        super().__init__()
 
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
-    
     def __criar_ponto_turistico(self, linha):
         categoria = Categoria(
             id=linha['categoria_id'],
@@ -59,7 +50,7 @@ class PontoTuristicoDAO:
         valor = [id_ponto]
         resultado = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -97,7 +88,7 @@ class PontoTuristicoDAO:
         """
         lista_pontos = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -140,7 +131,7 @@ class PontoTuristicoDAO:
         valor = [limite]
         lista_pontos = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -183,7 +174,7 @@ class PontoTuristicoDAO:
         ponto = None
         valor = [id_ponto]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -223,7 +214,7 @@ class PontoTuristicoDAO:
             novo_ponto.promocao.id if novo_ponto.promocao else None
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -260,7 +251,7 @@ class PontoTuristicoDAO:
             ponto_atualizado.id
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -278,7 +269,7 @@ class PontoTuristicoDAO:
         '''
         valor = [id_ponto]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -328,7 +319,7 @@ class PontoTuristicoDAO:
         sql+= " GROUP BY p.id ORDER BY p.nome ASC"
         lista_pontos = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:

@@ -1,22 +1,13 @@
 from projeto.models import User
+from . import BaseDAO
 from projeto.config import Config
-import mysql.connector
 from werkzeug.security import generate_password_hash
 import os
 
-class UserDAO:
+class UserDAO(BaseDAO):
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
-
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
+        super().__init__()
     
     def __criar_usuario(self, linha):
         return User(
@@ -37,7 +28,7 @@ class UserDAO:
 
         resultado = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -93,7 +84,7 @@ class UserDAO:
             novo_usuario.tipo_usuario
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -113,7 +104,7 @@ class UserDAO:
 
         usuario_encontrado = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -137,7 +128,7 @@ class UserDAO:
         """
         lista_usuarios = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -160,7 +151,7 @@ class UserDAO:
         """
         valor = [email]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -189,7 +180,7 @@ class UserDAO:
         """
         lista_usernames = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -215,7 +206,7 @@ class UserDAO:
             usuario_atualizado.email
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -241,7 +232,7 @@ class UserDAO:
             usuario_atualizado.email
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -261,7 +252,7 @@ class UserDAO:
 
         valores = [token, expiracao, email]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -279,7 +270,7 @@ class UserDAO:
         '''
         valor = [token]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         usuario = None
@@ -306,7 +297,7 @@ class UserDAO:
         '''
         valor = [email]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:

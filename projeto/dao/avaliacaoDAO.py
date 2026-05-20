@@ -1,21 +1,11 @@
 from projeto.models import Avaliacao, User, PontoTuristico
-from projeto.config import Config
-import mysql.connector
+from . import BaseDAO
 
-class AvaliacaoDAO:
+class AvaliacaoDAO(BaseDAO):
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
+        super().__init__()  
 
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
-    
     def __criar_avaliacao(self, linha):
         usuario = User(
             email=linha['usuario_email'],
@@ -56,7 +46,7 @@ class AvaliacaoDAO:
             nova_avaliacao.comentario
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -94,7 +84,7 @@ class AvaliacaoDAO:
        
         avaliacoes_ponto = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -129,7 +119,7 @@ class AvaliacaoDAO:
 
         avaliacao_encontrada = None
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -162,7 +152,7 @@ class AvaliacaoDAO:
             avaliacao_atualizada.ponto_turistico.id
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -180,7 +170,7 @@ class AvaliacaoDAO:
         """
         valor = [usuario_email, ponto_id]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -220,7 +210,7 @@ class AvaliacaoDAO:
 
         avaliacoes_ponto = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:

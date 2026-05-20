@@ -1,21 +1,11 @@
-from projeto.config import Config
+from . import BaseDAO
 from werkzeug.security import check_password_hash
-import mysql.connector
 
-class HistoricoSenhaDAO:
+class HistoricoSenhaDAO(BaseDAO):
 
     def __init__(self):
-        self.__db_config = {
-            'host': Config.MYSQL_HOST,
-            'user': Config.MYSQL_USER,
-            'password': Config.MYSQL_PASSWORD,
-            'database': Config.MYSQL_DATABASE,
-            'port': Config.MYSQL_PORT
-        }
+        super().__init__()
 
-    def __get_connection(self):
-        return mysql.connector.connect(**self.__db_config)
-     
     def listar_senhas_usuario(self, usuario_email):
         sql = '''
             SELECT senha_hash
@@ -26,7 +16,7 @@ class HistoricoSenhaDAO:
         valor = [usuario_email]
         lista_senhas = []
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
@@ -55,7 +45,7 @@ class HistoricoSenhaDAO:
             historico_senhas.senha_hash
         ]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -74,7 +64,7 @@ class HistoricoSenhaDAO:
         '''
         valor = [usuario_email]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
@@ -92,7 +82,7 @@ class HistoricoSenhaDAO:
         '''
         valor = [usuario.email]
 
-        conexao = self.__get_connection()
+        conexao = self._get_connection()
         cursor = conexao.cursor()
 
         try:
