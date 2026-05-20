@@ -1,5 +1,5 @@
 from .ponto_turistico import PontoTuristico
-from .user import User
+from .usuario import User
 
 class Favorito:
 

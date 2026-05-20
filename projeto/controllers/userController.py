@@ -1,5 +1,6 @@
 from flask import flash, render_template, redirect, url_for, request, session
 from projeto.dao import UserDAO, HistoricoSenhaDAO
+from projeto.factorys import UsuarioFactory
 from projeto.models import User, HistoricoSenha
 from projeto.config import Config
 from werkzeug.utils import secure_filename
@@ -97,7 +98,7 @@ class UserController:
             flash('As senhas não coincidem. Por favor, tente novamente.', 'danger')
             return redirect(url_for('user.cadastro'))
         
-        usuario_senha = User(
+        usuario_senha = UsuarioFactory.criar_usuario(
             email=email,
             username=username.capitalize().strip()
         )
@@ -119,7 +120,7 @@ class UserController:
 
             foto.save(caminho)
 
-        novo_usuario = User(
+        novo_usuario = UsuarioFactory.criar_usuario(
             email=email,
             senha_hash=senha_hash,
             url_foto=nome_arquivo,
@@ -200,15 +201,13 @@ class UserController:
             flash('Usuário não encontrado', 'danger')
             return redirect(url_for('user.gerenciar_usuarios'))
 
-        if usuario.tipo_usuario == 'admin':
-            usuario.tipo_usuario = 'user'
-            self.__dao_usuario.alterar_permissao_usuario(usuario)
+        if usuario.tipo_usuario() == 'admin':
+            self.__dao_usuario.alterar_permissao_usuario(usuario, 'user')
             
             flash('Permissão alterada com sucesso', 'success')
             return redirect(url_for('user.gerenciar_usuarios'))
         else:
-            usuario.tipo_usuario = 'admin'
-            self.__dao_usuario.alterar_permissao_usuario(usuario)
+            self.__dao_usuario.alterar_permissao_usuario(usuario, 'admin')
             
             flash('Permissão alterada com sucesso', 'success')
             return redirect(url_for('user.gerenciar_usuarios'))
@@ -307,7 +306,7 @@ class UserController:
 
         tipo_usuario = session['usuario']['tipo_usuario']
 
-        usuario_atualizado = User(
+        usuario_atualizado = UsuarioFactory.criar_usuario(
             email=email,
             senha_hash=senha_hash,
             url_foto=nome_arquivo,

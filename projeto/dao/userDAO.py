@@ -1,5 +1,5 @@
-from projeto.models import User
 from . import BaseDAO
+from projeto.factorys import UsuarioFactory
 from projeto.config import Config
 from werkzeug.security import generate_password_hash
 import os
@@ -8,15 +8,6 @@ class UserDAO(BaseDAO):
 
     def __init__(self):
         super().__init__()
-    
-    def __criar_usuario(self, linha):
-        return User(
-            email=linha['email'],
-            senha_hash=linha['senha_hash'],
-            url_foto=linha['url_foto'],
-            username=linha['username'],
-            tipo_usuario=linha['tipo_usuario']
-        )
     
     def __pegar_foto_usuario(self, email):
         sql = """
@@ -51,12 +42,12 @@ class UserDAO(BaseDAO):
         if not usuario:
             senha_hash = generate_password_hash(superadmin_senha)
 
-            superadmin = User(
+            superadmin = UsuarioFactory.criar_usuario(
+                tipo_usuario="superadmin",
                 email=superadmin_email,
                 senha_hash=senha_hash,
                 url_foto="img/default/user_foto.webp",
-                username=superadmin_username.capitalize().strip(),
-                tipo_usuario="superadmin"
+                username=superadmin_username.capitalize().strip()
             )
 
             self.cadastrar_usuario(superadmin)
@@ -73,15 +64,12 @@ class UserDAO(BaseDAO):
             VALUES (%s, %s, %s, %s, %s)
         """
 
-        if not novo_usuario.tipo_usuario:
-            novo_usuario.tipo_usuario = 'user'
-
         valores = [
             novo_usuario.email,
             novo_usuario.senha_hash,
             novo_usuario.url_foto,
             novo_usuario.username,
-            novo_usuario.tipo_usuario
+            novo_usuario.tipo_usuario()
         ]
 
         conexao = self._get_connection()
@@ -112,7 +100,7 @@ class UserDAO(BaseDAO):
             resultado = cursor.fetchone()
 
             if resultado:
-                usuario_encontrado = self.__criar_usuario(resultado)
+                usuario_encontrado = UsuarioFactory.criar_usuario(**resultado)
              
         finally:
             cursor.close()
@@ -134,7 +122,7 @@ class UserDAO(BaseDAO):
         try:
             cursor.execute(sql)
             for linha in cursor.fetchall():
-                usuario = self.__criar_usuario(linha)
+                usuario = UsuarioFactory.criar_usuario(**linha)
 
                 lista_usuarios.append(usuario)
         finally:
@@ -195,14 +183,14 @@ class UserDAO(BaseDAO):
 
         return lista_usernames
     
-    def alterar_permissao_usuario(self, usuario_atualizado):
+    def alterar_permissao_usuario(self, usuario_atualizado, tipo_usuario):
         sql = '''
             UPDATE usuarios
             SET tipo_usuario = %s
             WHERE email = %s
         '''
         valores = [
-            usuario_atualizado.tipo_usuario,
+            tipo_usuario,
             usuario_atualizado.email
         ]
 
@@ -280,7 +268,7 @@ class UserDAO(BaseDAO):
             resultado = cursor.fetchone()
 
             if resultado:
-                usuario = self.__criar_usuario(resultado)
+                usuario = UsuarioFactory.criar_usuario(**resultado)
 
         finally:
             cursor.close()

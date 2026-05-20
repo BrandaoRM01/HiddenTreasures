@@ -17,13 +17,13 @@
                 <div>
                     <strong>{{ usuario.username }}</strong><br>
                     <small>{{ usuario.email }}</small><br>
-                    <span class="badge bg-secondary">{{ usuario.tipo_usuario }}</span>
+                    <span class="badge bg-secondary">{{ usuario.tipo_usuario() }}</span>
                 </div>
             </div>
 
-            {% if session['usuario']['tipo_usuario'] == 'superadmin' and usuario.tipo_usuario != 'superadmin' %}
+            {% if session['usuario']['tipo_usuario'] == 'superadmin' and usuario.tipo_usuario() != 'superadmin' %}
             <div class="d-flex gap-2">
-                {% if usuario.tipo_usuario == 'admin' %}
+                {% if usuario.tipo_usuario() == 'admin' %}
                 <a href="{{ url_for('user.alterar_permissao', email=usuario.email) }}"
                     class="btn btn-secondary btn-sm flex-fill">Remover Admin</a>
                 {% else %}

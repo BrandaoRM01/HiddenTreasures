@@ -1,4 +1,4 @@
-from .user import User
+from .usuario import User
 from .ponto_turistico import PontoTuristico
 
 class Avaliacao:

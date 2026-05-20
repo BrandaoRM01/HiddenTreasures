@@ -1,4 +1,5 @@
-from projeto.models import Avaliacao, User, PontoTuristico
+from projeto.models import Avaliacao, PontoTuristico
+from projeto.factorys import UsuarioFactory
 from . import BaseDAO
 
 class AvaliacaoDAO(BaseDAO):
@@ -7,7 +8,7 @@ class AvaliacaoDAO(BaseDAO):
         super().__init__()  
 
     def __criar_avaliacao(self, linha):
-        usuario = User(
+        usuario = UsuarioFactory.criar_usuario(
             email=linha['usuario_email'],
             username=linha['usuario_username'],
             url_foto=linha['usuario_url_foto']

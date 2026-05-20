@@ -1,4 +1,5 @@
-from projeto.models import Favorito, User, PontoTuristico
+from projeto.models import Favorito, PontoTuristico
+from projeto.factorys import UsuarioFactory
 from . import BaseDAO
 
 class FavoritoDAO(BaseDAO):
@@ -13,7 +14,7 @@ class FavoritoDAO(BaseDAO):
             localizacao=linha['localizacao']
         )
 
-        usuario = User(
+        usuario = UsuarioFactory.criar_usuario(
             email=linha['email'],
             username=linha['username']
         )

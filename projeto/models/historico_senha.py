@@ -1,4 +1,4 @@
-from .user import User
+from .usuario import User
 
 class HistoricoSenha:
     def __init__(self, usuario: User, senha_hash, criado_em=None):
