@@ -7,14 +7,17 @@ class CategoriaController:
     def __init__(self):
         self.__dao = CategoriaDAO()
 
+    def __usuario_pode_moderar(self):
+        return 'usuario' in session and session['usuario']['pode_moderar']
+
     def listar_categorias(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         return self.preparar_gerenciar_categorias()
     
     def preparar_gerenciar_categorias(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         lista = self.__dao.carregar_categorias()
@@ -22,7 +25,7 @@ class CategoriaController:
         return render_template('gerenciar_categorias.html', lista=lista)
     
     def cadastrar_categoria(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         nome = request.form.get('nome')
@@ -52,7 +55,7 @@ class CategoriaController:
         return redirect(url_for('categorias.gerenciar_categorias'))
     
     def remover_categoria(self, id_categoria):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         self.__dao.remover_categoria(id_categoria)
@@ -61,7 +64,7 @@ class CategoriaController:
         return redirect(url_for('categorias.gerenciar_categorias'))
     
     def preparar_editar_categoria(self, id_categoria):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
 
         categoria = self.__dao.buscar_categoria_por_id(id_categoria)
@@ -72,7 +75,7 @@ class CategoriaController:
         return render_template('editar_categoria.html', categoria=categoria)
     
     def atualizar_categoria(self, id_categoria):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         nome = request.form.get('nome')

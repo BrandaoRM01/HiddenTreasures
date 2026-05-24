@@ -8,8 +8,11 @@ class PromocaoController:
     def __init__(self):
         self.__dao = PromocaoDAO()
 
+    def __usuario_pode_moderar(self):
+        return 'usuario' in session and session['usuario']['pode_moderar']
+
     def preparar_gerenciar_promocoes(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         self.__dao.deletar_promocoes_expiradas()
@@ -18,7 +21,7 @@ class PromocaoController:
         return render_template('gerenciar_promocoes.html', lista_promocoes=lista_promocoes)
     
     def preparar_editar_promocao(self, id):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         promocao = self.__dao.pegar_promocao_por_id(id)
@@ -29,7 +32,7 @@ class PromocaoController:
         return render_template('editar_promocao.html', promocao=promocao)
     
     def cadastrar_promocao(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         titulo = request.form.get('titulo')
@@ -86,7 +89,7 @@ class PromocaoController:
         return redirect(url_for('promocoes.gerenciar_promocoes'))
     
     def remover_promocao(self, id):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         promocao = self.__dao.pegar_promocao_por_id(id)
@@ -99,7 +102,7 @@ class PromocaoController:
         return redirect(url_for('promocoes.gerenciar_promocoes'))
     
     def editar_promocao(self, id):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         promocao_atualizada = self.__dao.pegar_promocao_por_id(id)

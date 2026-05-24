@@ -17,6 +17,9 @@ class PontoTuristicoController:
     def __listar_pontos(self):
         return self.__dao_pontos.listar_pontos()
     
+    def __usuario_pode_moderar(self):
+        return 'usuario' in session and session['usuario']['pode_moderar']
+
     def preparar_index(self):
         pontos_promocao = []
 
@@ -56,7 +59,7 @@ class PontoTuristicoController:
         return render_template('sobre.html')
 
     def preparar_gerenciar_pontos(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         lista_pontos = self.__listar_pontos()
@@ -66,7 +69,7 @@ class PontoTuristicoController:
         return render_template('gerenciar_pontos.html', lista_pontos=lista_pontos, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes)
     
     def preparar_editar_ponto(self, id_ponto):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
@@ -121,7 +124,7 @@ class PontoTuristicoController:
         return render_template('detalhes_ponto.html', ponto=ponto, avaliacoes=avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(avaliacoes_ponto) )
     
     def cadastrar_ponto(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         nome = request.form.get('nome')
@@ -207,15 +210,15 @@ class PontoTuristicoController:
         return self.preparar_gerenciar_pontos()
     
     def remover_ponto(self, id_ponto):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
-                return render_template('erro.html')
+        if not self.__usuario_pode_moderar():
+            return render_template('erro.html')
         
         self.__dao_pontos.excluir_ponto(id_ponto)
         flash('Ponto turístico excluído com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()
     
     def editar_ponto(self, id_ponto):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         nome = request.form.get('nome')

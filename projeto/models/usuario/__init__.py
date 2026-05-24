@@ -70,6 +70,10 @@ class Usuario(ABC):
     def pode_moderar(self):
         pass
 
+    @abstractmethod
+    def pode_gerenciar_usuarios(self):
+        pass
+
 from .user import User
 from .admin import Admin
 from .superadmin import Superadmin

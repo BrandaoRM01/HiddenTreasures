@@ -13,6 +13,12 @@ class UserController:
         self.__dao_usuario = UserDAO()
         self.__dao_historico_senha = HistoricoSenhaDAO()
 
+    def __usuario_pode_moderar(self):
+        return 'usuario' in session and session['usuario']['pode_moderar']
+    
+    def __usuario_pode_gerenciar_usuarios(self):
+        return 'usuario' in session and session['usuario']['pode_gerenciar_usuarios']
+
     def __verificar_senha(self, usuario, senha, senha_hash):
         if len(senha) < 8:
             flash('A senha deve ter pelo menos 8 caracteres.', 'danger')
@@ -56,13 +62,12 @@ class UserController:
         return render_template('editar_perfil.html')
     
     def preparar_painel_admin(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['admin', 'superadmin']:
-
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         return render_template('painel_admin.html')
     
     def preparar_gerenciar_usuarios(self):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] not in ['superadmin', 'admin']:
+        if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         usuarios = self.__dao_usuario.listar_usuarios()
@@ -171,7 +176,7 @@ class UserController:
         return redirect(url_for('pontos.index'))
     
     def excluir_usuario(self, email):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] != 'superadmin':
+        if not self.__usuario_pode_gerenciar_usuarios():
             return render_template('erro.html')
 
         self.__dao_usuario.excluir_usuario(email)
@@ -179,7 +184,7 @@ class UserController:
         return redirect(url_for('user.gerenciar_usuarios'))
     
     def apagar_perfil(self, email):
-        if 'usuario' not in session or session['usuario']['email'] != email or session['usuario']['tipo_usuario'] == 'superadmin':
+        if not self.__usuario_pode_gerenciar_usuarios() and session['usuario']['email'] != email:
             return render_template('erro.html')
 
         self.__dao_usuario.excluir_usuario(email)
@@ -188,7 +193,7 @@ class UserController:
         return redirect(url_for('pontos.index'))
     
     def alterar_permissao(self, usuario_email):
-        if 'usuario' not in session or session['usuario']['tipo_usuario'] != 'superadmin':
+        if not self.__usuario_pode_gerenciar_usuarios():
             return render_template('erro.html')
         
         if usuario_email == session['usuario']['email']:

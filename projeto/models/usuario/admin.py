@@ -10,6 +10,9 @@ class Admin(Usuario):
     
     def pode_moderar(self):
         return True
+    
+    def pode_gerenciar_usuarios(self):
+        return False
 
     def to_dict(self):
         return {
@@ -19,5 +22,7 @@ class Admin(Usuario):
             'username': self.username,
             'tipo_usuario': self.tipo_usuario(),
             'token_recuperacao': self.token_recuperacao,
-            'token_expiracao': self.token_expiracao      
+            'token_expiracao': self.token_expiracao,
+            'pode_moderar': self.pode_moderar(),
+            'pode_gerenciar_usuarios': self.pode_gerenciar_usuarios()
         }
