@@ -3,7 +3,7 @@ from .promocao import Promocao
 
 class PontoTuristico:
 
-    def __init__(self,  nome, localizacao, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None):
+    def __init__(self,  nome, localizacao, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None):
         self.__url_imagem = url_imagem
         self.__nome = nome
         self.__localizacao = localizacao
@@ -13,6 +13,7 @@ class PontoTuristico:
         self.__custo_entrada = custo_entrada
         self.__categoria = categoria
         self.__promocao = promocao
+        self.__avaliacoes = avaliacoes if avaliacoes is not None else []
         self.__id = id
 
     @property
@@ -55,6 +56,10 @@ class PontoTuristico:
     def promocao(self):
         return self.__promocao
     
+    @property
+    def avaliacoes(self):
+        return self.__avaliacoes
+    
     @media_avaliacao.setter
     def media_avaliacao(self, valor):
         self.__media_avaliacao = valor
@@ -95,6 +100,13 @@ class PontoTuristico:
     def promocao(self, valor):
         self.__promocao = valor
 
+    @avaliacoes.setter
+    def avaliacoes(self, valor):
+        self.__avaliacoes = valor
+
+    def adicionar_avaliacao(self, avaliacao):
+        self.__avaliacoes.append(avaliacao)
+
     def to_dict(self):
         return {
             'id': self.__id,
@@ -106,5 +118,6 @@ class PontoTuristico:
             'custo_entrada': self.__custo_entrada,
             'media_avaliacao': self.__media_avaliacao,
             'categoria': self.__categoria.to_dict(),
-            'promocao': self.__promocao.to_dict() if self.__promocao else None
+            'promocao': self.__promocao.to_dict() if self.__promocao else None,
+            'avaliacoes': [avaliacao.to_dict() for avaliacao in self.__avaliacoes]
         }

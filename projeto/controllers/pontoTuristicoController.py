@@ -104,6 +104,7 @@ class PontoTuristicoController:
     def preparar_detalhes_ponto(self, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
         usuario_email = None
+        avaliacao_usuario = None
 
         if not ponto:
             flash('Ponto turístico não encontrado.', 'danger')
@@ -112,16 +113,14 @@ class PontoTuristicoController:
         if 'usuario' in session:
             usuario_email = session['usuario']['email']
 
-        avaliacoes = self.__dao_avaliacoes.listar_ultimas_avaliacoes_ponto(id_ponto, usuario_email)
+        for avaliacao in ponto.avaliacoes:
+            if usuario_email and avaliacao.usuario.email == usuario_email:
+                avaliacao_usuario = avaliacao
+                break
+                
+        ultimas_avaliacoes = ponto.avaliacoes[-5:]
 
-        avaliacao_usuario = self.__dao_avaliacoes.buscar_avaliacao(usuario_email, id_ponto)
-
-        avaliacoes_ponto = self.__dao_avaliacoes.listar_avaliacoes_por_ponto(id_ponto, usuario_email)
-
-        if not avaliacao_usuario:
-            avaliacao_usuario = None
-
-        return render_template('detalhes_ponto.html', ponto=ponto, avaliacoes=avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(avaliacoes_ponto) )
+        return render_template('detalhes_ponto.html', ponto=ponto, avaliacoes=ultimas_avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(ponto.avaliacoes) )
     
     def cadastrar_ponto(self):
         if not self.__usuario_pode_moderar():

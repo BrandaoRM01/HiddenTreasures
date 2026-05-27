@@ -1,4 +1,5 @@
-from projeto.models import PontoTuristico, Categoria, Promocao
+from projeto.models import PontoTuristico, Categoria, Promocao, Avaliacao
+from projeto.factorys import UsuarioFactory, AvaliacaoFactory
 from . import BaseDAO
 from projeto.config import Config
 import os
@@ -14,7 +15,7 @@ class PontoTuristicoDAO(BaseDAO):
             nome=linha['categoria_nome']
         )
 
-        media_avaliacao = float(linha['media_avaliacao']) if linha['media_avaliacao'] is not None else None
+        media_avaliacao = self.__calcular_media_avaliacao(linha['id'])
 
         if linha['promocao_id'] is not None:
             promocao = Promocao(
@@ -41,6 +42,28 @@ class PontoTuristicoDAO(BaseDAO):
             promocao=promocao
         )
     
+    def __calcular_media_avaliacao(self, ponto_id):
+        sql = """
+            SELECT AVG(nota) AS media_avaliacao
+            FROM avaliacoes
+            WHERE ponto_id = %s
+        """
+        valor = [ponto_id]
+        media_avaliacao = None
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql, valor)
+            resultado = cursor.fetchone()
+            media_avaliacao = float(resultado['media_avaliacao']) if resultado['media_avaliacao'] is not None else None 
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return media_avaliacao
+
     def __pegar_imagem_ponto(self, id_ponto):
         sql = """
             SELECT url_imagem
@@ -68,25 +91,35 @@ class PontoTuristicoDAO(BaseDAO):
                 p.*,
                 c.id AS categoria_id,
                 c.nome AS categoria_nome,
-                AVG(a.nota) AS media_avaliacao,
 
                 pr.id AS promocao_id,
                 pr.titulo AS promocao_titulo,
                 pr.desconto AS promocao_desconto,
                 pr.data_inicio AS promocao_data_inicio,
                 pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario
 
             FROM pontos_turisticos AS p
 
-            JOIN categorias AS c ON p.categoria_id = c.id
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
-            GROUP BY p.id
             ORDER BY p.nome ASC
         """
-        lista_pontos = []
+        pontos_map = {}
 
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
@@ -94,14 +127,28 @@ class PontoTuristicoDAO(BaseDAO):
         try:
             cursor.execute(sql)
             for linha in cursor.fetchall():
-                ponto = self.__criar_ponto_turistico(linha)
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
 
-                lista_pontos.append(ponto)
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                        pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+                
         finally:
             cursor.close()
             conexao.close()
 
-        return lista_pontos
+        return list(pontos_map.values())
     
     def listar_top_pontos(self, limite=10):
         sql = """
@@ -109,27 +156,36 @@ class PontoTuristicoDAO(BaseDAO):
                 p.*,
                 c.id AS categoria_id,
                 c.nome AS categoria_nome,
-                AVG(a.nota) AS media_avaliacao,
 
                 pr.id AS promocao_id,
                 pr.titulo AS promocao_titulo,
                 pr.desconto AS promocao_desconto,
                 pr.data_inicio AS promocao_data_inicio,
                 pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario
 
             FROM pontos_turisticos AS p
 
-            JOIN categorias AS c ON p.categoria_id = c.id
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
-            GROUP BY p.id
-            ORDER BY media_avaliacao DESC, p.nome ASC
             LIMIT %s
         """
         valor = [limite]
-        lista_pontos = []
+        pontos_map = {}
 
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
@@ -137,39 +193,62 @@ class PontoTuristicoDAO(BaseDAO):
         try:
             cursor.execute(sql, valor)
             for linha in cursor.fetchall():
-                ponto = self.__criar_ponto_turistico(linha)
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
 
-                lista_pontos.append(ponto)
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                        pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
             
         finally:
             cursor.close()
             conexao.close()
 
-        return lista_pontos
-    
+        return sorted(list(pontos_map.values()), key=lambda ponto: (-ponto.media_avaliacao, ponto.nome))
+
     def buscar_ponto_por_id(self, id_ponto):
         sql = """
             SELECT 
                 p.*,
                 c.id AS categoria_id,
                 c.nome AS categoria_nome,
-                AVG(a.nota) AS media_avaliacao,
 
                 pr.id AS promocao_id,
                 pr.titulo AS promocao_titulo,
                 pr.desconto AS promocao_desconto,
                 pr.data_inicio AS promocao_data_inicio,
                 pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario
 
             FROM pontos_turisticos AS p
 
-            JOIN categorias AS c ON p.categoria_id = c.id
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
             WHERE p.id = %s
-            GROUP BY p.id
         """
         ponto = None
         valor = [id_ponto]
@@ -179,9 +258,24 @@ class PontoTuristicoDAO(BaseDAO):
 
         try:
             cursor.execute(sql, valor)
-            linha = cursor.fetchone()
-            if linha:
-                ponto = self.__criar_ponto_turistico(linha)
+            resultado = cursor.fetchall()
+            for linha in resultado:
+                if not ponto:
+                    ponto = self.__criar_ponto_turistico(linha)
+
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in ponto.avaliacoes:
+                        ponto.adicionar_avaliacao(avaliacao)
+            ponto.avaliacoes.sort(key=lambda avaliacao: avaliacao.data_avaliacao,reverse=True)
         finally:
             cursor.close()
             conexao.close()

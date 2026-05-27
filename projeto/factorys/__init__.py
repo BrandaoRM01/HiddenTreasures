@@ -1,1 +1,2 @@
 from .usuarioFactory import UsuarioFactory
+from .avaliacaoFactory import AvaliacaoFactory

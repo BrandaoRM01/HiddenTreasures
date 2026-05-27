@@ -170,6 +170,9 @@
     </div>
     {% else %}
     {% for avaliacao in avaliacoes %}
+
+    {% if not avaliacao_usuario or avaliacao.usuario.email != avaliacao_usuario.usuario.email %}
+
     <div class="card shadow-sm mb-3">
         <div class="card-body">
 
@@ -209,10 +212,14 @@
 
         </div>
     </div>
+    {% endif %}
     {% endfor %}
     {% endif %}
 
+
 </div>
+
+
 
 {% endblock conteudo %}
 

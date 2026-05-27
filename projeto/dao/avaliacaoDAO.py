@@ -1,5 +1,4 @@
-from projeto.models import Avaliacao, PontoTuristico
-from projeto.factorys import UsuarioFactory
+from projeto.factorys import UsuarioFactory, AvaliacaoFactory
 from . import BaseDAO
 
 class AvaliacaoDAO(BaseDAO):
@@ -7,27 +6,6 @@ class AvaliacaoDAO(BaseDAO):
     def __init__(self):
         super().__init__()  
 
-    def __criar_avaliacao(self, linha):
-        usuario = UsuarioFactory.criar_usuario(
-            email=linha['usuario_email'],
-            username=linha['usuario_username'],
-            url_foto=linha['usuario_url_foto']
-        )
-
-        ponto_turistico = PontoTuristico(
-            id=linha['ponto_id'],
-            nome=linha['ponto_nome'],
-            localizacao=linha['ponto_localizacao']
-        )
-
-        return Avaliacao(
-            usuario=usuario,
-            ponto_turistico=ponto_turistico,
-            nota=linha['nota'],
-            data_avaliacao=linha['data_avaliacao'],
-            comentario=linha['comentario']
-        )
-   
     def cadastrar_avaliacao(self, nova_avaliacao):
         sql = """
             INSERT INTO avaliacoes (
@@ -41,7 +19,7 @@ class AvaliacaoDAO(BaseDAO):
         """
         valores = [
             nova_avaliacao.usuario.email,
-            nova_avaliacao.ponto_turistico.id,
+            nova_avaliacao.ponto_id,
             nova_avaliacao.nota,
             nova_avaliacao.data_avaliacao,
             nova_avaliacao.comentario
@@ -64,6 +42,7 @@ class AvaliacaoDAO(BaseDAO):
                 u.email AS usuario_email,
                 u.username AS usuario_username,
                 u.url_foto AS usuario_url_foto,
+                u.tipo_usuario,
                 p.id AS ponto_id,
                 p.nome AS ponto_nome,
                 p.localizacao AS ponto_localizacao
@@ -92,7 +71,20 @@ class AvaliacaoDAO(BaseDAO):
             cursor.execute(sql, valores)
 
             for linha in cursor.fetchall():
-                avaliacao = self.__criar_avaliacao(linha)
+                usuario = UsuarioFactory.criar_usuario(
+                    email=linha['usuario_email'],
+                    username=linha['usuario_username'],
+                    url_foto=linha['usuario_url_foto'],
+                    tipo_usuario=linha['tipo_usuario']
+                )
+
+                avaliacao = AvaliacaoFactory.criar_avaliacao(
+                    usuario=usuario,
+                    ponto_id=linha['ponto_id'],
+                    nota=linha['nota'],
+                    data_avaliacao=linha['data_avaliacao'],
+                    comentario=linha['comentario']
+                )
                 avaliacoes_ponto.append(avaliacao)
 
         finally:
@@ -108,6 +100,7 @@ class AvaliacaoDAO(BaseDAO):
                 u.email AS usuario_email,
                 u.username AS usuario_username,
                 u.url_foto AS usuario_url_foto,
+                u.tipo_usuario,
                 p.id AS ponto_id,
                 p.nome AS ponto_nome,
                 p.localizacao AS ponto_localizacao
@@ -128,7 +121,20 @@ class AvaliacaoDAO(BaseDAO):
             linha = cursor.fetchone()
 
             if linha:
-                avaliacao_encontrada = self.__criar_avaliacao(linha)
+                usuario = UsuarioFactory.criar_usuario(
+                    email=linha['usuario_email'],
+                    username=linha['usuario_username'],
+                    url_foto=linha['usuario_url_foto'],
+                    tipo_usuario=linha['tipo_usuario']
+                )
+
+                avaliacao_encontrada = AvaliacaoFactory.criar_avaliacao(
+                    usuario=usuario,
+                    ponto_id=linha['ponto_id'],
+                    nota=linha['nota'],
+                    data_avaliacao=linha['data_avaliacao'],
+                    comentario=linha['comentario']
+                )
 
         finally:
             cursor.close()
@@ -150,7 +156,7 @@ class AvaliacaoDAO(BaseDAO):
             avaliacao_atualizada.comentario,
             avaliacao_atualizada.data_avaliacao,
             avaliacao_atualizada.usuario.email,
-            avaliacao_atualizada.ponto_turistico.id
+            avaliacao_atualizada.ponto_id
         ]
 
         conexao = self._get_connection()
@@ -218,7 +224,20 @@ class AvaliacaoDAO(BaseDAO):
             cursor.execute(sql, valores)
 
             for linha in cursor.fetchall():
-                avaliacao = self.__criar_avaliacao(linha)
+                usuario = UsuarioFactory.criar_usuario(
+                    email=linha['usuario_email'],
+                    username=linha['usuario_username'],
+                    url_foto=linha['usuario_url_foto'],
+                    tipo_usuario=linha['tipo_usuario']
+                )
+
+                avaliacao = AvaliacaoFactory.criar_avaliacao(
+                    usuario=usuario,
+                    ponto_id=linha['ponto_id'],
+                    nota=linha['nota'],
+                    data_avaliacao=linha['data_avaliacao'],
+                    comentario=linha['comentario']
+                )
                 avaliacoes_ponto.append(avaliacao)
 
         finally:

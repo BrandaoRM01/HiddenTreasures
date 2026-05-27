@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
-from projeto.dao import AvaliacaoDAO, PontoTuristicoDAO, UserDAO
-from projeto.models import Avaliacao
+from projeto.dao import AvaliacaoDAO, UserDAO, PontoTuristicoDAO
+from projeto.factorys import AvaliacaoFactory
 from datetime import datetime
 
 class AvaliacaoController:
@@ -93,12 +93,12 @@ class AvaliacaoController:
         if comentario:
             comentario = comentario.strip().capitalize()
         
-        nova_avaliacao = Avaliacao(
+        nova_avaliacao = AvaliacaoFactory.criar_avaliacao(
             usuario=usuario,
-            ponto_turistico=ponto,
+            ponto_id=ponto_id,
             nota=nota,
-            comentario=comentario,
-            data_avaliacao=data_avaliacao
+            data_avaliacao=data_avaliacao,
+            comentario=comentario
         )
 
         self.__dao_avaliacao.cadastrar_avaliacao(nova_avaliacao)
@@ -156,12 +156,12 @@ class AvaliacaoController:
         if comentario:
             comentario = comentario.strip().capitalize()
 
-        avaliacao_atualizada = Avaliacao(
+        avaliacao_atualizada = AvaliacaoFactory.criar_avaliacao(
             usuario=avaliacao.usuario,
-            ponto_turistico=avaliacao.ponto_turistico,
+            ponto_id=avaliacao.ponto_id,
             nota=nota,
-            comentario=comentario,
-            data_avaliacao=avaliacao.data_avaliacao
+            data_avaliacao=avaliacao.data_avaliacao,
+            comentario=comentario
         )
 
         self.__dao_avaliacao.atualizar_avaliacao(avaliacao_atualizada)

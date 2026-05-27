@@ -1,11 +1,10 @@
 from .usuario import User
-from .ponto_turistico import PontoTuristico
 
 class Avaliacao:
 
-    def __init__(self, usuario: User, ponto_turistico: PontoTuristico, nota, data_avaliacao, comentario=None):
+    def __init__(self, usuario: User, ponto_id, nota, data_avaliacao, comentario=None):
         self.__usuario = usuario
-        self.__ponto_turistico = ponto_turistico
+        self.__ponto_id = ponto_id
         self.__nota = nota
         self.__data_avaliacao = data_avaliacao
         self.__comentario = comentario
@@ -15,8 +14,8 @@ class Avaliacao:
         return self.__usuario
     
     @property
-    def ponto_turistico(self):
-        return self.__ponto_turistico
+    def ponto_id(self):
+        return self.__ponto_id
 
     @property
     def nota(self):
@@ -34,9 +33,9 @@ class Avaliacao:
     def usuario(self, valor):
         self.__usuario = valor
 
-    @ponto_turistico.setter
-    def ponto_turistico(self, valor):
-        self.__ponto_turistico = valor
+    @ponto_id.setter
+    def ponto_id(self, valor):
+        self.__ponto_id = valor
 
     @nota.setter
     def nota(self, valor):
@@ -53,7 +52,7 @@ class Avaliacao:
     def to_dict(self):
         return {
             'usuario': self.__usuario.to_dict(),
-            'ponto_turistico': self.__ponto_turistico.to_dict(),
+            'ponto_id': self.__ponto_id,
             'nota': self.__nota,
             'data_avaliacao': self.__data_avaliacao.isoformat(),
             'comentario': self.__comentario
