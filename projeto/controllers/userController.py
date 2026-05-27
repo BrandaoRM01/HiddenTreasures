@@ -1,7 +1,7 @@
 from flask import flash, render_template, redirect, url_for, request, session
 from projeto.dao import UserDAO, HistoricoSenhaDAO
 from projeto.factorys import UsuarioFactory
-from projeto.models import User, HistoricoSenha
+from projeto.models import User, HistoricoSenha, usuario
 from projeto.config import Config
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -72,6 +72,19 @@ class UserController:
         
         usuarios = self.__dao_usuario.listar_usuarios()
         return render_template('gerenciar_usuarios.html', usuarios=usuarios)
+    
+    def preparar_pagina_anterior(self):
+        return redirect(request.referrer or url_for('pontos.index'))
+
+    def preparar_favoritos(self, email):
+        if 'usuario' not in session:
+            return render_template('erro.html')
+        
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        favoritos = usuario.pontos_favoritos
+        
+        return render_template('favoritos.html', favoritos=favoritos)
     
     def cadastrar_usuario(self):
         email = request.form.get('email')
@@ -329,3 +342,31 @@ class UserController:
 
         flash('Usuário atualizado com sucesso!', 'success')
         return redirect(url_for('pontos.index'))
+    
+    def alterar_favorito(self):
+        if 'usuario' not in session:
+            return render_template('erro.html')
+        
+        usuario_email = session['usuario']['email']
+        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+        ponto_id = request.form.get('ponto_id')
+
+        if not ponto_id:
+            flash('Ponto turístico não encontrado', 'danger')
+
+        if self.__dao_usuario.verificar_favorito(usuario_email, ponto_id):
+            self.__dao_usuario.deletar_favorito(usuario_email, ponto_id)
+
+            usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+            session['usuario'] = usuario.to_dict()
+
+            flash('Ponto turístico desfavoritado com sucesso', 'success')
+            return redirect(request.referrer or url_for('pontos.index'))
+          
+        self.__dao_usuario.adicionar_favorito(ponto_id, usuario_email)
+
+        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+        session['usuario'] = usuario.to_dict()
+
+        flash('Ponto turístico favoritado com sucesso!', 'success')
+        return redirect(request.referrer or url_for('pontos.index'))

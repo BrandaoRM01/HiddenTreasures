@@ -1,8 +1,8 @@
-from .usuario import User
+from .usuario import Usuario
 
 class Avaliacao:
 
-    def __init__(self, usuario: User, ponto_id, nota, data_avaliacao, comentario=None):
+    def __init__(self, usuario: Usuario, ponto_id, nota, data_avaliacao, comentario=None):
         self.__usuario = usuario
         self.__ponto_id = ponto_id
         self.__nota = nota

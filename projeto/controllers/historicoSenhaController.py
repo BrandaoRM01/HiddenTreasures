@@ -1,8 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from projeto.config import Config
 from projeto.dao import UserDAO, HistoricoSenhaDAO
-from projeto.models import HistoricoSenha
-from projeto.factorys import UsuarioFactory
+from projeto.factorys import UsuarioFactory, HistoricoSenhaFactory
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from sib_api_v3_sdk import ApiClient, TransactionalEmailsApi, SendSmtpEmail
@@ -139,7 +138,7 @@ class HistoricoSenhaController:
             tipo_usuario=usuario.tipo_usuario()
             )
         
-        historico = HistoricoSenha(
+        historico = HistoricoSenhaFactory.criar_historico_senha(
             usuario=usuario,
             senha_hash=senha_hash
         )

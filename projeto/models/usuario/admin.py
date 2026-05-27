@@ -2,8 +2,8 @@ from . import Usuario
 
 class Admin(Usuario):
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None):
-       super().__init__(email, username, senha_hash, url_foto, token_recuperacao, token_expiracao)
+    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, pontos_favoritos=None):
+       super().__init__(email, username, senha_hash, url_foto, token_recuperacao, token_expiracao, pontos_favoritos)
 
     def tipo_usuario(self):
         return 'admin'
@@ -24,5 +24,6 @@ class Admin(Usuario):
             'token_recuperacao': self.token_recuperacao,
             'token_expiracao': self.token_expiracao,
             'pode_moderar': self.pode_moderar(),
-            'pode_gerenciar_usuarios': self.pode_gerenciar_usuarios()
+            'pode_gerenciar_usuarios': self.pode_gerenciar_usuarios(),
+            'pontos_favoritos': [ponto.to_dict() for ponto in self.pontos_favoritos]
         }

@@ -46,3 +46,13 @@ def excluir_usuario(email):
 @user_bp.route('/admin/alterar-permissao/<email>', methods=['GET'])
 def alterar_permissao(email):
     return controller.alterar_permissao(email)
+
+@user_bp.route('/favoritos/<email>')
+def favoritos(email):
+    return controller.preparar_favoritos(email)
+
+@user_bp.route('/alterar-favorito', methods=['GET', 'POST'])
+def alterar_favorito():
+    if request.method == 'POST':
+        return controller.alterar_favorito()
+    return controller.preparar_pagina_anterior()

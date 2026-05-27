@@ -1,5 +1,5 @@
-from projeto.models import PontoTuristico, Categoria, Promocao, Avaliacao
-from projeto.factorys import UsuarioFactory, AvaliacaoFactory
+from projeto.models import PontoTuristico, Categoria, Promocao
+from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory
 from . import BaseDAO
 from projeto.config import Config
 import os
@@ -10,15 +10,15 @@ class PontoTuristicoDAO(BaseDAO):
         super().__init__()
 
     def __criar_ponto_turistico(self, linha):
-        categoria = Categoria(
+        categoria = CategoriaFactory.criar_categoria(
             id=linha['categoria_id'],
             nome=linha['categoria_nome']
         )
 
-        media_avaliacao = self.__calcular_media_avaliacao(linha['id'])
+        media_avaliacao = self.calcular_media_avaliacao(linha['id'])
 
         if linha['promocao_id'] is not None:
-            promocao = Promocao(
+            promocao = PromocaoFactory.criar_promocao(
                 id=linha['promocao_id'],
                 titulo=linha['promocao_titulo'],
                 data_inicio=linha['promocao_data_inicio'],
@@ -29,7 +29,7 @@ class PontoTuristicoDAO(BaseDAO):
         else:
             promocao = None
 
-        return PontoTuristico(
+        return PontoTuristicoFactory.criar_ponto_turistico(
             id=linha['id'],
             nome=linha['nome'],
             descricao=linha['descricao'],
@@ -42,7 +42,7 @@ class PontoTuristicoDAO(BaseDAO):
             promocao=promocao
         )
     
-    def __calcular_media_avaliacao(self, ponto_id):
+    def calcular_media_avaliacao(self, ponto_id):
         sql = """
             SELECT AVG(nota) AS media_avaliacao
             FROM avaliacoes
@@ -114,7 +114,7 @@ class PontoTuristicoDAO(BaseDAO):
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
             ORDER BY p.nome ASC
@@ -179,7 +179,7 @@ class PontoTuristicoDAO(BaseDAO):
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
             LIMIT %s
@@ -214,7 +214,7 @@ class PontoTuristicoDAO(BaseDAO):
             cursor.close()
             conexao.close()
 
-        return sorted(list(pontos_map.values()), key=lambda ponto: (-ponto.media_avaliacao, ponto.nome))
+        return sorted(list(pontos_map.values()), key=lambda ponto: (-(ponto.media_avaliacao or 0), ponto.nome))
 
     def buscar_ponto_por_id(self, id_ponto):
         sql = """
@@ -245,7 +245,7 @@ class PontoTuristicoDAO(BaseDAO):
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
             WHERE p.id = %s
@@ -388,7 +388,6 @@ class PontoTuristicoDAO(BaseDAO):
                 p.*,
                 c.id AS categoria_id,
                 c.nome AS categoria_nome,
-                AVG(a.nota) AS media_avaliacao,
                 pr.id AS promocao_id,
                 pr.titulo AS promocao_titulo,
                 pr.desconto AS promocao_desconto,
@@ -396,8 +395,7 @@ class PontoTuristicoDAO(BaseDAO):
                 pr.data_fim AS promocao_data_fim,
                 pr.descricao AS promocao_descricao
             FROM pontos_turisticos AS p
-            JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
         """
 

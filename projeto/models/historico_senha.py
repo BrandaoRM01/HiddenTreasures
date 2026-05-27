@@ -1,7 +1,7 @@
-from .usuario import User
+from .usuario import Usuario
 
 class HistoricoSenha:
-    def __init__(self, usuario: User, senha_hash, criado_em=None):
+    def __init__(self, usuario: Usuario, senha_hash, criado_em=None):
         self.__usuario = usuario         
         self.__senha_hash = senha_hash
         self.__criado_em = criado_em

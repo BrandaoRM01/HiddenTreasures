@@ -14,13 +14,12 @@
     </div>
 
     <div class="row">
-        {% for ponto in pontos %}
-        {% if ponto.favorito %}
+        {% for ponto in favoritos %}
 
         <div class="col-md-4 mb-4 d-flex">
             <div class="card shadow-sm card-hover card-ponto w-100 position-relative">
 
-                <form method="POST" action="{{ url_for('favoritos.alterar_favorito') }}"
+                <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
                     class="position-absolute bottom-50 start-0 m-2">
 
                     <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
@@ -57,13 +56,18 @@
                             {% if ponto.custo_entrada %}
                             {% if ponto.promocao %}
                             <span class="preco-antigo">
-                                R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                                R$ {{ "%.2f"|format(ponto.custo_entrada|float) }}
                             </span>
+
                             <span class="preco-promocao">
-                                R$ {{ "%.2f"|format(ponto.custo_entrada * (1 - ponto.promocao.desconto / 100)) }}
+                                R$ {{ "%.2f"|format((ponto.custo_entrada|float) * (1 - (ponto.promocao.desconto|float /
+                                100))) }}
                             </span>
+
                             {% else %}
-                            R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+
+                            R$ {{ "%.2f"|format(ponto.custo_entrada|float) }}
+
                             {% endif %}
                             {% else %}
                             <span class="preco-promocao">Gratuito</span>
@@ -80,11 +84,10 @@
             </div>
         </div>
 
-        {% endif %}
         {% endfor %}
     </div>
 
-    {% if not tem_favoritos %}
+    {% if not session['usuario']['pontos_favoritos'] %}
     <div class="alert alert-secondary text-center">
         Você ainda não favoritou nenhum ponto turístico.
     </div>

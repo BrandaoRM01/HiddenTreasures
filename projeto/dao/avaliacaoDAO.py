@@ -47,8 +47,8 @@ class AvaliacaoDAO(BaseDAO):
                 p.nome AS ponto_nome,
                 p.localizacao AS ponto_localizacao
             FROM avaliacoes AS a
-            JOIN usuarios AS u ON a.usuario_email = u.email
-            JOIN pontos_turisticos AS p ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
             WHERE a.ponto_id = %s
         """
         
@@ -105,8 +105,8 @@ class AvaliacaoDAO(BaseDAO):
                 p.nome AS ponto_nome,
                 p.localizacao AS ponto_localizacao
             FROM avaliacoes AS a
-            JOIN usuarios AS u ON a.usuario_email = u.email
-            JOIN pontos_turisticos AS p ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
             WHERE a.usuario_email = %s AND a.ponto_id = %s
         """
         valor = [usuario_email, ponto_id]
@@ -198,8 +198,8 @@ class AvaliacaoDAO(BaseDAO):
                 p.nome AS ponto_nome,
                 p.localizacao AS ponto_localizacao
             FROM avaliacoes AS a
-            JOIN usuarios AS u ON a.usuario_email = u.email
-            JOIN pontos_turisticos AS p ON a.ponto_id = p.id
+            INNER JOIN usuarios AS u ON a.usuario_email = u.email
+            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
             WHERE a.ponto_id = %s
         """
         

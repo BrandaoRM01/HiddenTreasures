@@ -1,4 +1,4 @@
-from projeto.models import Categoria
+from projeto.factorys import CategoriaFactory
 from . import BaseDAO
 from projeto.config import Config
 import os
@@ -7,14 +7,7 @@ class CategoriaDAO(BaseDAO):
 
     def __init__(self):
         super().__init__()
-
-    def __criar_categoria(self, linha):
-        return Categoria(
-            nome=linha['nome'],
-            descricao=linha['descricao'],
-            id=linha['id']
-        )
-    
+ 
     def __deletar_imagens(self, imagens):
         for (imagem,) in imagens:
             if imagem:
@@ -39,8 +32,11 @@ class CategoriaDAO(BaseDAO):
         try:
             cursor.execute(sql)
             for linha in cursor.fetchall():
-                categoria = self.__criar_categoria(linha)
-
+                categoria = CategoriaFactory.criar_categoria(
+                    nome=linha['nome'],
+                    descricao=linha['descricao'],
+                    id=linha['id']
+                )
                 lista_categorias.append(categoria)
         finally:
             cursor.close()

@@ -8,14 +8,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    from projeto.blueprints import user_bp, pontos_bp, categorias_bp, avaliacoes_bp, promocoes_bp, favoritos_bp, historico_senhas_bp
+    from projeto.blueprints import user_bp, pontos_bp, categorias_bp, avaliacoes_bp, promocoes_bp, historico_senhas_bp
 
     app.register_blueprint(pontos_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(categorias_bp)
     app.register_blueprint(avaliacoes_bp)
     app.register_blueprint(promocoes_bp)
-    app.register_blueprint(favoritos_bp)
     app.register_blueprint(historico_senhas_bp)
 
     with app.app_context():

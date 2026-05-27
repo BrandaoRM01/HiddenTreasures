@@ -1,20 +1,10 @@
-from projeto.models import Promocao
+from projeto.factorys import PromocaoFactory
 from . import BaseDAO
 
 class PromocaoDAO(BaseDAO):  
 
     def __init__(self):
         super().__init__()
-    
-    def __criar_promocao(self, linha):
-        return Promocao(
-            id=linha['id'],
-            titulo=linha['titulo'],
-            descricao=linha['descricao'],
-            desconto=linha['desconto'],
-            data_inicio=linha['data_inicio'],
-            data_fim=linha['data_fim']
-        )
     
     def cadastrar_promocao(self, nova_promocao):
         sql = """
@@ -66,7 +56,14 @@ class PromocaoDAO(BaseDAO):
         try:
             cursor.execute(sql)
             for linha in cursor.fetchall():
-                promocao = self.__criar_promocao(linha)
+                promocao = PromocaoFactory.criar_promocao(
+                    titulo=linha['titulo'],
+                    descricao=linha['descricao'],
+                    desconto=linha['desconto'],
+                    data_inicio=linha['data_inicio'],
+                    data_fim=linha['data_fim'],
+                    id=linha['id']
+                )
 
                 lista_promocoes.append(promocao)
         finally:
@@ -95,7 +92,14 @@ class PromocaoDAO(BaseDAO):
         try:
             cursor.execute(sql)
             for linha in cursor.fetchall():
-                promocao = self.__criar_promocao(linha)
+                promocao = PromocaoFactory.criar_promocao(
+                    titulo=linha['titulo'],
+                    descricao=linha['descricao'],
+                    desconto=linha['desconto'],
+                    data_inicio=linha['data_inicio'],
+                    data_fim=linha['data_fim'],
+                    id=linha['id']
+                )
 
                 lista_promocoes.append(promocao)
         finally:
@@ -124,7 +128,17 @@ class PromocaoDAO(BaseDAO):
 
         try:
             cursor.execute(sql, valor)
-            promocao_encontrada = cursor.fetchone()
+            linha = cursor.fetchone()
+
+            if linha:
+                promocao_encontrada = PromocaoFactory.criar_promocao(
+                    titulo=linha['titulo'],
+                    descricao=linha['descricao'],
+                    desconto=linha['desconto'],
+                    data_inicio=linha['data_inicio'],
+                    data_fim=linha['data_fim'],
+                    id=linha['id']
+                )
 
         finally:
             cursor.close()
@@ -220,7 +234,14 @@ class PromocaoDAO(BaseDAO):
             linha = cursor.fetchone()
 
             if linha:
-                promocao_encontrada = self.__criar_promocao(linha)
+                promocao_encontrada = PromocaoFactory.criar_promocao(
+                    titulo=linha['titulo'],
+                    descricao=linha['descricao'],
+                    desconto=linha['desconto'],
+                    data_inicio=linha['data_inicio'],
+                    data_fim=linha['data_fim'],
+                    id=linha['id']
+                )
 
         finally:
             cursor.close()

@@ -1,6 +1,6 @@
 from flask import flash, render_template, redirect, session, url_for, request
 from projeto.dao import CategoriaDAO
-from projeto.models import Categoria
+from projeto.factorys import CategoriaFactory
 
 class CategoriaController:
 
@@ -44,7 +44,7 @@ class CategoriaController:
         if not descricao:
             descricao = "Sem descrição"
 
-        nova_categoria = Categoria(
+        nova_categoria = CategoriaFactory.criar_categoria(
             nome=nome.capitalize().strip(), 
             descricao=descricao.capitalize().strip()
         )
@@ -96,7 +96,7 @@ class CategoriaController:
         if not descricao:
             descricao = "Sem descrição"
 
-        categoria_atualizada = Categoria(
+        categoria_atualizada = CategoriaFactory.criar_categoria(
             nome=nome.capitalize().strip(),
             descricao=descricao.capitalize().strip(),
             id=id_categoria

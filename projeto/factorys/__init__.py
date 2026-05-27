@@ -1,2 +1,6 @@
 from .usuarioFactory import UsuarioFactory
 from .avaliacaoFactory import AvaliacaoFactory
+from .categoriaFactory import CategoriaFactory
+from .historicoSenhaFactory import HistoricoSenhaFactory
+from .promocaoFactory import PromocaoFactory
+from .pontoTuristicoFactory import PontoTuristicoFactory

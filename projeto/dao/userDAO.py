@@ -1,5 +1,5 @@
 from . import BaseDAO
-from projeto.factorys import UsuarioFactory
+from projeto.factorys import UsuarioFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory
 from projeto.config import Config
 from werkzeug.security import generate_password_hash
 import os
@@ -8,6 +8,28 @@ class UserDAO(BaseDAO):
 
     def __init__(self):
         super().__init__()
+
+    def __calcular_media_avaliacao(self, ponto_id):
+        sql = """
+            SELECT AVG(nota) AS media_avaliacao
+            FROM avaliacoes
+            WHERE ponto_id = %s
+        """
+        valor = [ponto_id]
+        media_avaliacao = None
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql, valor)
+            resultado = cursor.fetchone()
+            media_avaliacao = float(resultado['media_avaliacao']) if resultado['media_avaliacao'] is not None else None 
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return media_avaliacao
     
     def __pegar_foto_usuario(self, email):
         sql = """
@@ -101,6 +123,10 @@ class UserDAO(BaseDAO):
 
             if resultado:
                 usuario_encontrado = UsuarioFactory.criar_usuario(**resultado)
+
+                favoritos = self.listar_favoritos_por_usuario(email)
+                for favorito in favoritos:
+                    usuario_encontrado.adicionar_ponto_favorito(favorito)
              
         finally:
             cursor.close()
@@ -123,6 +149,10 @@ class UserDAO(BaseDAO):
             cursor.execute(sql)
             for linha in cursor.fetchall():
                 usuario = UsuarioFactory.criar_usuario(**linha)
+
+                favoritos = self.listar_favoritos_por_usuario(usuario.email)
+                for favorito in favoritos:
+                    usuario.adicionar_ponto_favorito(favorito)
 
                 lista_usuarios.append(usuario)
         finally:
@@ -294,3 +324,134 @@ class UserDAO(BaseDAO):
         finally:
             cursor.close()
             conexao.close()
+
+    def listar_favoritos_por_usuario(self, usuario_email):
+        sql = '''
+            SELECT 
+                p.*,
+                c.id AS categoria_id,
+                c.nome AS categoria_nome,
+                pr.id AS promocao_id,
+                pr.titulo AS promocao_titulo,
+                pr.desconto AS promocao_desconto,
+                pr.data_inicio AS promocao_data_inicio,
+                pr.data_fim AS promocao_data_fim,
+                pr.descricao AS promocao_descricao
+            FROM pontos_turisticos AS p
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+            INNER JOIN favoritos AS f ON p.id = f.ponto_id
+            WHERE f.usuario_email = %s
+        '''
+        valor = [usuario_email]
+        lista_favoritos = []
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql, valor)
+            for linha in cursor.fetchall():
+                categoria = CategoriaFactory.criar_categoria(
+                    id=linha['categoria_id'],
+                    nome=linha['categoria_nome']
+                )
+
+                if linha['promocao_id']:
+                    promocao = PromocaoFactory.criar_promocao(
+                        id=linha['promocao_id'],
+                        titulo=linha['promocao_titulo'],
+                        desconto=linha['promocao_desconto'],
+                        data_inicio=linha['promocao_data_inicio'],
+                        data_fim=linha['promocao_data_fim'],
+                        descricao=linha['promocao_descricao']
+                    )
+                else:
+                    promocao = None
+
+                media_avaliacao = self.__calcular_media_avaliacao(linha['id'])
+
+                favorito = PontoTuristicoFactory.criar_ponto_turistico(
+                    id=linha['id'],
+                    nome=linha['nome'],
+                    descricao=linha['descricao'],
+                    localizacao=linha['localizacao'],
+                    categoria=categoria,
+                    promocao=promocao,
+                    media_avaliacao=media_avaliacao,
+                    horario_funcionamento=linha['horario_funcionamento'],
+                    url_imagem=linha['url_imagem'],
+                    custo_entrada=linha['custo_entrada']
+                )
+
+                lista_favoritos.append(favorito)
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return lista_favoritos
+    
+    def adicionar_favorito(self, ponto_id, usuario_email):
+        sql = ''' 
+            INSERT INTO favoritos (
+                usuario_email,
+                ponto_id
+            )
+            VALUES (%s, %s)
+        '''
+        valores = [
+            usuario_email,
+            ponto_id
+        ]
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valores)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+    
+    def deletar_favorito(self, usuario_email, ponto_id):
+        sql = '''
+            DELETE
+            FROM favoritos
+            WHERE usuario_email = %s AND ponto_id = %s
+        '''
+        valores = [
+            usuario_email,
+            ponto_id
+        ]
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valores)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+
+    def verificar_favorito(self, usuario_email, ponto_id):
+        sql = '''
+            SELECT 1
+            FROM favoritos
+            WHERE usuario_email = %s AND ponto_id = %s
+        '''
+        valores = [usuario_email, ponto_id]
+        favorito = None
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, valores)
+            favorito = cursor.fetchone() 
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return favorito

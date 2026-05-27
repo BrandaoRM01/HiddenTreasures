@@ -2,13 +2,14 @@ from abc import ABC, abstractmethod
 
 class Usuario(ABC):
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None):
+    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, pontos_favoritos=None):
         self.__email = email
         self.__senha_hash = senha_hash
         self.__url_foto = url_foto
         self.__username = username
         self.__token_recuperacao = token_recuperacao
         self.__token_expiracao = token_expiracao
+        self.__pontos_favoritos = pontos_favoritos if pontos_favoritos is not None else []
 
     @property
     def email(self):
@@ -34,6 +35,10 @@ class Usuario(ABC):
     def token_expiracao(self):
         return self.__token_expiracao
     
+    @property
+    def pontos_favoritos(self):
+        return self.__pontos_favoritos
+    
     @email.setter
     def email(self, valor):
         self.__email = valor
@@ -58,6 +63,14 @@ class Usuario(ABC):
     def token_expiracao(self, valor):
         self.__token_expiracao = valor
 
+    @pontos_favoritos.setter
+    def pontos_favoritos(self, valor):
+        self.__pontos_favoritos = valor
+
+    def adicionar_ponto_favorito(self, ponto):
+        if ponto not in self.__pontos_favoritos:
+            self.__pontos_favoritos.append(ponto)
+        
     @abstractmethod
     def to_dict(self):
         pass

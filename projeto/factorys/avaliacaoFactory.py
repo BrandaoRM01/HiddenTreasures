@@ -1,10 +1,10 @@
 
-from projeto.models import User, Avaliacao
+from projeto.models import Avaliacao, Usuario
 
 class AvaliacaoFactory:
 
     @staticmethod
-    def criar_avaliacao(usuario: User, ponto_id, nota, data_avaliacao, comentario):
+    def criar_avaliacao(usuario: Usuario, ponto_id, nota, data_avaliacao, comentario):
         return Avaliacao(
             usuario=usuario,
             ponto_id=ponto_id,

@@ -1,6 +1,6 @@
 from flask import flash, render_template, redirect, url_for, request, session
 from projeto.dao import PromocaoDAO
-from projeto.models import Promocao
+from projeto.factorys import PromocaoFactory
 from datetime import datetime
 
 class PromocaoController:
@@ -76,7 +76,7 @@ class PromocaoController:
             flash('A data de fim deve ser no futuro.', 'danger')
             return redirect(url_for('promocoes.gerenciar_promocoes'))
         
-        nova_promocao = Promocao(
+        nova_promocao = PromocaoFactory.criar_promocao(
             titulo=titulo.capitalize().strip(),
             descricao=descricao,
             desconto=desconto,
@@ -152,7 +152,7 @@ class PromocaoController:
             flash('A data de fim deve ser no futuro.', 'danger')
             return redirect(url_for('promocoes.editar_promocao', id=id))
         
-        promocao_atualizada = Promocao(
+        promocao_atualizada = PromocaoFactory.criar_promocao(
             id=id,
             titulo=titulo.capitalize().strip(),
             descricao=descricao,
