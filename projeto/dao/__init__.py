@@ -20,3 +20,5 @@ from .userDAO import UserDAO
 from .avaliacaoDAO import AvaliacaoDAO
 from .promocaoDAO import PromocaoDAO
 from .historicoSenhaDAO import HistoricoSenhaDAO
+from .ecossistemaDAO import EcossistemaDAO
+from .tipoCulturalDAO import TipoCulturalDAO

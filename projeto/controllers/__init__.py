@@ -4,3 +4,5 @@ from .userController import UserController
 from .avaliacaoController import AvaliacaoController
 from .promocaoController import PromocaoController
 from .historicoSenhaController import HistoricoSenhaController
+from .ecossistemaController import EcossistemaController
+from .tipoCulturalController import TipoCulturalController

@@ -1,5 +1,4 @@
-from projeto.models import PontoTuristico, Categoria, Promocao
-from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory
+from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, EcossistemaFactory, TipoCulturalFactory
 from . import BaseDAO
 from projeto.config import Config
 import os
@@ -29,18 +28,49 @@ class PontoTuristicoDAO(BaseDAO):
         else:
             promocao = None
 
-        return PontoTuristicoFactory.criar_ponto_turistico(
-            id=linha['id'],
-            nome=linha['nome'],
-            descricao=linha['descricao'],
-            localizacao=linha['localizacao'],
-            custo_entrada=linha['custo_entrada'],
-            horario_funcionamento=linha['horario_funcionamento'],
-            url_imagem=linha['url_imagem'],
-            media_avaliacao=media_avaliacao,
-            categoria=categoria,
-            promocao=promocao
-        )
+        if linha['tipo_ponto'] == 'cultural':
+            tipo_cultural = TipoCulturalFactory.criar_tipo_cultural(
+                id=linha['tipo_cultural_id'],
+                nome=linha['tipo_cultural_nome']
+            )
+            return PontoTuristicoFactory.criar_ponto_turistico(
+                id=linha['id'],
+                nome=linha['nome'],
+                descricao=linha['descricao'],
+                localizacao=linha['localizacao'],
+                custo_entrada=linha['custo_entrada'],
+                horario_funcionamento=linha['horario_funcionamento'],
+                url_imagem=linha['url_imagem'],
+                media_avaliacao=media_avaliacao,
+                categoria=categoria,
+                promocao=promocao,
+                tipo_ponto=linha['tipo_ponto'],
+                tipo_cultural=tipo_cultural,
+                ano_fundacao=linha['ano_fundacao'],
+                status=linha['status']
+            )
+        else:
+            ecossistema = EcossistemaFactory.criar_ecossistema(
+                id=linha['ecossistema_id'],
+                nome=linha['ecossistema_nome']
+            )
+
+            return PontoTuristicoFactory.criar_ponto_turistico(
+                id=linha['id'],
+                nome=linha['nome'],
+                descricao=linha['descricao'],
+                localizacao=linha['localizacao'],
+                custo_entrada=linha['custo_entrada'],
+                horario_funcionamento=linha['horario_funcionamento'],
+                url_imagem=linha['url_imagem'],
+                media_avaliacao=media_avaliacao,
+                categoria=categoria,
+                promocao=promocao,
+                tipo_ponto=linha['tipo_ponto'],
+                ecossistema=ecossistema,
+                area_km=linha['area_km2'],
+                status=linha['status']
+            )
     
     def calcular_media_avaliacao(self, ponto_id):
         sql = """
@@ -108,11 +138,19 @@ class PontoTuristicoDAO(BaseDAO):
                 u.email,
                 u.username,
                 u.url_foto,
-                u.tipo_usuario
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
@@ -173,11 +211,19 @@ class PontoTuristicoDAO(BaseDAO):
                 u.email,
                 u.username,
                 u.url_foto,
-                u.tipo_usuario
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
@@ -239,11 +285,19 @@ class PontoTuristicoDAO(BaseDAO):
                 u.email,
                 u.username,
                 u.url_foto,
-                u.tipo_usuario
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
@@ -388,14 +442,38 @@ class PontoTuristicoDAO(BaseDAO):
                 p.*,
                 c.id AS categoria_id,
                 c.nome AS categoria_nome,
+
                 pr.id AS promocao_id,
                 pr.titulo AS promocao_titulo,
                 pr.desconto AS promocao_desconto,
                 pr.data_inicio AS promocao_data_inicio,
                 pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome
+
             FROM pontos_turisticos AS p
+
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
         """
 

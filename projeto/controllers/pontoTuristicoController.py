@@ -1,6 +1,6 @@
 from flask import flash, render_template, redirect, url_for, request, session
-from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO
-from projeto.factorys import PontoTuristicoFactory, CategoriaFactory, PromocaoFactory
+from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO, TipoCulturalDAO, EcossistemaDAO
+from projeto.factorys import PontoTuristicoFactory, CategoriaFactory, PromocaoFactory, TipoCulturalFactory, EcossistemaFactory
 from projeto.config import Config
 from werkzeug.utils import secure_filename
 import os
@@ -12,6 +12,8 @@ class PontoTuristicoController:
         self.__dao_categorias = CategoriaDAO()
         self.__dao_usuario = UserDAO()
         self.__dao_promocoes = PromocaoDAO()
+        self.__dao_tipo_cultural = TipoCulturalDAO()
+        self.__dao_ecossistema = EcossistemaDAO()
 
     def __listar_pontos(self):
         return self.__dao_pontos.listar_pontos()
@@ -120,6 +122,11 @@ class PontoTuristicoController:
         categoria_id = request.form.get('categoria')
         promocao_id = request.form.get('promocao')
         foto = request.files.get('foto')
+        tipo_ponto = request.form.get('tipo_ponto')
+        tipo_cultural_id = request.form.get('tipo_cultural')
+        ano_fundacao = request.form.get('ano_fundacao')
+        ecossistema_id = request.form.get('ecossistema')
+        area_km = request.form.get('area_km')
 
         if not nome or not localizacao or not descricao or not categoria_id:
             flash('Por favor, preencha todos os campos obrigatórios.', 'danger')
@@ -132,6 +139,13 @@ class PontoTuristicoController:
                 custo_entrada = float(custo_entrada)
             except (ValueError, TypeError):
                 flash('Por favor, insira um valor válido para o custo de entrada.', 'danger')
+                return redirect(url_for('pontos.gerenciar_pontos'))
+            
+        if tipo_ponto == 'natural':
+            try:
+                area_km = float(area_km)
+            except (ValueError, TypeError):
+                flash('Por favor, insira um valor válido para a área.', 'danger')
                 return redirect(url_for('pontos.gerenciar_pontos'))
             
         if not horario_funcionamento:
@@ -178,16 +192,59 @@ class PontoTuristicoController:
         else:
             promocao = None
 
-        novo_ponto = PontoTuristicoFactory.criar_ponto_turistico(
-            nome=nome.capitalize().strip(),
-            localizacao=localizacao.capitalize().strip(),
-            descricao=descricao.capitalize().strip(),
-            horario_funcionamento=horario_funcionamento.capitalize().strip(),
-            custo_entrada=custo_entrada,
-            categoria=categoria,
-            promocao=promocao,
-            url_imagem=nome_arquivo
-        )
+        if tipo_ponto == "cultural":
+            tipo_cultural_dados = self.__dao_tipo_cultural.buscar_tipo_por_id(tipo_cultural_id)
+
+            if not tipo_cultural_dados:
+                flash('Tipo cultural selecionado não encontrado.', 'danger')
+                return redirect(url_for('pontos.gerenciar_pontos'))
+
+            tipo_cultural = TipoCulturalFactory.criar_tipo_cultural(
+                id=tipo_cultural_dados.id,
+                nome=tipo_cultural_dados.nome
+            )
+
+            novo_ponto = PontoTuristicoFactory.criar_ponto_turistico(
+                nome=nome.capitalize().strip(),
+                localizacao=localizacao.capitalize().strip(),
+                descricao=descricao.capitalize().strip(),
+                horario_funcionamento=horario_funcionamento.capitalize().strip(),
+                custo_entrada=custo_entrada,
+                categoria=categoria,
+                promocao=promocao,
+                url_imagem=nome_arquivo,
+                tipo_cultural=tipo_cultural,
+                ano_fundacao=ano_fundacao.strip() if ano_fundacao else "Não informado",
+                status="aprovado",
+                tipo_ponto=tipo_ponto
+            )
+        else:
+            ecossistema_dados = self.__dao_ecossistema.buscar_ecossistema_por_id(ecossistema_id)
+
+            if not ecossistema_dados:
+                flash('Ecossistema selecionado não encontrado.', 'danger')
+                return redirect(url_for('pontos.gerenciar_pontos'))
+
+            ecossistema = EcossistemaFactory.criar_ecossistema(
+                id=ecossistema_dados.id,
+                nome=ecossistema_dados.nome
+            )
+
+            novo_ponto = PontoTuristicoFactory.criar_ponto_turistico(
+                nome=nome.capitalize().strip(),
+                localizacao=localizacao.capitalize().strip(),
+                descricao=descricao.capitalize().strip(),
+                horario_funcionamento=horario_funcionamento.capitalize().strip(),
+                custo_entrada=custo_entrada,
+                categoria=categoria,
+                promocao=promocao,
+                url_imagem=nome_arquivo,
+                tipo_ponto=tipo_ponto,
+                ecossistema=ecossistema,
+                area_km=area_km if area_km else 0,
+                status="aprovado"
+            )
+
 
         self.__dao_pontos.cadastrar_ponto(novo_ponto)
 
@@ -214,6 +271,11 @@ class PontoTuristicoController:
         categoria_id = request.form.get('categoria')
         promocao_id = request.form.get('promocao')
         foto = request.files.get('foto')
+        tipo_ponto = request.form.get('tipo_ponto')
+        tipo_cultural_id = request.form.get('tipo_cultural')
+        ano_fundacao = request.form.get('ano_fundacao')
+        ecossistema_id = request.form.get('ecossistema')
+        area_km = request.form.get('area_km')
 
         if not nome or not localizacao or not descricao or not categoria_id:
             flash('Por favor, preencha todos os campos obrigatórios.', 'danger')
@@ -226,6 +288,13 @@ class PontoTuristicoController:
                 custo_entrada = float(custo_entrada)
             except (ValueError, TypeError):
                 flash('Por favor, insira um valor válido para o custo de entrada.', 'danger')
+                return redirect(url_for('pontos.editar_ponto', id=id_ponto))
+            
+        if tipo_ponto == 'natural':
+            try:
+                area_km = float(area_km)
+            except (ValueError, TypeError):
+                flash('Por favor, insira um valor válido para a área.', 'danger')
                 return redirect(url_for('pontos.editar_ponto', id=id_ponto))
             
         if not horario_funcionamento:
@@ -314,17 +383,60 @@ class PontoTuristicoController:
         else:
             promocao = None
 
-        ponto_atualizado = PontoTuristicoFactory.criar_ponto_turistico(
-            id=id_ponto,
-            nome=nome.capitalize().strip(),
-            localizacao=localizacao.capitalize().strip(),
-            descricao=descricao.capitalize().strip(),
-            horario_funcionamento=horario_funcionamento.capitalize().strip(),
-            custo_entrada=custo_entrada,
-            categoria=categoria,
-            promocao=promocao,
-            url_imagem=nome_arquivo
-        )
+        if tipo_ponto == "cultural":
+            tipo_cultural_dados = self.__dao_tipo_cultural.buscar_tipo_por_id(tipo_cultural_id)
+
+            if not tipo_cultural_dados:
+                flash('Tipo cultural selecionado não encontrado.', 'danger')
+                return redirect(url_for('pontos.editar_ponto', id=id_ponto))
+
+            tipo_cultural = TipoCulturalFactory.criar_tipo_cultural(
+                id=tipo_cultural_dados.id,
+                nome=tipo_cultural_dados.nome
+            )
+
+            ponto_atualizado = PontoTuristicoFactory.criar_ponto_turistico(
+                id=id_ponto,
+                nome=nome.capitalize().strip(),
+                localizacao=localizacao.capitalize().strip(),
+                descricao=descricao.capitalize().strip(),
+                horario_funcionamento=horario_funcionamento.capitalize().strip(),
+                custo_entrada=custo_entrada,
+                categoria=categoria,
+                promocao=promocao,
+                url_imagem=nome_arquivo,
+                tipo_cultural=tipo_cultural,
+                ano_fundacao=ano_fundacao.strip() if ano_fundacao else "Não informado",
+                status=ponto_existente.status,
+                tipo_ponto=tipo_ponto
+            )
+        else:
+            ecossistema_dados = self.__dao_ecossistema.buscar_ecossistema_por_id(ecossistema_id)
+
+            if not ecossistema_dados:
+                flash('Ecossistema selecionado não encontrado.', 'danger')
+                return redirect(url_for('pontos.editar_ponto', id=id_ponto))
+
+            ecossistema = EcossistemaFactory.criar_ecossistema(
+                id=ecossistema_dados.id,
+                nome=ecossistema_dados.nome
+            )
+
+            ponto_atualizado = PontoTuristicoFactory.criar_ponto_turistico(
+                id=id_ponto,
+                nome=nome.capitalize().strip(),
+                localizacao=localizacao.capitalize().strip(),
+                descricao=descricao.capitalize().strip(),
+                horario_funcionamento=horario_funcionamento.capitalize().strip(),
+                custo_entrada=custo_entrada,
+                categoria=categoria,
+                promocao=promocao,
+                url_imagem=nome_arquivo,
+                tipo_ponto=tipo_ponto,
+                ecossistema=ecossistema,
+                area_km=area_km if area_km else 0,
+                status=ponto_existente.status
+            )
 
         imagem_antiga = ponto_existente.url_imagem
 

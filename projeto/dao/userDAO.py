@@ -1,5 +1,5 @@
 from . import BaseDAO
-from projeto.factorys import UsuarioFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory
+from projeto.factorys import UsuarioFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, TipoCulturalFactory, EcossistemaFactory
 from projeto.config import Config
 from werkzeug.security import generate_password_hash
 import os
@@ -336,11 +336,17 @@ class UserDAO(BaseDAO):
                 pr.desconto AS promocao_desconto,
                 pr.data_inicio AS promocao_data_inicio,
                 pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao
+                pr.descricao AS promocao_descricao,
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome
             FROM pontos_turisticos AS p
             INNER JOIN categorias AS c ON p.categoria_id = c.id
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
             INNER JOIN favoritos AS f ON p.id = f.ponto_id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             WHERE f.usuario_email = %s
         '''
         valor = [usuario_email]
@@ -371,18 +377,51 @@ class UserDAO(BaseDAO):
 
                 media_avaliacao = self.__calcular_media_avaliacao(linha['id'])
 
-                favorito = PontoTuristicoFactory.criar_ponto_turistico(
-                    id=linha['id'],
-                    nome=linha['nome'],
-                    descricao=linha['descricao'],
-                    localizacao=linha['localizacao'],
-                    categoria=categoria,
-                    promocao=promocao,
-                    media_avaliacao=media_avaliacao,
-                    horario_funcionamento=linha['horario_funcionamento'],
-                    url_imagem=linha['url_imagem'],
-                    custo_entrada=linha['custo_entrada']
-                )
+                if linha['tipo_ponto'] == 'cultural':
+                    tipo_cultural = TipoCulturalFactory.criar_tipo_cultural(
+                        id=linha['tipo_cultural_id'],
+                        nome=linha['tipo_cultural_nome']
+                    )
+                    
+                    favorito = PontoTuristicoFactory.criar_ponto_turistico(
+                        id=linha['id'],
+                        nome=linha['nome'],
+                        descricao=linha['descricao'],
+                        localizacao=linha['localizacao'],
+                        categoria=categoria,
+                        promocao=promocao,
+                        media_avaliacao=media_avaliacao,
+                        horario_funcionamento=linha['horario_funcionamento'],
+                        url_imagem=linha['url_imagem'],
+                        custo_entrada=linha['custo_entrada'],
+                        tipo_cultural=tipo_cultural,
+                        ano_fundacao=linha['ano_fundacao'],
+                        status=linha['status'],
+                        tipo_ponto=linha['tipo_ponto']
+                    )
+
+                else:
+                    ecossistema = EcossistemaFactory.criar_ecossistema(
+                        id=linha['ecossistema_id'],
+                        nome=linha['ecossistema_nome']
+                    )
+
+                    favorito = PontoTuristicoFactory.criar_ponto_turistico(
+                        id=linha['id'],
+                        nome=linha['nome'],
+                        descricao=linha['descricao'],
+                        localizacao=linha['localizacao'],
+                        categoria=categoria,
+                        promocao=promocao,
+                        media_avaliacao=media_avaliacao,
+                        horario_funcionamento=linha['horario_funcionamento'],
+                        url_imagem=linha['url_imagem'],
+                        custo_entrada=linha['custo_entrada'],
+                        ecossistema=ecossistema,
+                        area_km=linha['area_km2'],
+                        tipo_ponto=linha['tipo_ponto'],
+                        status=linha['status']
+                    )
 
                 lista_favoritos.append(favorito)
         finally:

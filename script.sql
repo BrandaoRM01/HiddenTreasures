@@ -38,6 +38,16 @@ CREATE TABLE IF NOT EXISTS promocoes (
     CHECK (data_fim IS NULL OR data_fim >= data_inicio)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ecossistemas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS tipos_culturais (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS pontos_turisticos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL UNIQUE,
@@ -46,12 +56,23 @@ CREATE TABLE IF NOT EXISTS pontos_turisticos (
     horario_funcionamento VARCHAR(100),
     custo_entrada DECIMAL(10,2) DEFAULT 0.00,
     url_imagem VARCHAR(500) DEFAULT 'img/default/hidden_treasures_logo.png',
+    area_km2 FLOAT,
+    ano_fundacao VARCHAR(100),
+    tipo_ponto ENUM('natural', 'cultural') NOT NULL,
+    status ENUM('pendente', 'aprovado', 'rejeitado') NOT NULL DEFAULT 'pendente',
+
     categoria_id INT NOT NULL,
     promocao_id INT DEFAULT NULL,
+    ecossistema_id INT DEFAULT NULL,
+    tipo_cultural_id INT DEFAULT NULL,
 
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
     ON DELETE CASCADE,
     FOREIGN KEY (promocao_id) REFERENCES promocoes(id)
+    ON DELETE SET NULL,
+    FOREIGN KEY (ecossistema_id) REFERENCES ecossistemas(id)
+    ON DELETE SET NULL,
+    FOREIGN KEY (tipo_cultural_id) REFERENCES tipos_culturais(id)
     ON DELETE SET NULL
 ) ENGINE=InnoDB;
 

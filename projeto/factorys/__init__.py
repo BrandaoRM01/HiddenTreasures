@@ -4,3 +4,5 @@ from .categoriaFactory import CategoriaFactory
 from .historicoSenhaFactory import HistoricoSenhaFactory
 from .promocaoFactory import PromocaoFactory
 from .pontoTuristicoFactory import PontoTuristicoFactory
+from .ecossistemaFactory import EcossistemaFactory
+from .tipoCulturalFactory import TipoCulturalFactory

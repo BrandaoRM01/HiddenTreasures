@@ -1,10 +1,12 @@
-from .categoria import Categoria
-from .promocao import Promocao
+from abc import ABC, abstractmethod
+from projeto.models.promocao import Promocao
+from projeto.models.categoria import Categoria
 
-class PontoTuristico:
+class PontoTuristico(ABC):
 
-    def __init__(self,  nome, localizacao, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None):
+    def __init__(self,  nome, localizacao, status, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None):
         self.__url_imagem = url_imagem
+        self.__status = status
         self.__nome = nome
         self.__localizacao = localizacao
         self.__media_avaliacao = media_avaliacao
@@ -60,6 +62,10 @@ class PontoTuristico:
     def avaliacoes(self):
         return self.__avaliacoes
     
+    @property
+    def status(self):
+        return self.__status
+    
     @media_avaliacao.setter
     def media_avaliacao(self, valor):
         self.__media_avaliacao = valor
@@ -104,20 +110,20 @@ class PontoTuristico:
     def avaliacoes(self, valor):
         self.__avaliacoes = valor
 
+    @status.setter
+    def status(self, valor):
+        self.__status = valor
+
     def adicionar_avaliacao(self, avaliacao):
         self.__avaliacoes.append(avaliacao)
 
+    @abstractmethod
+    def tipo_ponto(self):
+        pass
+
+    @abstractmethod
     def to_dict(self):
-        return {
-            'id': self.__id,
-            'url_imagem': self.__url_imagem,
-            'nome': self.__nome,
-            'localizacao': self.__localizacao,
-            'descricao': self.__descricao,
-            'horario_funcionamento': self.__horario_funcionamento,
-            'custo_entrada': self.__custo_entrada,
-            'media_avaliacao': self.__media_avaliacao,
-            'categoria': self.__categoria.to_dict(),
-            'promocao': self.__promocao.to_dict() if self.__promocao else None,
-            'avaliacoes': [avaliacao.to_dict() for avaliacao in self.__avaliacoes]
-        }
+        pass
+
+from .pontoCultural import PontoCultural
+from .pontoNatural import PontoNatural
