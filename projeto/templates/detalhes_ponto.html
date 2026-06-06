@@ -24,6 +24,7 @@
 
         <div class="col-md-6 d-flex flex-column justify-content-center">
             <h2><strong>{{ ponto.nome }}</strong></h2>
+            <p><strong>Tipo:</strong> Ponto {{ ponto.tipo_ponto() }}</p>
             <p><strong>Localização:</strong> {{ ponto.localizacao }}</p>
             <p><strong>Descrição:</strong> {{ ponto.descricao }}</p>
 
@@ -32,6 +33,60 @@
             {% endif %}
 
             <p><strong>Categoria:</strong> {{ ponto.categoria.nome }}</p>
+
+            {% if ponto.tipo_ponto() == 'cultural' %}
+
+            {% if ponto.tipo_cultural.nome %}
+            <p>
+                <strong>Tipo Cultural:</strong>
+                {{ ponto.tipo_cultural.nome }}
+            </p>
+            {% else %}
+            <p>
+                <strong>Tipo Cultural:</strong>
+                Não especificado
+            </p>
+            {% endif %}
+
+            {% if ponto.ano_fundacao %}
+            <p>
+                <strong>Ano de Fundação:</strong>
+                {{ ponto.ano_fundacao }}
+            </p>
+            {% else %}
+            <p>
+                <strong>Ano de Fundação:</strong>
+                Não informado
+            </p>
+            {% endif %}
+
+            {% elif ponto.tipo_ponto() == 'natural' %}
+
+            {% if ponto.ecossistema.nome %}
+            <p>
+                <strong>Ecossistema:</strong>
+                {{ ponto.ecossistema.nome }}
+            </p>
+            {% else %}
+            <p>
+                <strong>Ecossistema:</strong>
+                Não especificado
+            </p>
+            {% endif %}
+
+            {% if ponto.area_km %}
+            <p>
+                <strong>Área:</strong>
+                {{ ponto.area_km }} km²
+            </p>
+            {% else %}
+            <p>
+                <strong>Área:</strong>
+                Não informada
+            </p>
+            {% endif %}
+
+            {% endif %}
 
             {% if ponto.promocao %}
             <div class="mt-2 p-3" style="background-color:#f8f9fa; border-left:4px solid #d63384; border-radius:8px;">

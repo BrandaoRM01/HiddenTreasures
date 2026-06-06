@@ -1,4 +1,5 @@
 from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, EcossistemaFactory, TipoCulturalFactory
+from projeto.models import PontoCultural, PontoNatural
 from . import BaseDAO
 from projeto.config import Config
 import os
@@ -337,30 +338,72 @@ class PontoTuristicoDAO(BaseDAO):
         return ponto
     
     def cadastrar_ponto(self, novo_ponto):
-        sql = """
-            INSERT INTO pontos_turisticos (
-                nome,
-                localizacao,
-                descricao,
-                horario_funcionamento,
-                custo_entrada,
-                url_imagem,
-                categoria_id,
-                promocao_id
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """
+        if isinstance(novo_ponto, PontoCultural):
+            sql = """
+                INSERT INTO pontos_turisticos (
+                    nome,
+                    localizacao,
+                    descricao,
+                    horario_funcionamento,
+                    custo_entrada,
+                    url_imagem,
+                    categoria_id,
+                    promocao_id,
+                    tipo_ponto,
+                    tipo_cultural_id,
+                    ano_fundacao,
+                    status
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
 
-        valores = [
-            novo_ponto.nome,
-            novo_ponto.localizacao,
-            novo_ponto.descricao,
-            novo_ponto.horario_funcionamento,
-            novo_ponto.custo_entrada,
-            novo_ponto.url_imagem,
-            novo_ponto.categoria.id,
-            novo_ponto.promocao.id if novo_ponto.promocao else None
-        ]
+            valores = [
+                novo_ponto.nome,
+                novo_ponto.localizacao,
+                novo_ponto.descricao,
+                novo_ponto.horario_funcionamento,
+                novo_ponto.custo_entrada,
+                novo_ponto.url_imagem,
+                novo_ponto.categoria.id,
+                novo_ponto.promocao.id if novo_ponto.promocao else None,
+                novo_ponto.tipo_ponto(),
+                novo_ponto.tipo_cultural.id if novo_ponto.tipo_cultural else None,
+                novo_ponto.ano_fundacao,
+                novo_ponto.status
+            ]
+        else:
+            sql = """
+                INSERT INTO pontos_turisticos (
+                    nome,
+                    localizacao,
+                    descricao,
+                    horario_funcionamento,
+                    custo_entrada,
+                    url_imagem,
+                    categoria_id,
+                    promocao_id,
+                    tipo_ponto,
+                    ecossistema_id,
+                    area_km2,
+                    status
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+
+            valores = [
+                novo_ponto.nome,
+                novo_ponto.localizacao,
+                novo_ponto.descricao,
+                novo_ponto.horario_funcionamento,
+                novo_ponto.custo_entrada,
+                novo_ponto.url_imagem,
+                novo_ponto.categoria.id,
+                novo_ponto.promocao.id if novo_ponto.promocao else None,
+                novo_ponto.tipo_ponto(),
+                novo_ponto.ecossistema.id if novo_ponto.ecossistema else None,
+                novo_ponto.area_km,
+                novo_ponto.status
+            ]
 
         conexao = self._get_connection()
         cursor = conexao.cursor()
@@ -373,31 +416,78 @@ class PontoTuristicoDAO(BaseDAO):
             conexao.close()
 
     def atualizar_ponto(self, ponto_atualizado, imagem_antiga):
-        sql = """
-            UPDATE pontos_turisticos
-            SET 
-                nome = %s,
-                localizacao = %s,
-                descricao = %s,
-                horario_funcionamento = %s,
-                custo_entrada = %s,
-                url_imagem = %s,
-                categoria_id = %s,
-                promocao_id = %s
-            WHERE id = %s
-        """
+        if isinstance(ponto_atualizado, PontoCultural):
+            sql = """
+                UPDATE pontos_turisticos
+                SET 
+                    nome = %s,
+                    localizacao = %s,
+                    descricao = %s,
+                    horario_funcionamento = %s,
+                    custo_entrada = %s,
+                    url_imagem = %s,
+                    categoria_id = %s,
+                    promocao_id = %s,
+                    status = %s,
+                    tipo_ponto = %s,
+                    tipo_cultural_id = %s,
+                    ano_fundacao = %s,
+                    ecossistema_id = NULL,
+                    area_km2 = NULL
+                WHERE id = %s
+            """
 
-        valores = [
-            ponto_atualizado.nome,
-            ponto_atualizado.localizacao,
-            ponto_atualizado.descricao,
-            ponto_atualizado.horario_funcionamento,
-            ponto_atualizado.custo_entrada,
-            ponto_atualizado.url_imagem,
-            ponto_atualizado.categoria.id,
-            ponto_atualizado.promocao.id if ponto_atualizado.promocao else None,
-            ponto_atualizado.id
-        ]
+            valores = [
+                ponto_atualizado.nome,
+                ponto_atualizado.localizacao,
+                ponto_atualizado.descricao,
+                ponto_atualizado.horario_funcionamento,
+                ponto_atualizado.custo_entrada,
+                ponto_atualizado.url_imagem,
+                ponto_atualizado.categoria.id,
+                ponto_atualizado.promocao.id if ponto_atualizado.promocao else None,
+                ponto_atualizado.status,
+                ponto_atualizado.tipo_ponto(),
+                ponto_atualizado.tipo_cultural.id if ponto_atualizado.tipo_cultural else None,
+                ponto_atualizado.ano_fundacao,
+                ponto_atualizado.id
+            ]
+        else:
+            sql = """
+                UPDATE pontos_turisticos
+                SET 
+                    nome = %s,
+                    localizacao = %s,
+                    descricao = %s,
+                    horario_funcionamento = %s,
+                    custo_entrada = %s,
+                    url_imagem = %s,
+                    categoria_id = %s,
+                    promocao_id = %s,
+                    status = %s,
+                    tipo_ponto = %s,
+                    ecossistema_id = %s,
+                    area_km2 = %s,
+                    tipo_cultural_id = NULL,
+                    ano_fundacao = NULL
+                WHERE id = %s
+            """
+
+            valores = [
+                ponto_atualizado.nome,
+                ponto_atualizado.localizacao,
+                ponto_atualizado.descricao,
+                ponto_atualizado.horario_funcionamento,
+                ponto_atualizado.custo_entrada,
+                ponto_atualizado.url_imagem,
+                ponto_atualizado.categoria.id,
+                ponto_atualizado.promocao.id if ponto_atualizado.promocao else None,
+                ponto_atualizado.status,
+                ponto_atualizado.tipo_ponto(),
+                ponto_atualizado.ecossistema.id if ponto_atualizado.ecossistema else None,
+                ponto_atualizado.area_km,
+                ponto_atualizado.id
+            ]
 
         conexao = self._get_connection()
         cursor = conexao.cursor()

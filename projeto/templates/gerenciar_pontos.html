@@ -98,6 +98,80 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="tipo_ponto" class="form-label">
+                    Tipo do Ponto <span class="text-danger">*</span>
+                </label>
+
+                <select id="tipo_ponto" name="tipo_ponto" class="form-control" onchange="mostrarCampos()" required>
+
+                    <option value="cultural">Ponto Cultural</option>
+                    <option value="natural">Ponto Natural</option>
+
+                </select>
+            </div>
+
+            <div id="campos-natural">
+
+                <div class="mb-3">
+                    <label for="ecossistema" class="form-label">
+                        Ecossistema
+                    </label>
+
+                    <select id="ecossistema" name="ecossistema" class="form-control">
+
+                        <option value="">Selecione um ecossistema</option>
+
+                        {% for ecossistema in lista_ecossistemas %}
+                        <option value="{{ ecossistema.id }}">
+                            {{ ecossistema.nome }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="area_km" class="form-label">
+                        Área (km²)
+                    </label>
+
+                    <input id="area_km" name="area_km" type="number" step="0.01" class="form-control"
+                        placeholder="Ex: 125.50">
+                </div>
+
+            </div>
+
+            <div id="campos-cultural" class="d-none">
+
+                <div class="mb-3">
+                    <label for="tipo_cultural" class="form-label">
+                        Tipo Cultural
+                    </label>
+
+                    <select id="tipo_cultural" name="tipo_cultural" class="form-control">
+
+                        <option value="">Selecione um tipo</option>
+
+                        {% for tipo in lista_tipos_culturais %}
+                        <option value="{{ tipo.id }}">
+                            {{ tipo.nome }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ano_fundacao" class="form-label">
+                        Ano de Fundação
+                    </label>
+
+                    <input id="ano_fundacao" name="ano_fundacao" class="form-control" placeholder="Ex: 1895">
+                </div>
+
+            </div>
+
             <button type="submit" class="btn btn-primary w-100">
                 Adicionar
             </button>
@@ -128,6 +202,7 @@
 
                 <div>
                     <strong>{{ ponto.nome }}</strong><br>
+                    <small class="text-muted">Ponto {{ ponto.tipo_ponto() }}</small><br>
                     <small class="text-muted">{{ ponto.localizacao }}</small><br>
                     <small class="text-muted">{{ ponto.categoria.nome }}</small><br>
 

@@ -39,3 +39,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    let tipoPonto = document.getElementById('tipo_ponto');
+    let camposNatural = document.getElementById('campos-natural');
+    let camposCultural = document.getElementById('campos-cultural');
+
+    if (!tipoPonto || !camposNatural || !camposCultural) {
+        return;
+    }
+
+    function atualizarCamposPonto() {
+        if (tipoPonto.value === 'natural') {
+            camposNatural.classList.remove('d-none');
+            camposCultural.classList.add('d-none');
+        } else {
+            camposNatural.classList.add('d-none');
+            camposCultural.classList.remove('d-none');
+        }
+    }
+
+    tipoPonto.addEventListener('change', atualizarCamposPonto);
+
+    atualizarCamposPonto();
+});

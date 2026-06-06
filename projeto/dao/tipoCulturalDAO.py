@@ -101,6 +101,10 @@ class TipoCulturalDAO(BaseDAO):
         try:
             cursor.execute(sql, [id_tipo])
             tipo_cultural_dados = cursor.fetchone()
+
+            if not tipo_cultural_dados:
+                return None
+        
             return TipoCulturalFactory.criar_tipo_cultural(
                 id=tipo_cultural_dados['id'],
                 nome=tipo_cultural_dados['nome']

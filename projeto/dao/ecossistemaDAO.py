@@ -97,6 +97,10 @@ class EcossistemaDAO(BaseDAO):
         try:
             cursor.execute(sql, [id_ecossistema])
             ecossistema_dados = cursor.fetchone()
+
+            if not ecossistema_dados:
+                return None
+
             return EcossistemaFactory.criar_ecossistema(
                 id=ecossistema_dados['id'],
                 nome=ecossistema_dados['nome']

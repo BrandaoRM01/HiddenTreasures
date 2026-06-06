@@ -99,6 +99,88 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="tipo_ponto" class="form-label">
+                    Tipo do Ponto <span class="text-danger">*</span>
+                </label>
+
+                <select id="tipo_ponto" name="tipo_ponto" class="form-control" required>
+
+                    <option value="cultural" {% if ponto.tipo_ponto()=='cultural' %}selected{% endif %}>
+                        Ponto Cultural
+                    </option>
+
+                    <option value="natural" {% if ponto.tipo_ponto()=='natural' %}selected{% endif %}>
+                        Ponto Natural
+                    </option>
+
+                </select>
+            </div>
+
+            <div id="campos-natural">
+
+                <div class="mb-3">
+                    <label for="ecossistema" class="form-label">
+                        Ecossistema
+                    </label>
+
+                    <select id="ecossistema" name="ecossistema" class="form-control">
+
+                        <option value="">Selecione um ecossistema</option>
+
+                        {% for ecossistema in lista_ecossistemas %}
+                        <option value="{{ ecossistema.id }}" {% if ponto.ecossistema and
+                            ponto.ecossistema.id==ecossistema.id %} selected {% endif %}>
+                            {{ ecossistema.nome }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="area_km" class="form-label">
+                        Área (km²)
+                    </label>
+
+                    <input id="area_km" name="area_km" type="number" step="0.01" class="form-control"
+                        placeholder="Ex: 125.50" value="{{ ponto.area_km or '' }}">
+                </div>
+
+            </div>
+
+            <div id="campos-cultural" class="d-none">
+
+                <div class="mb-3">
+                    <label for="tipo_cultural" class="form-label">
+                        Tipo Cultural
+                    </label>
+
+                    <select id="tipo_cultural" name="tipo_cultural" class="form-control">
+
+                        <option value="">Selecione um tipo</option>
+
+                        {% for tipo in lista_tipos_culturais %}
+                        <option value="{{ tipo.id }}" {% if ponto.tipo_cultural and ponto.tipo_cultural.id==tipo.id %}
+                            selected {% endif %}>
+                            {{ tipo.nome }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ano_fundacao" class="form-label">
+                        Ano de Fundação
+                    </label>
+
+                    <input id="ano_fundacao" name="ano_fundacao" class="form-control" placeholder="Ex: 1895"
+                        value="{{ ponto.ano_fundacao or '' }}">
+                </div>
+
+            </div>
+
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     Salvar Alterações
