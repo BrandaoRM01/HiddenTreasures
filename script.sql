@@ -76,6 +76,22 @@ CREATE TABLE IF NOT EXISTS pontos_turisticos (
     ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS destaques (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pontos_destaques (
+    ponto_id INT NOT NULL,
+    destaque_id INT NOT NULL,
+
+    PRIMARY KEY (ponto_id, destaque_id),
+    FOREIGN KEY (ponto_id) REFERENCES pontos_turisticos(id)
+    ON DELETE CASCADE,
+    FOREIGN KEY (destaque_id) REFERENCES destaques(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS avaliacoes (
     usuario_email VARCHAR(150) NOT NULL,
     ponto_id INT NOT NULL,

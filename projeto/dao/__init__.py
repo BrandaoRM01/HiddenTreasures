@@ -22,3 +22,4 @@ from .promocaoDAO import PromocaoDAO
 from .historicoSenhaDAO import HistoricoSenhaDAO
 from .ecossistemaDAO import EcossistemaDAO
 from .tipoCulturalDAO import TipoCulturalDAO
+from .destaqueDAO import DestaqueDAO

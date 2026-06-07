@@ -4,7 +4,7 @@ from projeto.models.categoria import Categoria
 
 class PontoTuristico(ABC):
 
-    def __init__(self,  nome, localizacao, status, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None):
+    def __init__(self,  nome, localizacao, status, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None):
         self.__url_imagem = url_imagem
         self.__status = status
         self.__nome = nome
@@ -16,6 +16,7 @@ class PontoTuristico(ABC):
         self.__categoria = categoria
         self.__promocao = promocao
         self.__avaliacoes = avaliacoes if avaliacoes is not None else []
+        self.__destaques = destaques if destaques is not None else []
         self.__id = id
 
     @property
@@ -66,6 +67,10 @@ class PontoTuristico(ABC):
     def status(self):
         return self.__status
     
+    @property
+    def destaques(self):
+        return self.__destaques
+    
     @media_avaliacao.setter
     def media_avaliacao(self, valor):
         self.__media_avaliacao = valor
@@ -114,8 +119,15 @@ class PontoTuristico(ABC):
     def status(self, valor):
         self.__status = valor
 
+    @destaques.setter
+    def destaques(self, valor):
+        self.__destaques = valor
+
     def adicionar_avaliacao(self, avaliacao):
         self.__avaliacoes.append(avaliacao)
+
+    def adicionar_destaque(self, destaque):
+        self.__destaques.append(destaque)
 
     @abstractmethod
     def tipo_ponto(self):

@@ -6,3 +6,4 @@ from .promocao import Promocao
 from .historico_senha import HistoricoSenha
 from .ecossistema import Ecossistema
 from .tipo_cultural import TipoCultural
+from .destaque import Destaque

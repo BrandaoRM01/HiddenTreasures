@@ -6,3 +6,4 @@ from .promocaoController import PromocaoController
 from .historicoSenhaController import HistoricoSenhaController
 from .ecossistemaController import EcossistemaController
 from .tipoCulturalController import TipoCulturalController
+from .destaqueController import DestaqueController

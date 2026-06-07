@@ -6,3 +6,4 @@ from .promocoes_bp import promocoes_bp
 from .historico_senhas_bp import historico_senhas_bp
 from .ecossistemas_bp import ecossistemas_bp
 from .tipos_culturais_bp import tipos_culturais_bp
+from .destaques_bp import destaques_bp

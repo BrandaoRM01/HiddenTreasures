@@ -6,3 +6,4 @@ from .promocaoFactory import PromocaoFactory
 from .pontoTuristicoFactory import PontoTuristicoFactory
 from .ecossistemaFactory import EcossistemaFactory
 from .tipoCulturalFactory import TipoCulturalFactory
+from .destaqueFactory import DestaqueFactory

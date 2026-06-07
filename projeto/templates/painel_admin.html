@@ -63,6 +63,24 @@
 
     </div>
 
+    <div class="row justify-content-center align-items-stretch">
+        <div class="col-md-4 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Destaques</h3>
+                <p>Gerencie os destaques disponíveis para os pontos turísticos</p>
+                <a href="{{ url_for('destaques.gerenciar_destaques') }}" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4 d-flex">
+            <div class="card shadow text-center p-4 card-hover h-100 w-100 d-flex flex-column">
+                <h3 class="fw-bold">Sugestões</h3>
+                <p>Visualize e modere as sugestões enviadas pelos usuários</p>
+                <a href="#" class="btn btn-primary mt-auto">Acessar</a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {% endblock conteudo %}
