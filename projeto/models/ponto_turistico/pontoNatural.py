@@ -3,7 +3,7 @@ from projeto.models.ecossistema import Ecossistema
 
 class PontoNatural(PontoTuristico):
 
-    def __init__(self,  nome, localizacao, ecossistema, status, area_km=None, promocao=None, categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None):
+    def __init__(self,  nome, localizacao, ecossistema, status, area_km=None, promocao=None, categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None, sugerido_por=None):
         super().__init__(
             nome=nome,
             localizacao=localizacao,
@@ -17,7 +17,8 @@ class PontoNatural(PontoTuristico):
             url_imagem=url_imagem,
             id=id,
             avaliacoes=avaliacoes,
-            destaques=destaques
+            destaques=destaques,
+            sugerido_por=sugerido_por
         )
         self.__ecossistema = ecossistema
         self.__area_km = area_km
@@ -58,5 +59,6 @@ class PontoNatural(PontoTuristico):
             'area_km': self.__area_km if self.__area_km else 0,
             'tipo_ponto': self.tipo_ponto(),
             'status': self.status,
-            'destaques': [destaque.to_dict() for destaque in self.destaques]
+            'destaques': [destaque.to_dict() for destaque in self.destaques],
+            'sugerido_por': self.sugerido_por if self.sugerido_por else None
         }

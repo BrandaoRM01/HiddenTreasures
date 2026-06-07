@@ -21,6 +21,10 @@ def pontos():
 def gerenciar_pontos():
     return controller.preparar_gerenciar_pontos()
 
+@pontos_bp.route('/admin/gerenciar-sugestoes')
+def gerenciar_sugestoes():
+    return controller.preparar_gerenciar_sugestoes()
+
 @pontos_bp.route('/admin/cadastrar-pontos', methods=['GET', 'POST'])
 def cadastrar_ponto():
     if request.method == 'POST':
@@ -48,3 +52,21 @@ def buscar_pontos():
     if request.method == 'POST':
         return controller.listar_pontos_busca()
     return controller.preparar_index()
+
+@pontos_bp.route('/sugerir-ponto', methods=['GET', 'POST'])
+def sugerir_ponto():
+    if request.method == 'POST':
+        return controller.sugerir_ponto()
+    return controller.preparar_sugerir_ponto()
+
+@pontos_bp.route('/editar-sugestao/<int:id>', methods=['GET', 'POST'])
+def editar_sugestao(id):
+    if request.method == 'POST':
+        return controller.editar_ponto(id)
+    return controller.preparar_editar_sugestao(id)
+
+@pontos_bp.route('/admin/alterar-status-sugestao/<int:id_ponto>/<string:status>', methods=['POST','GET'])
+def alterar_status_sugestao(id_ponto, status):
+    if request.method == 'POST':
+        return controller.alterar_status(id_ponto, status)
+    return controller.preparar_gerenciar_pontos()

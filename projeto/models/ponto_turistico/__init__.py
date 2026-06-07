@@ -4,7 +4,7 @@ from projeto.models.categoria import Categoria
 
 class PontoTuristico(ABC):
 
-    def __init__(self,  nome, localizacao, status, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None):
+    def __init__(self,  nome, localizacao, status, promocao: Promocao=None, categoria: Categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None, sugerido_por=None):
         self.__url_imagem = url_imagem
         self.__status = status
         self.__nome = nome
@@ -18,7 +18,7 @@ class PontoTuristico(ABC):
         self.__avaliacoes = avaliacoes if avaliacoes is not None else []
         self.__destaques = destaques if destaques is not None else []
         self.__id = id
-
+        self.__sugerido_por = sugerido_por
     @property
     def id(self):
         return self.__id
@@ -71,6 +71,10 @@ class PontoTuristico(ABC):
     def destaques(self):
         return self.__destaques
     
+    @property
+    def sugerido_por(self):
+        return self.__sugerido_por
+    
     @media_avaliacao.setter
     def media_avaliacao(self, valor):
         self.__media_avaliacao = valor
@@ -122,6 +126,10 @@ class PontoTuristico(ABC):
     @destaques.setter
     def destaques(self, valor):
         self.__destaques = valor
+
+    @sugerido_por.setter
+    def sugerido_por(self, valor):
+        self.__sugerido_por = valor
 
     def adicionar_avaliacao(self, avaliacao):
         self.__avaliacoes.append(avaliacao)

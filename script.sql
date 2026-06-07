@@ -61,11 +61,14 @@ CREATE TABLE IF NOT EXISTS pontos_turisticos (
     tipo_ponto ENUM('natural', 'cultural') NOT NULL,
     status ENUM('pendente', 'aprovado', 'rejeitado') NOT NULL DEFAULT 'pendente',
 
+    sugerido_por VARCHAR(150) DEFAULT NULL,
     categoria_id INT NOT NULL,
     promocao_id INT DEFAULT NULL,
     ecossistema_id INT DEFAULT NULL,
     tipo_cultural_id INT DEFAULT NULL,
 
+    FOREIGN KEY (sugerido_por) REFERENCES usuarios(email)
+    ON DELETE SET NULL,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
     ON DELETE CASCADE,
     FOREIGN KEY (promocao_id) REFERENCES promocoes(id)

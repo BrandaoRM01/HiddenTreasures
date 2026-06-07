@@ -144,7 +144,7 @@
 
         </div>
     </div>
-
+    {% if ponto.status == 'aprovado' %}
     {% if session.get('usuario') %}
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -286,6 +286,7 @@
     </div>
     {% endif %}
     {% endfor %}
+    {% endif %}
     {% endif %}
 
 </div>

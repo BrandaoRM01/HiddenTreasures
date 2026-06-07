@@ -3,7 +3,7 @@ from projeto.models.tipo_cultural import TipoCultural
 
 class PontoCultural(PontoTuristico):
 
-    def __init__(self,  nome, localizacao, tipo_cultural, status, ano_fundacao=None, promocao=None, categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None):
+    def __init__(self,  nome, localizacao, tipo_cultural, status, ano_fundacao=None, promocao=None, categoria=None, media_avaliacao=None, descricao=None, horario_funcionamento=None, custo_entrada=None, url_imagem=None, id=None, avaliacoes=None, destaques=None, sugerido_por=None):
         super().__init__(
                 nome=nome,
                 localizacao=localizacao,
@@ -17,7 +17,8 @@ class PontoCultural(PontoTuristico):
                 url_imagem=url_imagem,
                 id=id,
                 avaliacoes=avaliacoes,
-                destaques=destaques
+                destaques=destaques,
+                sugerido_por=sugerido_por   
         )
         self.__tipo_cultural = tipo_cultural
         self.__ano_fundacao = ano_fundacao
@@ -58,5 +59,6 @@ class PontoCultural(PontoTuristico):
             'ano_fundacao': self.__ano_fundacao if self.__ano_fundacao else 'Não Informado',
             'tipo_ponto': self.tipo_ponto(),
             'status': self.status,
-            'destaques': [destaque.to_dict() for destaque in self.destaques]
+            'destaques': [destaque.to_dict() for destaque in self.destaques],
+            'sugerido_por': self.sugerido_por if self.sugerido_por else None
         }

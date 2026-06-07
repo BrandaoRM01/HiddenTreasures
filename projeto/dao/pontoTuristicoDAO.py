@@ -48,7 +48,8 @@ class PontoTuristicoDAO(BaseDAO):
                 tipo_ponto=linha['tipo_ponto'],
                 tipo_cultural=tipo_cultural,
                 ano_fundacao=linha['ano_fundacao'],
-                status=linha['status']
+                status=linha['status'],
+                sugerido_por=linha['sugerido_por']
             )
         else:
             ecossistema = EcossistemaFactory.criar_ecossistema(
@@ -70,7 +71,8 @@ class PontoTuristicoDAO(BaseDAO):
                 tipo_ponto=linha['tipo_ponto'],
                 ecossistema=ecossistema,
                 area_km=linha['area_km2'],
-                status=linha['status']
+                status=linha['status'],
+                sugerido_por=linha['sugerido_por']
             )
     
     def calcular_media_avaliacao(self, ponto_id):
@@ -160,8 +162,95 @@ class PontoTuristicoDAO(BaseDAO):
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+            WHERE p.status = 'aprovado'
 
             ORDER BY p.nome ASC
+        """
+        pontos_map = {}
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql)
+            for linha in cursor.fetchall():
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
+
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                        pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)
+                
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return list(pontos_map.values())
+    
+    def listar_todos_pontos(self):
+        sql = """
+            SELECT 
+                p.*,
+                c.id AS categoria_id,
+                c.nome AS categoria_nome,
+
+                pr.id AS promocao_id,
+                pr.titulo AS promocao_titulo,
+                pr.desconto AS promocao_desconto,
+                pr.data_inicio AS promocao_data_inicio,
+                pr.data_fim AS promocao_data_fim,
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
+
+            FROM pontos_turisticos AS p
+
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+
+            ORDER BY p.status ASC, p.nome ASC
         """
         pontos_map = {}
 
@@ -246,6 +335,7 @@ class PontoTuristicoDAO(BaseDAO):
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+            WHERE p.status = 'aprovado'
         """
         pontos_map = {}
 
@@ -397,9 +487,10 @@ class PontoTuristicoDAO(BaseDAO):
                     tipo_ponto,
                     tipo_cultural_id,
                     ano_fundacao,
-                    status
+                    status,
+                    sugerido_por
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
 
             valores = [
@@ -414,7 +505,8 @@ class PontoTuristicoDAO(BaseDAO):
                 novo_ponto.tipo_ponto(),
                 novo_ponto.tipo_cultural.id if novo_ponto.tipo_cultural else None,
                 novo_ponto.ano_fundacao,
-                novo_ponto.status
+                novo_ponto.status,
+                novo_ponto.sugerido_por
             ]
         else:
             sql = """
@@ -430,9 +522,10 @@ class PontoTuristicoDAO(BaseDAO):
                     tipo_ponto,
                     ecossistema_id,
                     area_km2,
-                    status
+                    status,
+                    sugerido_por
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
 
             valores = [
@@ -447,7 +540,8 @@ class PontoTuristicoDAO(BaseDAO):
                 novo_ponto.tipo_ponto(),
                 novo_ponto.ecossistema.id if novo_ponto.ecossistema else None,
                 novo_ponto.area_km,
-                novo_ponto.status
+                novo_ponto.status,
+                novo_ponto.sugerido_por
             ]
 
         conexao = self._get_connection()
@@ -481,7 +575,8 @@ class PontoTuristicoDAO(BaseDAO):
                     tipo_cultural_id = %s,
                     ano_fundacao = %s,
                     ecossistema_id = NULL,
-                    area_km2 = NULL
+                    area_km2 = NULL,
+                    sugerido_por = %s
                 WHERE id = %s
             """
 
@@ -498,6 +593,7 @@ class PontoTuristicoDAO(BaseDAO):
                 ponto_atualizado.tipo_ponto(),
                 ponto_atualizado.tipo_cultural.id if ponto_atualizado.tipo_cultural else None,
                 ponto_atualizado.ano_fundacao,
+                ponto_atualizado.sugerido_por,
                 ponto_atualizado.id
             ]
         else:
@@ -517,7 +613,8 @@ class PontoTuristicoDAO(BaseDAO):
                     ecossistema_id = %s,
                     area_km2 = %s,
                     tipo_cultural_id = NULL,
-                    ano_fundacao = NULL
+                    ano_fundacao = NULL,
+                    sugerido_por = %s
                 WHERE id = %s
             """
 
@@ -534,6 +631,7 @@ class PontoTuristicoDAO(BaseDAO):
                 ponto_atualizado.tipo_ponto(),
                 ponto_atualizado.ecossistema.id if ponto_atualizado.ecossistema else None,
                 ponto_atualizado.area_km,
+                ponto_atualizado.sugerido_por,
                 ponto_atualizado.id
             ]
 
@@ -620,6 +718,7 @@ class PontoTuristicoDAO(BaseDAO):
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+            WHERE p.status = 'aprovado'
         """
 
         valor = [f'%{escrita}%']
@@ -669,6 +768,196 @@ class PontoTuristicoDAO(BaseDAO):
 
         return list(pontos_map.values())
     
+    def listar_sugestoes_usuario(self, email_usuario):
+        sql = """
+            SELECT 
+                p.*,
+                c.id AS categoria_id,
+                c.nome AS categoria_nome,
+
+                pr.id AS promocao_id,
+                pr.titulo AS promocao_titulo,
+                pr.desconto AS promocao_desconto,
+                pr.data_inicio AS promocao_data_inicio,
+                pr.data_fim AS promocao_data_fim,
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
+
+            FROM pontos_turisticos AS p
+
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+
+            WHERE p.sugerido_por = %s
+            ORDER BY p.status ASC, p.nome ASC
+        """
+        pontos_map = {}
+        valor = [email_usuario]
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql, valor)
+            for linha in cursor.fetchall():
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
+
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                        pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)   
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return list(pontos_map.values())
+    
+    def listar_pontos_sugeridos(self):
+        sql = """
+            SELECT 
+                p.*,
+                c.id AS categoria_id,
+                c.nome AS categoria_nome,
+
+                pr.id AS promocao_id,
+                pr.titulo AS promocao_titulo,
+                pr.desconto AS promocao_desconto,
+                pr.data_inicio AS promocao_data_inicio,
+                pr.data_fim AS promocao_data_fim,
+                pr.descricao AS promocao_descricao,
+
+                a.ponto_id,
+                a.usuario_email,
+                a.nota,
+                a.data_avaliacao,
+                a.comentario,
+
+                u.email,
+                u.username,
+                u.url_foto,
+                u.tipo_usuario,
+
+                tc.id AS tipo_cultural_id,
+                tc.nome AS tipo_cultural_nome,
+
+                e.id AS ecossistema_id,
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
+
+            FROM pontos_turisticos AS p
+
+            INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
+            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
+            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
+
+            WHERE p.sugerido_por IS NOT NULL
+            ORDER BY p.status ASC, p.nome ASC
+        """
+        pontos_map = {}
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql)
+            for linha in cursor.fetchall():
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
+
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                        pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)   
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return list(pontos_map.values())
+    
+    def alterar_status(self, id_ponto, status):
+        sql = """
+            UPDATE pontos_turisticos
+            SET status = %s
+            WHERE id = %s
+        """
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor()
+
+        try:
+            cursor.execute(sql, (status, id_ponto))
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+
     def __salvar_destaques_ponto(self, cursor, id_ponto, destaques_ids):
         for id in destaques_ids:
             sql = """
