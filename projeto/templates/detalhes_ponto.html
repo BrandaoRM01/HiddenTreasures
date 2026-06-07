@@ -12,13 +12,30 @@
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="position-relative">
+
                 {% if ponto.promocao %}
-                <span
-                    style="position:absolute; top:10px; left:10px; background-color:#d63384; color:white; padding:5px 10px; border-radius:8px; font-weight:bold; z-index:2;">
+                <span style="position:absolute; top:10px; left:10px;
+        background-color:#d63384; color:white; padding:5px 10px;
+        border-radius:8px; font-weight:bold; z-index:2;">
                     -{{ ponto.promocao.desconto|int }}%
                 </span>
                 {% endif %}
+
                 <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="img-fluid">
+
+                {% if ponto.destaques %}
+                <div class="position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1"
+                    style="background: linear-gradient(to top, rgba(0,0,0,0.65), transparent);">
+
+                    {% for d in ponto.destaques %}
+                    <span class="badge bg-dark bg-opacity-75 text-white">
+                        #{{ d.nome }}
+                    </span>
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+
             </div>
         </div>
 

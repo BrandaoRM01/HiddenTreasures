@@ -349,7 +349,12 @@ class PontoTuristicoDAO(BaseDAO):
                     ponto = self.__criar_ponto_turistico(linha)
 
                 if linha['usuario_email'] and linha['ponto_id']:
-                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+                    usuario = UsuarioFactory.criar_usuario(
+                        email=linha['email'],
+                        username=linha['username'],
+                        url_foto=linha['url_foto'],
+                        tipo_usuario=linha['tipo_usuario']
+                    )
 
                     avaliacao = AvaliacaoFactory.criar_avaliacao(
                         usuario=usuario,
@@ -358,7 +363,8 @@ class PontoTuristicoDAO(BaseDAO):
                         data_avaliacao=linha['data_avaliacao'],
                         comentario=linha['comentario']
                     )
-                    if avaliacao not in ponto.avaliacoes:
+
+                    if not any(a.usuario.email == usuario.email and a.data_avaliacao == avaliacao.data_avaliacao for a in ponto.avaliacoes):
                         ponto.adicionar_avaliacao(avaliacao)
 
                 if linha['destaque_nome']:
@@ -366,7 +372,7 @@ class PontoTuristicoDAO(BaseDAO):
                         id=linha['destaque_id'],
                         nome=linha['destaque_nome']
                     )
-                    if destaque not in ponto.destaques:
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in ponto.destaques):
                         ponto.adicionar_destaque(destaque)
 
             ponto.avaliacoes.sort(key=lambda avaliacao: avaliacao.data_avaliacao,reverse=True)
