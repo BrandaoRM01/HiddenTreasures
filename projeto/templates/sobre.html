@@ -4,56 +4,131 @@
 {% block conteudo %}
 
 <div class="container mt-4">
+
     <div class="text-center mb-5">
         <h1 class="fw-bold">Sobre o HiddenTreasures</h1>
         <p class="text-muted">Descobrindo o que o mundo esconde</p>
     </div>
 
     <div class="row align-items-center">
+
         <div class="col-md-6">
+
             <h3><strong>Nosso propósito</strong></h3>
+
             <p>
-                O <strong>HiddenTreasures</strong> é uma plataforma criada com o objetivo de
-                divulgar pontos turísticos que muitas vezes passam despercebidos.
-                Enquanto destinos famosos recebem grande atenção, diversos lugares
-                incríveis permanecem escondidos, verdadeiros tesouros. Obiviamente, também queremos destacar os pontos
-                turísticos mais conhecidos, afinal, quem não gosta de visitar um lugar famoso de vez em quando? Porém,
-                nosso foco é justamente ajudar a revelar aqueles cantinhos especiais que não estão no radar de todo
-                mundo, mas que oferecem experiências únicas e memoráveis.
+                O <strong>HiddenTreasures</strong> é uma plataforma desenvolvida para explorar,
+                divulgar e valorizar pontos turísticos ao redor do mundo, desde locais famosos
+                até lugares pouco conhecidos que muitas vezes passam despercebidos.
             </p>
 
             <p>
-                Nosso foco é ajudar você a descobrir experiências únicas, explorando
-                locais autênticos, pouco conhecidos e cheios de história, cultura
-                e beleza natural.
+                O sistema permite que usuários descubram novos destinos, visualizem informações
+                detalhadas, fotos, localização, custo de entrada, horário de funcionamento
+                e avaliações feitas pela comunidade.
             </p>
+
+            <p>
+                Além disso, o projeto também destaca experiências especiais como
+                promoções em pontos turísticos e destaques criados pela comunidade,
+                ajudando a enriquecer a descoberta de novos lugares.
+            </p>
+
         </div>
 
         <div class="col-md-6">
             <img src="{{ url_for('static', filename='img/default/hidden_treasures_logo.png') }}"
                 class="img-fluid rounded shadow">
         </div>
+
     </div>
 
     <div class="row mt-5">
+
         <div class="col-md-4 text-center">
             <h4><strong>Explorar</strong></h4>
-            <p>Encontre destinos únicos e pouco ou muito conhecidos. Vivencie aventuras inesquecíveis e descubra
-                tesouros escondidos.</p>
+            <p>
+                Navegue por uma lista de pontos turísticos organizados por avaliação,
+                categoria e popularidade. Descubra lugares incríveis ao redor do mundo.
+            </p>
         </div>
 
         <div class="col-md-4 text-center">
             <h4><strong>Avaliar</strong></h4>
-            <p>Compartilhe sua experiência com outros usuários. Comente, avalie e se divirta! Suas avaliações ajudam
-                outros viajantes a descobrir novos destinos.</p>
+            <p>
+                Usuários podem avaliar os pontos turísticos com notas e comentários,
+                ajudando outros viajantes a escolher melhores destinos.
+            </p>
         </div>
 
         <div class="col-md-4 text-center">
-            <h4><strong>Salvar</strong></h4>
-            <p>Guarde seus lugares favoritos para visitar depois. Sempre bom manter no coração e na memória onde você já
-                esteve.</p>
+            <h4><strong>Salvar favoritos</strong></h4>
+            <p>
+                Cada usuário pode marcar seus pontos turísticos preferidos,
+                criando uma lista personalizada de lugares para visitar depois.
+            </p>
         </div>
+
     </div>
+
+    <hr class="my-5">
+
+    <div class="text-center mb-4">
+        <h3><strong>Recursos do sistema</strong></h3>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <h5>⭐ Sistema de avaliações</h5>
+            <p>
+                Cada ponto turístico possui uma média de avaliação calculada automaticamente
+                com base nas notas dos usuários.
+            </p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5>🏷️ Categorias e tipos</h5>
+            <p>
+                Os pontos são organizados por categorias e tipos culturais ou naturais,
+                facilitando a navegação e descoberta.
+            </p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5>🔥 Promoções</h5>
+            <p>
+                Alguns pontos turísticos possuem promoções ativas com desconto no valor de entrada,
+                destacadas na página inicial.
+            </p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5>📍 Destaques</h5>
+            <p>
+                Cada local pode conter destaques especiais, como características únicas,
+                experiências ou atrações principais.
+            </p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5>🧭 Detalhes completos</h5>
+            <p>
+                Cada ponto possui uma página própria com informações completas,
+                incluindo avaliações, descrição e dados de visita.
+            </p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5>👤 Sistema de usuários</h5>
+            <p>
+                O sistema conta com login, favoritos e interações que personalizam a experiência
+                de cada usuário.
+            </p>
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock conteudo %}

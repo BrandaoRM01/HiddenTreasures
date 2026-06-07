@@ -1,5 +1,5 @@
 from . import BaseDAO
-from projeto.factorys import UsuarioFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, TipoCulturalFactory, EcossistemaFactory
+from projeto.factorys import UsuarioFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, TipoCulturalFactory, EcossistemaFactory, DestaqueFactory
 from projeto.config import Config
 from werkzeug.security import generate_password_hash
 import os
@@ -340,17 +340,21 @@ class UserDAO(BaseDAO):
                 tc.id AS tipo_cultural_id,
                 tc.nome AS tipo_cultural_nome,
                 e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome
+                e.nome AS ecossistema_nome,
+                d.id AS destaque_id,
+                d.nome AS destaque_nome
             FROM pontos_turisticos AS p
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS dp ON p.id = dp.ponto_id
+            LEFT JOIN destaques AS d ON dp.destaque_id = d.id
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-            INNER JOIN favoritos AS f ON p.id = f.ponto_id
+            LEFT JOIN favoritos AS f ON p.id = f.ponto_id
             LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             WHERE f.usuario_email = %s
         '''
         valor = [usuario_email]
-        lista_favoritos = []
+        favoritos_map = {}
 
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
@@ -423,12 +427,23 @@ class UserDAO(BaseDAO):
                         status=linha['status']
                     )
 
-                lista_favoritos.append(favorito)
+                favorito_id = favorito.id
+                if favorito_id not in favoritos_map:
+                    favoritos_map[favorito_id] = favorito
+
+                if linha['destaque_id']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in favoritos_map[favorito_id].destaques):
+                        favoritos_map[favorito_id].adicionar_destaque(destaque)
+                
         finally:
             cursor.close()
             conexao.close()
 
-        return lista_favoritos
+        return list(favoritos_map.values())
     
     def adicionar_favorito(self, ponto_id, usuario_email):
         sql = ''' 

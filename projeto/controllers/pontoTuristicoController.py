@@ -1,5 +1,5 @@
 from flask import flash, render_template, redirect, url_for, request, session
-from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO, TipoCulturalDAO, EcossistemaDAO
+from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO, TipoCulturalDAO, EcossistemaDAO, DestaqueDAO
 from projeto.factorys import PontoTuristicoFactory, CategoriaFactory, PromocaoFactory, TipoCulturalFactory, EcossistemaFactory
 from projeto.config import Config
 from werkzeug.utils import secure_filename
@@ -14,6 +14,7 @@ class PontoTuristicoController:
         self.__dao_promocoes = PromocaoDAO()
         self.__dao_tipo_cultural = TipoCulturalDAO()
         self.__dao_ecossistema = EcossistemaDAO()
+        self.__dao_destaque = DestaqueDAO()
 
     def __listar_pontos(self):
         return self.__dao_pontos.listar_pontos()
@@ -60,8 +61,9 @@ class PontoTuristicoController:
         lista_promocoes = self.__dao_promocoes.listar_promocoes_ativas()
         lista_tipos_culturais = self.__dao_tipo_cultural.carregar_tipos_culturais()
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
+        lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('gerenciar_pontos.html', lista_pontos=lista_pontos, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas)
+        return render_template('gerenciar_pontos.html', lista_pontos=lista_pontos, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
 
     def preparar_editar_ponto(self, id_ponto):
         if not self.__usuario_pode_moderar():
@@ -77,9 +79,10 @@ class PontoTuristicoController:
         lista_promocoes = self.__dao_promocoes.listar_promocoes_ativas()
         lista_tipos_culturais = self.__dao_tipo_cultural.carregar_tipos_culturais()
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
+        lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('editar_ponto.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas)
-    
+        return render_template('editar_ponto.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
+
     def preparar_pontos_turisticos(self):
         lista_pontos = self.__listar_pontos()
 
@@ -131,6 +134,7 @@ class PontoTuristicoController:
         ano_fundacao = request.form.get('ano_fundacao')
         ecossistema_id = request.form.get('ecossistema')
         area_km = request.form.get('area_km')
+        destaques_ids = request.form.getlist('destaques')   
 
         if not nome or not localizacao or not descricao or not categoria_id:
             flash('Por favor, preencha todos os campos obrigatórios.', 'danger')
@@ -250,7 +254,7 @@ class PontoTuristicoController:
                 status="aprovado"
             )
 
-        self.__dao_pontos.cadastrar_ponto(novo_ponto)
+        self.__dao_pontos.cadastrar_ponto(novo_ponto, destaques_ids)
 
         flash('Ponto turístico cadastrado com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()
@@ -280,6 +284,7 @@ class PontoTuristicoController:
         ano_fundacao = request.form.get('ano_fundacao')
         ecossistema_id = request.form.get('ecossistema')
         area_km = request.form.get('area_km')
+        destaques_ids = request.form.getlist('destaques')
 
         if not nome or not localizacao or not descricao or not categoria_id:
             flash('Por favor, preencha todos os campos obrigatórios.', 'danger')
@@ -445,7 +450,7 @@ class PontoTuristicoController:
 
         imagem_antiga = ponto_existente.url_imagem
 
-        self.__dao_pontos.atualizar_ponto(ponto_atualizado, imagem_antiga)
+        self.__dao_pontos.atualizar_ponto(ponto_atualizado, imagem_antiga, destaques_ids)
 
         flash('Ponto turístico atualizado com sucesso!', 'success')
         return self.preparar_gerenciar_pontos()

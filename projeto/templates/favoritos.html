@@ -19,26 +19,41 @@
         <div class="col-md-4 mb-4 d-flex">
             <div class="card shadow-sm card-hover card-ponto w-100 position-relative">
 
-                <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
-                    class="position-absolute bottom-50 start-0 m-2">
+                <div class="position-relative">
+                    <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
+                        class="position-absolute bottom-0 end-0 m-2">
 
-                    <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+                        <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
 
-                    <button type="submit"
-                        class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                        style="width: 45px; height: 45px;">
+                        <button type="submit"
+                            class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                            style="width: 45px; height: 45px;">
 
-                        <span style="color: red; font-size: 20px;">❤️</span>
+                            <span style="color: red; font-size: 20px;">❤️</span>
 
-                    </button>
-                </form>
+                        </button>
+                    </form>
 
-                {% if ponto.promocao %}
-                <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
-                {% endif %}
+                    {% if ponto.promocao %}
+                    <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
+                    {% endif %}
 
-                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top"
-                    style="height: 300px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top"
+                        style="height: 300px; object-fit: cover;">
+
+                    {% if ponto.destaques %}
+                    <div class="position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1"
+                        style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);">
+
+                        {% for d in ponto.destaques %}
+                        <span class="badge bg-dark bg-opacity-75 text-white">
+                            #{{ d.nome }}
+                        </span>
+                        {% endfor %}
+
+                    </div>
+                    {% endif %}
+                </div>
 
                 <div class="card-body">
                     <div>

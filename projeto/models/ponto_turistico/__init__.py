@@ -129,6 +129,12 @@ class PontoTuristico(ABC):
     def adicionar_destaque(self, destaque):
         self.__destaques.append(destaque)
 
+    def possui_destaque(self, destaque_id):
+        for d in self.__destaques:
+            if d.id == destaque_id:
+                return True
+        return False
+
     @abstractmethod
     def tipo_ponto(self):
         pass

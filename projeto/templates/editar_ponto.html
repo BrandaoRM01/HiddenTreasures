@@ -100,6 +100,28 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">
+                    Destaques <span class="text-muted">(máximo 3)</span>
+                </label>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    {% for destaque in lista_destaques %}
+
+                    <input type="checkbox" class="btn-check destaque-checkbox" id="destaque{{ destaque.id }}"
+                        name="destaques" value="{{ destaque.id }}" autocomplete="off" {% if
+                        ponto.possui_destaque(destaque.id) %} checked {% endif %}>
+
+                    <label class="btn btn-outline-primary destaque-chip" for="destaque{{ destaque.id }}">
+                        {{ destaque.nome }}
+                    </label>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <div class="mb-3">
                 <label for="tipo_ponto" class="form-label">
                     Tipo do Ponto <span class="text-danger">*</span>
                 </label>

@@ -52,8 +52,51 @@
             <div class="badge-desconto-direita">-{{ ponto.promocao.desconto|int }}%</div>
             {% endif %}
 
-            <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top ponto-img"
-                style="height: 300px; object-fit: cover;">
+            <div class="position-relative">
+
+                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top ponto-img"
+                    style="height: 300px; object-fit: cover;">
+
+                <div
+                    class="ranking-number 
+        {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% elif loop.index == 3 %}bronze{% else %}blue{% endif %}">
+                    {{ loop.index }}
+                </div>
+
+                {% if session.get('usuario') %}
+                <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
+                    class="position-absolute bottom-0 end-0 m-2">
+
+                    <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+
+                    <button type="submit"
+                        class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 45px;">
+
+                        {% if ponto.id in favoritos_ids %}
+                        <span style="color: red; font-size: 20px;">❤️</span>
+                        {% else %}
+                        <span style="color: gray; font-size: 20px;">🤍</span>
+                        {% endif %}
+
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if ponto.destaques %}
+                <div class="position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1"
+                    style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);">
+
+                    {% for d in ponto.destaques %}
+                    <span class="badge bg-dark bg-opacity-75 text-white">
+                        #{{ d.nome }}
+                    </span>
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+
+            </div>
 
             <div class="card-body">
                 <div>
@@ -102,32 +145,49 @@
     <div class="col-md-4 mb-4 d-flex">
         <div class="card shadow-sm card-hover card-ponto w-100 position-relative">
 
-            {% if session.get('usuario') %}
-            <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
-                class="position-absolute bottom-50 start-0 m-2">
+            <div class="position-relative">
 
-                <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+                <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top ponto-img"
+                    style="height: 300px; object-fit: cover;">
 
-                <button type="submit"
-                    class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                    style="width: 45px; height: 45px;">
+                {% if ponto.destaques %}
+                <div class="position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1"
+                    style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);">
 
-                    {% if ponto.id in favoritos_ids %}
-                    <span style="color: red; font-size: 20px;">❤️</span>
-                    {% else %}
-                    <span style="color: gray; font-size: 20px;">🤍</span>
-                    {% endif %}
+                    {% for d in ponto.destaques %}
+                    <span class="badge bg-dark bg-opacity-75 text-white">
+                        #{{ d.nome }}
+                    </span>
+                    {% endfor %}
 
-                </button>
-            </form>
-            {% endif %}
+                </div>
+                {% endif %}
 
-            {% if ponto.promocao %}
-            <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
-            {% endif %}
+                {% if ponto.promocao %}
+                <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
+                {% endif %}
 
-            <img src="{{ url_for('static', filename=ponto.url_imagem) }}" class="card-img-top rounded-top ponto-img"
-                style="height: 300px; object-fit: cover;">
+                {% if session.get('usuario') %}
+                <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
+                    class="position-absolute bottom-0 end-0 m-2">
+
+                    <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+
+                    <button type="submit"
+                        class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 45px;">
+
+                        {% if ponto.id in favoritos_ids %}
+                        <span style="color: red; font-size: 20px;">❤️</span>
+                        {% else %}
+                        <span style="color: gray; font-size: 20px;">🤍</span>
+                        {% endif %}
+
+                    </button>
+                </form>
+                {% endif %}
+
+            </div>
 
             <div class="card-body">
                 <div>

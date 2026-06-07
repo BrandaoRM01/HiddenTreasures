@@ -1,4 +1,4 @@
-from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, EcossistemaFactory, TipoCulturalFactory
+from projeto.factorys import UsuarioFactory, AvaliacaoFactory, PontoTuristicoFactory, PromocaoFactory, CategoriaFactory, EcossistemaFactory, TipoCulturalFactory, DestaqueFactory
 from projeto.models import PontoCultural, PontoNatural
 from . import BaseDAO
 from projeto.config import Config
@@ -145,11 +145,16 @@ class PontoTuristicoDAO(BaseDAO):
                 tc.nome AS tipo_cultural_nome,
 
                 e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
             LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
@@ -182,6 +187,14 @@ class PontoTuristicoDAO(BaseDAO):
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)
                 
         finally:
             cursor.close()
@@ -218,27 +231,29 @@ class PontoTuristicoDAO(BaseDAO):
                 tc.nome AS tipo_cultural_nome,
 
                 e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
             LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-
-            LIMIT %s
         """
-        valor = [limite]
         pontos_map = {}
 
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
 
         try:
-            cursor.execute(sql, valor)
+            cursor.execute(sql)
             for linha in cursor.fetchall():
                 ponto_id = linha['id']
                 if ponto_id not in pontos_map:
@@ -256,12 +271,22 @@ class PontoTuristicoDAO(BaseDAO):
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+                
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)
             
         finally:
             cursor.close()
             conexao.close()
 
-        return sorted(list(pontos_map.values()), key=lambda ponto: (-(ponto.media_avaliacao or 0), ponto.nome))
+        pontos_ordenados = sorted(list(pontos_map.values()), key=lambda ponto: (-(ponto.media_avaliacao or 0), ponto.nome))
+
+        return pontos_ordenados[:limite]
 
     def buscar_ponto_por_id(self, id_ponto):
         sql = """
@@ -292,11 +317,16 @@ class PontoTuristicoDAO(BaseDAO):
                 tc.nome AS tipo_cultural_nome,
 
                 e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
             LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
@@ -330,6 +360,15 @@ class PontoTuristicoDAO(BaseDAO):
                     )
                     if avaliacao not in ponto.avaliacoes:
                         ponto.adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if destaque not in ponto.destaques:
+                        ponto.adicionar_destaque(destaque)
+
             ponto.avaliacoes.sort(key=lambda avaliacao: avaliacao.data_avaliacao,reverse=True)
         finally:
             cursor.close()
@@ -337,7 +376,7 @@ class PontoTuristicoDAO(BaseDAO):
 
         return ponto
     
-    def cadastrar_ponto(self, novo_ponto):
+    def cadastrar_ponto(self, novo_ponto, destaques_ids):
         if isinstance(novo_ponto, PontoCultural):
             sql = """
                 INSERT INTO pontos_turisticos (
@@ -410,12 +449,15 @@ class PontoTuristicoDAO(BaseDAO):
 
         try:
             cursor.execute(sql, valores)
+            novo_ponto.id = cursor.lastrowid
+
+            self.__salvar_destaques_ponto(cursor, novo_ponto.id, destaques_ids)
             conexao.commit()
         finally:
             cursor.close()
             conexao.close()
 
-    def atualizar_ponto(self, ponto_atualizado, imagem_antiga):
+    def atualizar_ponto(self, ponto_atualizado, imagem_antiga, destaques_ids):
         if isinstance(ponto_atualizado, PontoCultural):
             sql = """
                 UPDATE pontos_turisticos
@@ -494,6 +536,7 @@ class PontoTuristicoDAO(BaseDAO):
 
         try:
             cursor.execute(sql, valores)
+            self.__atualizar_destaques_ponto(cursor, ponto_atualizado.id, destaques_ids)
             conexao.commit()
         finally:
             cursor.close()
@@ -520,6 +563,7 @@ class PontoTuristicoDAO(BaseDAO):
                     if os.path.exists(caminho):
                         os.remove(caminho)
 
+            self.__remover_destaques_ponto(cursor, id_ponto)
             cursor.execute(sql, valor)
             conexao.commit()
         finally:
@@ -555,11 +599,16 @@ class PontoTuristicoDAO(BaseDAO):
                 tc.nome AS tipo_cultural_nome,
 
                 e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome
+                e.nome AS ecossistema_nome,
+
+                d.nome AS destaque_nome,
+                d.id AS destaque_id
 
             FROM pontos_turisticos AS p
 
             INNER JOIN categorias AS c ON p.categoria_id = c.id
+            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
             LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
             LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
             LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
@@ -576,8 +625,8 @@ class PontoTuristicoDAO(BaseDAO):
         elif filtro == "localizacao":
             sql += "WHERE p.localizacao LIKE %s"
 
-        sql+= " GROUP BY p.id ORDER BY p.nome ASC"
-        lista_pontos = []
+        sql+= "ORDER BY p.nome ASC"
+        pontos_map = {}
 
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
@@ -585,11 +634,52 @@ class PontoTuristicoDAO(BaseDAO):
         try:
             cursor.execute(sql, valor)
             for linha in cursor.fetchall():
-                ponto = self.__criar_ponto_turistico(linha)
+                ponto_id = linha['id']
+                if ponto_id not in pontos_map:
+                    pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
 
-                lista_pontos.append(ponto)
+                if linha['usuario_email'] and linha['ponto_id']:
+                    usuario = UsuarioFactory.criar_usuario(email=linha['email'], username=linha['username'], url_foto=linha['url_foto'], tipo_usuario=linha['tipo_usuario'])
+
+                    avaliacao = AvaliacaoFactory.criar_avaliacao(
+                        usuario=usuario,
+                        ponto_id=linha['ponto_id'],
+                        nota=linha['nota'],
+                        data_avaliacao=linha['data_avaliacao'],
+                        comentario=linha['comentario']
+                    )
+                    pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                if linha['destaque_nome']:
+                    destaque = DestaqueFactory.criar_destaque(
+                        id=linha['destaque_id'],
+                        nome=linha['destaque_nome']
+                    )
+                    if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                        pontos_map[ponto_id].adicionar_destaque(destaque)
         finally:
             cursor.close()
             conexao.close()
 
-        return lista_pontos
+        return list(pontos_map.values())
+    
+    def __salvar_destaques_ponto(self, cursor, id_ponto, destaques_ids):
+        for id in destaques_ids:
+            sql = """
+                INSERT INTO pontos_destaques (ponto_id, destaque_id)
+                VALUES (%s, %s)
+            """
+            valores = [id_ponto, id]
+            cursor.execute(sql, valores)
+
+    def __remover_destaques_ponto(self, cursor, id_ponto):
+        sql = """
+            DELETE FROM pontos_destaques
+            WHERE ponto_id = %s
+        """
+        valor = [id_ponto]
+        cursor.execute(sql, valor)
+
+    def __atualizar_destaques_ponto(self, cursor, id_ponto, destaques_ids):
+        self.__remover_destaques_ponto(cursor, id_ponto)
+        self.__salvar_destaques_ponto(cursor, id_ponto, destaques_ids)

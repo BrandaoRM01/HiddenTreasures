@@ -37,3 +37,15 @@ body {
     height: 100%;
     object-fit: cover;
 }
+
+.destaque-chip {
+    border-radius: 25px;
+    padding: 8px 16px;
+    transition: .2s;
+}
+
+.btn-check:checked+.destaque-chip {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
