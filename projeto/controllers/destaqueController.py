@@ -22,7 +22,7 @@ class DestaqueController:
 
         lista = self.__dao.carregar_destaques()
 
-        return render_template('gerenciar_destaques.html', lista=lista)
+        return render_template('destaque/gerenciar_destaques.html', lista=lista)
 
     def cadastrar_destaque(self):
         if not self.__usuario_pode_moderar():
@@ -68,7 +68,7 @@ class DestaqueController:
             flash('Destaque não encontrado.', 'danger')
             return redirect(url_for('destaques.gerenciar_destaques'))
 
-        return render_template('editar_destaque.html', destaque=destaque)
+        return render_template('destaque/editar_destaque.html', destaque=destaque)
 
     def atualizar_destaque(self, id_destaque):
         if not self.__usuario_pode_moderar():
@@ -82,12 +82,12 @@ class DestaqueController:
 
         if not nome:
             flash('O campo nome do destaque é obrigatório.', 'danger')
-            return redirect(url_for('destaques.preparar_editar_destaque', id_destaque=id_destaque)
+            return redirect(url_for('destaques.atualizar_destaque', id_destaque=id_destaque)
             )
 
         if nome.capitalize().strip() in nomes_destaques and nome.capitalize().strip() != destaque_atual.nome:
             flash('Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('destaques.preparar_editar_destaque', id_destaque=id_destaque)
+            return redirect(url_for('destaques.atualizar_destaque', id_destaque=id_destaque)
             )
 
         destaque_atualizado = DestaqueFactory.criar_destaque(

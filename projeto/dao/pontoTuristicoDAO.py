@@ -250,7 +250,7 @@ class PontoTuristicoDAO(BaseDAO):
             LEFT JOIN usuarios AS u ON a.usuario_email = u.email
             LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
 
-            ORDER BY p.status ASC, p.nome ASC
+            ORDER BY p.status DESC, p.nome ASC
         """
         pontos_map = {}
 
@@ -724,11 +724,11 @@ class PontoTuristicoDAO(BaseDAO):
         valor = [f'%{escrita}%']
 
         if filtro == "nome":
-            sql += "WHERE p.nome LIKE %s"
+            sql += " and p.nome LIKE %s"
         elif filtro == "categoria":
-            sql += "WHERE c.nome LIKE %s"
+            sql += " and c.nome LIKE %s"
         elif filtro == "localizacao":
-            sql += "WHERE p.localizacao LIKE %s"
+            sql += " and p.localizacao LIKE %s"
 
         sql+= "ORDER BY p.nome ASC"
         pontos_map = {}

@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS pontos_turisticos (
     area_km2 FLOAT,
     ano_fundacao VARCHAR(100),
     tipo_ponto ENUM('natural', 'cultural') NOT NULL,
-    status ENUM('pendente', 'aprovado', 'rejeitado') NOT NULL DEFAULT 'pendente',
+    status ENUM('rejeitado', 'pendente', 'aprovado') NOT NULL DEFAULT 'pendente',
 
     sugerido_por VARCHAR(150) DEFAULT NULL,
     categoria_id INT NOT NULL,

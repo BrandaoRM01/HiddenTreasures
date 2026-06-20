@@ -22,7 +22,7 @@ class CategoriaController:
         
         lista = self.__dao.carregar_categorias()
 
-        return render_template('gerenciar_categorias.html', lista=lista)
+        return render_template('categoria/gerenciar_categorias.html', lista=lista)
     
     def cadastrar_categoria(self):
         if not self.__usuario_pode_moderar():
@@ -72,7 +72,7 @@ class CategoriaController:
         if not categoria:
             flash('Categoria não encontrada.', 'danger')
             return redirect(url_for('categorias.gerenciar_categorias'))
-        return render_template('editar_categoria.html', categoria=categoria)
+        return render_template('categoria/editar_categoria.html', categoria=categoria)
     
     def atualizar_categoria(self, id_categoria):
         if not self.__usuario_pode_moderar():

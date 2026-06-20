@@ -36,7 +36,7 @@ class AvaliacaoController:
             flash('Ponto turístico não encontrado.', 'danger')
             return redirect(url_for('pontos.detalhes_ponto', id=ponto_id))
 
-        return render_template('editar_avaliacao.html', avaliacao=avaliacao, ponto=ponto)
+        return render_template('avaliacao/editar_avaliacao.html', avaliacao=avaliacao, ponto=ponto)
     
     def preparar_avaliacoes_ponto(self, ponto_id):
         ponto = self.__dao_ponto.buscar_ponto_por_id(ponto_id)
@@ -53,7 +53,7 @@ class AvaliacaoController:
     
         avaliacoes = self.__dao_avaliacao.listar_avaliacoes_por_ponto(ponto_id, usuario_email)
 
-        return render_template('avaliacoes_ponto.html', avaliacoes=avaliacoes, ponto=ponto, avaliacao_usuario=avaliacao_usuario)
+        return render_template('avaliacao/avaliacoes_ponto.html', avaliacoes=avaliacoes, ponto=ponto, avaliacao_usuario=avaliacao_usuario)
 
     def cadastrar_avaliacao(self, ponto_id):
         if 'usuario' not in session:

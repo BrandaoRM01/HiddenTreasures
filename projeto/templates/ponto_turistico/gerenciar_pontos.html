@@ -316,6 +316,7 @@
                                         <i class="bi bi-pencil-fill"></i>
 
                                     </a>
+                                    {% endif %}
 
                                     <form action="{{ url_for('pontos.remover_ponto', id=ponto.id) }}" method="POST"
                                         class="d-inline"
@@ -328,7 +329,7 @@
                                         </button>
 
                                     </form>
-                                    {% endif %}
+
                                 </div>
 
                             </div>

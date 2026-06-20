@@ -22,7 +22,7 @@ class EcossistemaController:
 
         lista = self.__dao.carregar_ecossistemas()
 
-        return render_template('gerenciar_ecossistemas.html', lista=lista)
+        return render_template('ecossistema/gerenciar_ecossistemas.html', lista=lista)
 
     def cadastrar_ecossistema(self):
         if not self.__usuario_pode_moderar():
@@ -68,7 +68,7 @@ class EcossistemaController:
             flash('Ecossistema não encontrado.', 'danger')
             return redirect(url_for('ecossistemas.gerenciar_ecossistemas'))
 
-        return render_template('editar_ecossistema.html', ecossistema=ecossistema)
+        return render_template('ecossistema/editar_ecossistema.html', ecossistema=ecossistema)
 
     def atualizar_ecossistema(self, id_ecossistema):
         if not self.__usuario_pode_moderar():

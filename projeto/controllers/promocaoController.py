@@ -18,7 +18,7 @@ class PromocaoController:
         self.__dao.deletar_promocoes_expiradas()
         
         lista_promocoes = self.__dao.listar_todas_promocoes()
-        return render_template('gerenciar_promocoes.html', lista_promocoes=lista_promocoes)
+        return render_template('promocao/gerenciar_promocoes.html', lista_promocoes=lista_promocoes)
     
     def preparar_editar_promocao(self, id):
         if not self.__usuario_pode_moderar():
@@ -29,7 +29,7 @@ class PromocaoController:
             flash('Promoção não encontrada.', 'danger')
             return redirect(url_for('promocoes.gerenciar_promocoes'))
         
-        return render_template('editar_promocao.html', promocao=promocao)
+        return render_template('promocao/editar_promocao.html', promocao=promocao)
     
     def cadastrar_promocao(self):
         if not self.__usuario_pode_moderar():

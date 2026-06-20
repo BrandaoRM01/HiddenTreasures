@@ -43,7 +43,7 @@ class HistoricoSenhaController:
     def __enviar_email_brevo(self, email_destino, link):
 
         html = render_template(
-            "email_redefinir_senha.html",
+            "usuario/email_redefinir_senha.html",
             link=link
         )
 
@@ -70,7 +70,7 @@ class HistoricoSenhaController:
     def preparar_recuperar_senha(self):
         if 'usuario' in session:
             return render_template('erro.html')
-        return render_template('recuperar_senha.html')
+        return render_template('usuario/recuperar_senha.html')
 
     def preparar_redefinir_senha(self, token):
         if 'usuario' in session:
@@ -85,7 +85,7 @@ class HistoricoSenhaController:
             flash('Token expirado.', 'danger')
             return redirect(url_for('user.login'))
 
-        return render_template('redefinir_senha.html', token=token)
+        return render_template('usuario/redefinir_senha.html', token=token)
 
     def enviar_recuperacao(self):
         email = request.form.get('email')

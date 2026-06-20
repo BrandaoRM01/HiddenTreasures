@@ -22,7 +22,7 @@ class TipoCulturalController:
 
         lista = self.__dao.carregar_tipos_culturais()
 
-        return render_template('gerenciar_tipos_culturais.html', lista=lista)
+        return render_template('tipo_cultural/gerenciar_tipos_culturais.html', lista=lista)
 
     def cadastrar_tipo_cultural(self):
         if not self.__usuario_pode_moderar():
@@ -68,7 +68,7 @@ class TipoCulturalController:
             flash('Tipo cultural não encontrado.', 'danger')
             return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
 
-        return render_template('editar_tipo_cultural.html', tipo=tipo)
+        return render_template('tipo_cultural/editar_tipo_cultural.html', tipo=tipo)
 
     def atualizar_tipo_cultural(self, id_tipo):
         if not self.__usuario_pode_moderar():

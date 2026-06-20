@@ -45,26 +45,6 @@
                     <div class="badge-desconto">-{{ ponto.promocao.desconto|int }}%</div>
                     {% endif %}
 
-                    {% if session.get('usuario') %}
-                    <form method="POST" action="{{ url_for('user.alterar_favorito') }}"
-                        class="position-absolute bottom-0 end-0 m-2">
-
-                        <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
-
-                        <button type="submit"
-                            class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                            style="width: 45px; height: 45px;">
-
-                            {% if ponto.id in favoritos_ids %}
-                            <span style="color: red; font-size: 20px;">❤️</span>
-                            {% else %}
-                            <span style="color: gray; font-size: 20px;">🤍</span>
-                            {% endif %}
-
-                        </button>
-                    </form>
-                    {% endif %}
-
                 </div>
 
                 <div class="card-body">
@@ -80,22 +60,44 @@
                         <p class="text-warning">⭐ Nenhuma avaliação</p>
                         {% endif %}
 
-                        <p class="preco">
-                            {% if ponto.custo_entrada %}
-                            {% if ponto.promocao %}
-                            <span class="preco-antigo">
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <p class="preco mb-0">
+                                {% if ponto.custo_entrada %}
+                                {% if ponto.promocao %}
+                                <span class="preco-antigo">
+                                    R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                                </span>
+                                <span class="preco-promocao">
+                                    R$ {{ "%.2f"|format(ponto.custo_entrada * (1 - ponto.promocao.desconto / 100)) }}
+                                </span>
+                                {% else %}
                                 R$ {{ "%.2f"|format(ponto.custo_entrada) }}
-                            </span>
-                            <span class="preco-promocao">
-                                R$ {{ "%.2f"|format(ponto.custo_entrada * (1 - ponto.promocao.desconto / 100)) }}
-                            </span>
-                            {% else %}
-                            R$ {{ "%.2f"|format(ponto.custo_entrada) }}
+                                {% endif %}
+                                {% else %}
+                                <span class="preco-promocao">Gratuito</span>
+                                {% endif %}
+                            </p>
+
+                            {% if session.get('usuario') %}
+                            <form method="POST" action="{{ url_for('user.alterar_favorito') }}">
+                                <input type="hidden" name="ponto_id" value="{{ ponto.id }}">
+
+                                <button type="submit"
+                                    class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                    style="width:40px;height:40px;">
+
+                                    {% if ponto.id in favoritos_ids %}
+                                    <span style="color:red;font-size:20px;">❤️</span>
+                                    {% else %}
+                                    <span style="color:gray;font-size:20px;">🤍</span>
+                                    {% endif %}
+
+                                </button>
+                            </form>
                             {% endif %}
-                            {% else %}
-                            <span class="preco-promocao">Gratuito</span>
-                            {% endif %}
-                        </p>
+
+                        </div>
 
                     </div>
 

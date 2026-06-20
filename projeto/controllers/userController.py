@@ -48,30 +48,30 @@ class UserController:
     def preparar_cadastro(self):
         if 'usuario' in session:
             return render_template('erro.html')
-        return render_template('cadastro.html')
+        return render_template('usuario/cadastro.html')
     
     def preparar_login(self):
         if 'usuario' in session:
             return render_template('erro.html')
-        return render_template('login.html')
+        return render_template('usuario/login.html')
     
     def preparar_editar_perfil(self):
         if 'usuario' not in session:
             return render_template('erro.html')
         
-        return render_template('editar_perfil.html')
+        return render_template('usuario/editar_perfil.html')
     
     def preparar_painel_admin(self):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
-        return render_template('painel_admin.html')
+        return render_template('usuario/painel_admin.html')
     
     def preparar_gerenciar_usuarios(self):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
         usuarios = self.__dao_usuario.listar_usuarios()
-        return render_template('gerenciar_usuarios.html', usuarios=usuarios)
+        return render_template('usuario/gerenciar_usuarios.html', usuarios=usuarios)
     
     def preparar_pagina_anterior(self):
         return redirect(request.referrer or url_for('pontos.index'))
@@ -84,7 +84,7 @@ class UserController:
 
         favoritos = usuario.pontos_favoritos
         
-        return render_template('favoritos.html', favoritos=favoritos)
+        return render_template('ponto_turistico/favoritos.html', favoritos=favoritos)
     
     def cadastrar_usuario(self):
         email = request.form.get('email')

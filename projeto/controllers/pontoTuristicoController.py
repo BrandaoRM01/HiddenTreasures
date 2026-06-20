@@ -47,10 +47,10 @@ class PontoTuristicoController:
         else:
             favoritos_ids = []
    
-        return render_template('index.html', pontos_promocao=pontos_promocao, top_pontos=top_pontos, favoritos_ids=favoritos_ids)
+        return render_template('ponto_turistico/index.html', pontos_promocao=pontos_promocao, top_pontos=top_pontos, favoritos_ids=favoritos_ids)
 
     def preparar_sobre(self):
-        return render_template('sobre.html')
+        return render_template('ponto_turistico/sobre.html')
 
     def preparar_gerenciar_pontos(self):
         if not self.__usuario_pode_moderar():
@@ -63,7 +63,7 @@ class PontoTuristicoController:
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
         lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('gerenciar_pontos.html', lista_pontos=lista_pontos, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
+        return render_template('ponto_turistico/gerenciar_pontos.html', lista_pontos=lista_pontos, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
     
     def preparar_gerenciar_sugestoes(self):
         if not self.__usuario_pode_moderar():
@@ -71,7 +71,7 @@ class PontoTuristicoController:
     
         lista_sugestoes = self.__dao_pontos.listar_pontos_sugeridos()
 
-        return render_template('gerenciar_sugestoes.html', lista_sugestoes=lista_sugestoes)
+        return render_template('ponto_turistico/gerenciar_sugestoes.html', lista_sugestoes=lista_sugestoes)
     
     def preparar_sugerir_ponto(self):
         if 'usuario' not in session:
@@ -88,7 +88,7 @@ class PontoTuristicoController:
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
         lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('sugerir_ponto.html', lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques, lista_sugestoes=lista_sugestoes)
+        return render_template('ponto_turistico/sugerir_ponto.html', lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques, lista_sugestoes=lista_sugestoes)
 
     def preparar_editar_ponto(self, id_ponto):
         if not self.__usuario_pode_moderar():
@@ -109,7 +109,7 @@ class PontoTuristicoController:
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
         lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('editar_ponto.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
+        return render_template('ponto_turistico/editar_ponto.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
     
     def preparar_editar_sugestao(self, id_ponto):
         if 'usuario' not in session:
@@ -135,7 +135,7 @@ class PontoTuristicoController:
         lista_ecossistemas = self.__dao_ecossistema.carregar_ecossistemas()
         lista_destaques = self.__dao_destaque.carregar_destaques()
 
-        return render_template('editar_sugestao.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
+        return render_template('ponto_turistico/editar_sugestao.html', ponto=ponto, lista_categorias=lista_categorias, lista_promocoes=lista_promocoes, lista_tipos_culturais=lista_tipos_culturais, lista_ecossistemas=lista_ecossistemas, lista_destaques=lista_destaques)
 
     def preparar_pontos_turisticos(self):
         lista_pontos = self.__listar_pontos()
@@ -148,7 +148,7 @@ class PontoTuristicoController:
         else:
             favoritos_ids = []
 
-        return render_template('pontos.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
+        return render_template('ponto_turistico/pontos.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
 
     def preparar_detalhes_ponto(self, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
@@ -169,7 +169,7 @@ class PontoTuristicoController:
 
         ultimas_avaliacoes = ponto.avaliacoes[-5:]
 
-        return render_template('detalhes_ponto.html', ponto=ponto, avaliacoes=ultimas_avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(ponto.avaliacoes))
+        return render_template('ponto_turistico/detalhes_ponto.html', ponto=ponto, avaliacoes=ultimas_avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(ponto.avaliacoes))
     
     def cadastrar_ponto(self):
         if 'usuario' not in session:
@@ -582,7 +582,7 @@ class PontoTuristicoController:
         else:
             favoritos_ids = []
 
-        return render_template('pontos_busca.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
+        return render_template('ponto_turistico/pontos_busca.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
     
     def alterar_status(self, id_ponto, status):
         if not self.__usuario_pode_moderar():
