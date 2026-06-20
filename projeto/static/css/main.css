@@ -49,3 +49,15 @@ body {
     color: white;
     border-color: var(--bs-primary);
 }
+
+.btn-rejeitar {
+    background-color: #ff9603;
+    border-color: #ff9603;
+    color: white;
+}
+
+.btn-rejeitar:hover {
+    background-color: #e68600;
+    border-color: #e68600;
+    color: white;
+}

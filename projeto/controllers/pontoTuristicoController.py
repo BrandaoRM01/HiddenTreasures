@@ -124,6 +124,10 @@ class PontoTuristicoController:
             else:
                 flash('Um admin não pode editar a sugestão de um usuário, apenas conferir as informações e aprovar ou rejeitar essa sugestão!', 'warning')
                 return redirect(url_for('pontos.gerenciar_sugestoes'))
+            
+        if session['usuario']['email'] == ponto.sugerido_por and ponto.status == 'aprovado':
+            flash('Você não pode editar sua sugestão porque ela já foi aprovada!', 'danger')
+            return redirect(url_for('pontos.sugerir_ponto'))
 
         if not ponto:
             flash('Ponto turístico não encontrado.', 'danger')
@@ -340,11 +344,15 @@ class PontoTuristicoController:
         if 'usuario' not in session:
             return render_template('erro.html')
         
+        ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
         self.__dao_pontos.excluir_ponto(id_ponto)
         flash('Ponto turístico excluído com sucesso!', 'success')
         if session['usuario']['pode_moderar']:
             return redirect(url_for('pontos.gerenciar_pontos'))
         else:
+            if session['usuario']['email'] == ponto.sugerido_por and ponto.status == 'aprovado':
+                flash('Você não pode excluir sua sugestão porque ela já foi aprovada!', 'danger')
+                return redirect(url_for('pontos.sugerir_ponto'))
             return redirect(url_for('pontos.sugerir_ponto'))
     
     def editar_ponto(self, id_ponto):
