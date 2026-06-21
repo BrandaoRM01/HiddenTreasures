@@ -196,60 +196,45 @@ SELECT
     p.nome AS ponto_nome,
     p.localizacao AS ponto_localizacao
 
-FROM avaliacoes a
-INNER JOIN usuarios u ON a.usuario_email = u.email
-INNER JOIN pontos_turisticos p ON a.ponto_id = p.id;
+    FROM avaliacoes a
+        INNER JOIN usuarios u ON a.usuario_email = u.email
+        INNER JOIN pontos_turisticos p ON a.ponto_id = p.id;
 
-INSERT INTO categorias (id, nome, descricao) VALUES
-(11, 'Praia', 'Mar e areia'),
-(12, 'Montanha', 'Lugar belo e alto'),
-(13, 'Monumento', 'Algo feito pelo homem e que marcou a história'),
-(14, 'Museu', 'Lugar onde se admirar obras de arte'),
-(15, 'Cidade histórica', 'Cidade marcada por importância histórica'),
-(16, 'Cânion', 'Grande buraco natural'),
-(19, 'Local histórico', 'Sem descrição'),
-(20, 'Parque ecológico', 'Sem descrição'),
-(21, 'Edifício', 'Sem descrição'),
-(22, 'Torre', 'Sem descrição'),
-(23, 'Shopping', 'Sem descrição'),
-(24, 'Floresta', 'Sem descrição');
+CREATE OR REPLACE VIEW vw_usuarios_protegidos AS
+SELECT 
+    email,
+    username,
+    url_foto,
+    tipo_usuario
+FROM usuarios;
 
-INSERT INTO promocoes 
-(id, titulo, descricao, desconto, data_inicio, data_fim)
-VALUES
-(3, 'Promoção de natal - 2026', 
-'Promoção perfeita para seu fim de ano', 
-45.50, '2026-12-01', '2026-12-30'),
+CREATE USER 'superadmin'@'localhost'
+IDENTIFIED BY 'Super@dmin'; 
 
-(4, 'Promoção internacional', 
-'Promoção para pessoas que pretendem visitar lugares distantes pelo mundo!', 
-35.00, '2026-04-03', '2026-05-15');
+CREATE USER 'admin'@'localhost'
+IDENTIFIED BY '@dmin1607'; 
 
-INSERT INTO pontos_turisticos 
-(id, nome, localizacao, descricao, horario_funcionamento, custo_entrada, url_imagem, categoria_id, promocao_id)
-VALUES
-(18, 'Grand canyon', 'Arizona, EUA', 'Conhecido pelas suas camadas rochosas vermelhas que revelam bilhões de anos da história da terra, é um patrimônio mundial da UNESCO e um dos parques nacionais mais visitados', '24 horas por dia', 120.00, 'uploads/pontos/grand_canyon.jpg', 16, 4),
+CREATE USER 'user'@'localhost'
+IDENTIFIED BY 'Us&r123'; 
 
-(20, 'Muralha da China', 'China', 'A grande muralha da china é uma série de fortificações na china, construída ao longo das fronteiras históricas para proteção', '7:30 às 18:30', 390.00, 'uploads/pontos/muralha_da_china.jpg', 19, NULL),
+CREATE ROLE 'role_superadmin';
+CREATE ROLE 'role_admin';
+CREATE ROLE 'role_user';
 
-(21, 'Parque Natural Municipal do Basalto', 'Araraquara, SP, Brasil', 'Parque ecológico em Araraquara', '08 às 18', 0.00, 'uploads/pontos/parque_natural_municipal_do_basalto.jpg', 20, NULL),
+GRANT ALL PRIVILEGES ON *.* TO 'role_superadmin';
 
-(22, 'Ouro Preto', 'Minas Gerais, Brasil', 'Uma cidade histórica famosa do Brasil', 'Dia todo', 0.00, 'uploads/pontos/ouro_preto.jpg', 15, NULL),
+GRANT SELECT, INSERT, UPDATE, DELETE ON pontos_turisticos.* TO 'role_admin';
 
-(23, 'Torre Eiffel', 'Paris, França', 'Uma torre muito linda e alta', 'Dia todo', 100.00, 'uploads/pontos/torre_eiffel.jpg', 13, 4),
+GRANT SELECT ON pontos_turisticos.* TO 'role_user';
 
-(24, 'Coliseu', 'Roma, Itália', 'Um antigo edifício famoso na época da política do pão e circo', '10 às 18', 100.00, 'uploads/pontos/coliseu.jpg', 19, 4),
+GRANT INSERT, UPDATE, DELETE ON pontos_turisticos.avaliacoes TO 'role_user';
 
-(25, 'Cristo Redentor', 'Rio de Janeiro, Brasil', 'Um monumento famoso considerado uma das sete maravilhas do mundo', 'Dia todo', 25.00, 'uploads/pontos/cristo_redentor.webp', 13, NULL),
+GRANT INSERT, DELETE ON pontos_turisticos.favoritos TO 'role_user';
 
-(27, 'Shopping Jaraguá', 'Araraquara, SP, Brasil', 'Shopping center em Araraquara', '08 às 22 horas', 0.00, 'uploads/pontos/shopping_jaragua.jpg', 23, NULL),
+GRANT INSERT ON pontos_turisticos.pontos_turisticos TO 'role_user';
 
-(28, 'Bueno de Andrada', 'Bueno de Andrada, SP, Brasil', 'Cidade conhecida pelas coxinhas', 'Dia todo', 0.00, 'uploads/pontos/bueno_de_andrada.jpg', 15, NULL),
+GRANT 'role_superadmin' TO 'superadmin'@'localhost';
 
-(29, 'Douradinhas de Nova Pauliceia', 'Nova Pauliceia, SP, Brasil', 'Lugar maravilhoso', 'Dia todo', 0.00, 'img/default/hidden_treasures_logo.png', 15, NULL),
+GRANT 'role_admin' TO 'admin'@'localhost';
 
-(30, 'Cristo de Araraquara', 'Araraquara, SP, Brasil (Melhado, rodoviária)', 'Ponto de entretenimento e diversão', '18h às 6h', 300.00, 'uploads/pontos/cristo_de_araraquara.jpg', 13, NULL),
-
-(31, 'Caesars Palace', 'Las Vegas, EUA', 'Resort e cassino icônico inspirado na Roma antiga', '24h', 0.00, 'uploads/pontos/caesars_palace.jpg', 21, NULL),
-
-(32, 'Vila Belmiro', 'Santos, SP, Brasil', 'Estádio histórico do Santos FC com grande importância esportiva', '08:00 às 24:00', 150.00, 'uploads/pontos/villa_belmiro.jpg', 19, NULL);
+GRANT 'role_user' TO 'user'@'localhost';
