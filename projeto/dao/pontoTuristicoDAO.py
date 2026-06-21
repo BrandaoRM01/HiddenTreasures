@@ -120,51 +120,9 @@ class PontoTuristicoDAO(BaseDAO):
     
     def listar_pontos(self):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-            WHERE p.status = 'aprovado'
-
-            ORDER BY p.nome ASC
+            SELECT *
+            FROM vw_pontos_turisticos
+            ORDER BY nome ASC
         """
         pontos_map = {}
 
@@ -207,50 +165,9 @@ class PontoTuristicoDAO(BaseDAO):
     
     def listar_todos_pontos(self):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-
-            ORDER BY p.status DESC, p.nome ASC
+            SELECT *
+            FROM vw_pontos_turisticos
+            ORDER BY status DESC, nome ASC
         """
         pontos_map = {}
 
@@ -293,49 +210,9 @@ class PontoTuristicoDAO(BaseDAO):
     
     def listar_top_pontos(self, limite=10):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-            WHERE p.status = 'aprovado'
+            SELECT *
+            FROM vw_pontos_turisticos
+            WHERE status = 'aprovado'
         """
         pontos_map = {}
 
@@ -380,50 +257,9 @@ class PontoTuristicoDAO(BaseDAO):
 
     def buscar_ponto_por_id(self, id_ponto):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-
-            WHERE p.id = %s
+            SELECT *
+            FROM vw_pontos_turisticos
+            WHERE id = %s
         """
         ponto = None
         valor = [id_ponto]
@@ -676,61 +512,21 @@ class PontoTuristicoDAO(BaseDAO):
 
     def buscar_pontos(self, escrita, filtro):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-            WHERE p.status = 'aprovado'
+            SELECT *
+            FROM vw_pontos_turisticos
+            WHERE status = 'aprovado'
         """
 
         valor = [f'%{escrita}%']
 
         if filtro == "nome":
-            sql += " and p.nome LIKE %s"
+            sql += " and nome LIKE %s"
         elif filtro == "categoria":
-            sql += " and c.nome LIKE %s"
+            sql += " and nome LIKE %s"
         elif filtro == "localizacao":
-            sql += " and p.localizacao LIKE %s"
+            sql += " and localizacao LIKE %s"
 
-        sql+= "ORDER BY p.nome ASC"
+        sql+= "ORDER BY nome ASC"
         pontos_map = {}
 
         conexao = self._get_connection()
@@ -770,51 +566,10 @@ class PontoTuristicoDAO(BaseDAO):
     
     def listar_sugestoes_usuario(self, email_usuario):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-
-            WHERE p.sugerido_por = %s
-            ORDER BY p.status ASC, p.nome ASC
+            SELECT *
+            FROM vw_pontos_turisticos
+            WHERE sugerido_por = %s
+            ORDER BY status ASC, p.nome ASC
         """
         pontos_map = {}
         valor = [email_usuario]
@@ -857,51 +612,10 @@ class PontoTuristicoDAO(BaseDAO):
     
     def listar_pontos_sugeridos(self):
         sql = """
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-
-                a.ponto_id,
-                a.usuario_email,
-                a.nota,
-                a.data_avaliacao,
-                a.comentario,
-
-                u.email,
-                u.username,
-                u.url_foto,
-                u.tipo_usuario,
-
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-
-                d.nome AS destaque_nome,
-                d.id AS destaque_id
-
-            FROM pontos_turisticos AS p
-
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
-            LEFT JOIN destaques AS d ON pd.destaque_id = d.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
-            LEFT JOIN usuarios AS u ON a.usuario_email = u.email
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-
-            WHERE p.sugerido_por IS NOT NULL
-            ORDER BY p.status ASC, p.nome ASC
+            SELECT *
+            FROM vw_pontos_turisticos
+            WHERE sugerido_por IS NOT NULL
+            ORDER BY status ASC, p.nome ASC
         """
         pontos_map = {}
 

@@ -122,6 +122,65 @@ CREATE TABLE IF NOT EXISTS favoritos (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE OR REPLACE VIEW vw_pontos_turisticos AS
+    SELECT 
+    p.id,
+    p.nome,
+    p.localizacao,
+    p.descricao,
+    p.horario_funcionamento,
+    p.custo_entrada,
+    p.url_imagem,
+    p.categoria_id AS ponto_categoria_id,
+    p.promocao_id AS ponto_promocao_id,
+    p.ecossistema_id AS ponto_ecossistema_id,
+    p.tipo_cultural_id AS ponto_tipo_cultural_id,
+    p.area_km2,
+    p.ano_fundacao,
+    p.tipo_ponto,
+    p.status,
+    p.sugerido_por,
+
+    c.id AS categoria_id,
+    c.nome AS categoria_nome,
+
+    pr.id AS promocao_id,
+    pr.titulo AS promocao_titulo,
+    pr.desconto AS promocao_desconto,
+    pr.data_inicio AS promocao_data_inicio,
+    pr.data_fim AS promocao_data_fim,
+    pr.descricao AS promocao_descricao,
+
+    a.ponto_id,
+    a.usuario_email,
+    a.nota,
+    a.data_avaliacao,
+    a.comentario,
+
+    u.email,
+    u.username,
+    u.url_foto,
+    u.tipo_usuario,
+
+    tc.id AS tipo_cultural_id,
+    tc.nome AS tipo_cultural_nome,
+
+    e.id AS ecossistema_id,
+    e.nome AS ecossistema_nome,
+
+    d.nome AS destaque_nome,
+    d.id AS destaque_id
+
+    FROM pontos_turisticos AS p
+        INNER JOIN categorias AS c ON p.categoria_id = c.id
+        LEFT JOIN pontos_destaques AS pd ON pd.ponto_id = p.id
+        LEFT JOIN destaques AS d ON pd.destaque_id = d.id
+        LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+        LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
+        LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
+        LEFT JOIN usuarios AS u ON a.usuario_email = u.email
+        LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id;
+
 INSERT INTO categorias (id, nome, descricao) VALUES
 (11, 'Praia', 'Mar e areia'),
 (12, 'Montanha', 'Lugar belo e alto'),

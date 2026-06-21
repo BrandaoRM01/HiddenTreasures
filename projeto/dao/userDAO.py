@@ -327,30 +327,9 @@ class UserDAO(BaseDAO):
 
     def listar_favoritos_por_usuario(self, usuario_email):
         sql = '''
-            SELECT 
-                p.*,
-                c.id AS categoria_id,
-                c.nome AS categoria_nome,
-                pr.id AS promocao_id,
-                pr.titulo AS promocao_titulo,
-                pr.desconto AS promocao_desconto,
-                pr.data_inicio AS promocao_data_inicio,
-                pr.data_fim AS promocao_data_fim,
-                pr.descricao AS promocao_descricao,
-                tc.id AS tipo_cultural_id,
-                tc.nome AS tipo_cultural_nome,
-                e.id AS ecossistema_id,
-                e.nome AS ecossistema_nome,
-                d.id AS destaque_id,
-                d.nome AS destaque_nome
-            FROM pontos_turisticos AS p
-            INNER JOIN categorias AS c ON p.categoria_id = c.id
-            LEFT JOIN pontos_destaques AS dp ON p.id = dp.ponto_id
-            LEFT JOIN destaques AS d ON dp.destaque_id = d.id
-            LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id
-            LEFT JOIN favoritos AS f ON p.id = f.ponto_id
-            LEFT JOIN tipos_culturais AS tc ON p.tipo_cultural_id = tc.id
-            LEFT JOIN ecossistemas AS e ON p.ecossistema_id = e.id
+            SELECT v.*
+            FROM vw_pontos_turisticos v
+            INNER JOIN favoritos f ON f.ponto_id = v.id
             WHERE f.usuario_email = %s
         '''
         valor = [usuario_email]
