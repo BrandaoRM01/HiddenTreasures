@@ -200,12 +200,13 @@ SELECT
         INNER JOIN usuarios u ON a.usuario_email = u.email
         INNER JOIN pontos_turisticos p ON a.ponto_id = p.id;
 
-CREATE OR REPLACE VIEW vw_usuarios_protegidos AS
+CREATE OR REPLACE VIEW vw_usuarios_basicos AS
 SELECT 
     email,
     username,
     url_foto,
-    tipo_usuario
+    tipo_usuario,
+    senha_hash
 FROM usuarios;
 
 CREATE USER 'superadmin'@'localhost'

@@ -34,7 +34,7 @@ class UserDAO(BaseDAO):
     def __pegar_foto_usuario(self, email):
         sql = """
             SELECT *
-            FROM vw_usuarios_protegidos
+            FROM vw_usuarios_basicos
             WHERE email = %s
         """
         valor = [email]
@@ -107,7 +107,7 @@ class UserDAO(BaseDAO):
     def buscar_usuario_por_email(self, email):
         sql = """
             SELECT *
-            FROM vw_usuarios_protegidos
+            FROM vw_usuarios_basicos
             WHERE email = %s
         """
         valor = [email]
@@ -137,7 +137,7 @@ class UserDAO(BaseDAO):
     def listar_usuarios(self):
         sql = """
             SELECT *
-            FROM vw_usuarios_protegidos
+            FROM vw_usuarios_basicos
             ORDER BY tipo_usuario DESC, email ASC
         """
         lista_usuarios = []
@@ -194,7 +194,7 @@ class UserDAO(BaseDAO):
     def pegar_usernames(self):
         sql = """
             SELECT username
-            FROM vw_usuarios_protegidos
+            FROM vw_usuarios_basicos
         """
         lista_usernames = []
 
