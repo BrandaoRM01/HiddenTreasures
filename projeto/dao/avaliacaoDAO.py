@@ -37,29 +37,19 @@ class AvaliacaoDAO(BaseDAO):
 
     def listar_avaliacoes_por_ponto(self, ponto_id, usuario_email=None):
         sql = """
-            SELECT 
-                a.*,
-                u.email AS usuario_email,
-                u.username AS usuario_username,
-                u.url_foto AS usuario_url_foto,
-                u.tipo_usuario,
-                p.id AS ponto_id,
-                p.nome AS ponto_nome,
-                p.localizacao AS ponto_localizacao
-            FROM avaliacoes AS a
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
-            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
-            WHERE a.ponto_id = %s
+            SELECT *
+            FROM vw_avaliacoes
+            WHERE ponto_id = %s
         """
         
         valores = [ponto_id]
 
         if usuario_email:
-            sql += " AND a.usuario_email != %s"
+            sql += " AND usuario_email != %s"
             valores.append(usuario_email)
 
         sql += """
-            ORDER BY a.data_avaliacao DESC
+            ORDER BY data_avaliacao DESC
         """
        
         avaliacoes_ponto = []
@@ -95,19 +85,9 @@ class AvaliacaoDAO(BaseDAO):
 
     def buscar_avaliacao(self, usuario_email, ponto_id):
         sql = """
-            SELECT 
-                a.*,
-                u.email AS usuario_email,
-                u.username AS usuario_username,
-                u.url_foto AS usuario_url_foto,
-                u.tipo_usuario,
-                p.id AS ponto_id,
-                p.nome AS ponto_nome,
-                p.localizacao AS ponto_localizacao
-            FROM avaliacoes AS a
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
-            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
-            WHERE a.usuario_email = %s AND a.ponto_id = %s
+            SELECT *
+            FROM vw_avaliacoes
+            WHERE usuario_email = %s AND ponto_id = %s
         """
         valor = [usuario_email, ponto_id]
 
@@ -189,28 +169,19 @@ class AvaliacaoDAO(BaseDAO):
 
     def listar_ultimas_avaliacoes_ponto(self, ponto_id, usuario_email=None, limite=5):
         sql = """
-            SELECT 
-                a.*,
-                u.email AS usuario_email,
-                u.username AS usuario_username,
-                u.url_foto AS usuario_url_foto,
-                p.id AS ponto_id,
-                p.nome AS ponto_nome,
-                p.localizacao AS ponto_localizacao
-            FROM avaliacoes AS a
-            INNER JOIN usuarios AS u ON a.usuario_email = u.email
-            INNER JOIN pontos_turisticos AS p ON a.ponto_id = p.id
-            WHERE a.ponto_id = %s
+            SELECT *
+            FROM vw_avaliacoes
+            WHERE ponto_id = %s
         """
         
         valores = [ponto_id]
 
         if usuario_email:
-            sql += " AND a.usuario_email != %s"
+            sql += " AND usuario_email != %s"
             valores.append(usuario_email)
 
         sql += """
-            ORDER BY a.data_avaliacao DESC
+            ORDER BY data_avaliacao DESC
             LIMIT %s
         """
         valores.append(limite)

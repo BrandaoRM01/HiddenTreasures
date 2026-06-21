@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS favoritos (
 ) ENGINE=InnoDB;
 
 CREATE OR REPLACE VIEW vw_pontos_turisticos AS
-    SELECT 
+SELECT 
     p.id,
     p.nome,
     p.localizacao,
@@ -180,6 +180,25 @@ CREATE OR REPLACE VIEW vw_pontos_turisticos AS
         LEFT JOIN avaliacoes AS a ON a.ponto_id = p.id
         LEFT JOIN usuarios AS u ON a.usuario_email = u.email
         LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id;
+
+CREATE OR REPLACE VIEW vw_avaliacoes AS
+SELECT
+    a.usuario_email,
+    a.ponto_id,
+    a.nota,
+    a.data_avaliacao,
+    a.comentario,
+
+    u.username AS usuario_username,
+    u.url_foto AS usuario_url_foto,
+    u.tipo_usuario,
+
+    p.nome AS ponto_nome,
+    p.localizacao AS ponto_localizacao
+
+FROM avaliacoes a
+INNER JOIN usuarios u ON a.usuario_email = u.email
+INNER JOIN pontos_turisticos p ON a.ponto_id = p.id;
 
 INSERT INTO categorias (id, nome, descricao) VALUES
 (11, 'Praia', 'Mar e areia'),
