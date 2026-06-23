@@ -222,20 +222,16 @@ CREATE ROLE 'role_superadmin';
 CREATE ROLE 'role_admin';
 CREATE ROLE 'role_user';
 
-GRANT ALL PRIVILEGES ON *.* TO 'role_superadmin';
+GRANT ALL PRIVILEGES ON pontos_turisticos.* TO 'role_superadmin';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON pontos_turisticos.* TO 'role_admin';
+GRANT ALL PRIVILEGES ON pontos_turisticos.* TO 'role_admin';
+REVOKE UPDATE, DELETE ON pontos_turisticos.usuarios FROM 'role_admin';
 
 GRANT SELECT ON pontos_turisticos.* TO 'role_user';
-
 GRANT INSERT, UPDATE, DELETE ON pontos_turisticos.avaliacoes TO 'role_user';
-
 GRANT INSERT, DELETE ON pontos_turisticos.favoritos TO 'role_user';
-
 GRANT INSERT ON pontos_turisticos.pontos_turisticos TO 'role_user';
 
 GRANT 'role_superadmin' TO 'superadmin'@'localhost';
-
 GRANT 'role_admin' TO 'admin'@'localhost';
-
 GRANT 'role_user' TO 'user'@'localhost';
