@@ -122,6 +122,7 @@ class PontoTuristicoDAO(BaseDAO):
         sql = """
             SELECT *
             FROM vw_pontos_turisticos
+            WHERE status = 'aprovado'
             ORDER BY nome ASC
         """
         pontos_map = {}
