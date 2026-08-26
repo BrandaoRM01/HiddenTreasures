@@ -1,14 +1,14 @@
-import { API_CATEGORIA_URL, mostrarMensagem } from '../main.js';
+import { API_ECOSSISTEMA_URL, mostrarMensagem } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await listarCategorias();
+    await listarEcossistemas();
 });
 
-export async function listarCategorias() {
-    const lista = document.getElementById('lista-categorias');
+export async function listarEcossistemas() {
+    const lista = document.getElementById('lista-ecossistemas');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_CATEGORIA_URL);
+    let resposta = await fetch(API_ECOSSISTEMA_URL);
 
     let dados = await resposta.json();
 
@@ -29,16 +29,16 @@ export async function listarCategorias() {
 
         let h4 = document.createElement('h4');
         h4.className = 'mb-2';
-        h4.textContent = 'Nenhuma categoria cadastrada';
+        h4.textContent = 'Nenhuma ecossistema cadastrada';
 
         let p = document.createElement('p');
         p.className = 'text-muted';
-        p.textContent = 'Comece criando uma categoria para organizar os pontos turísticos.';
+        p.textContent = 'Comece criando uma ecossistema para organizar os pontos turísticos.';
 
         let button = document.createElement('a');
         button.href = '#';
         button.className = 'btn btn-primary mt-3';
-        button.textContent = 'Criar primeira categoria';
+        button.textContent = 'Criar primeira ecossistema';
 
         div.appendChild(divIcone);
         div.appendChild(h4);
@@ -50,7 +50,7 @@ export async function listarCategorias() {
         return;
     }
 
-    dados.forEach(categoria => {
+    dados.forEach(ecossistema => {
 
         let div = document.createElement('div');
         div.className = 'd-flex justify-content-between align-items-center border-bottom py-3';
@@ -58,23 +58,15 @@ export async function listarCategorias() {
         let informacoes = document.createElement('div');
 
         let nome = document.createElement('strong');
-        nome.textContent = categoria.nome;
-
-        let br = document.createElement('br');
-
-        let descricao = document.createElement('small');
-        descricao.className = 'text-muted';
-        descricao.textContent = categoria.descricao;
+        nome.textContent = ecossistema.nome;
 
         informacoes.appendChild(nome);
-        informacoes.appendChild(br);
-        informacoes.appendChild(descricao);
 
         let botoes = document.createElement('div');
         botoes.className = 'd-flex gap-2';
 
         let editar = document.createElement('a');
-        editar.href = `/admin/atualizar-categoria/${categoria.id}`;
+        editar.href = `/admin/atualizar-ecossistema/${ecossistema.id}`;
         editar.className = 'btn btn-warning btn-sm';
         editar.title = 'Editar';
 
@@ -88,7 +80,7 @@ export async function listarCategorias() {
         excluir.className = 'btn btn-danger btn-sm d-flex align-items-center justify-content-center';
         excluir.title = 'Excluir';
 
-        removerCategoria(excluir, categoria, div);
+        removerEcossistema(excluir, ecossistema, div);
 
         let iconeExcluir = document.createElement('i');
         iconeExcluir.className = 'bi bi-trash';
@@ -105,17 +97,17 @@ export async function listarCategorias() {
     });
 }
 
-async function removerCategoria(botao, categoria, div) {
+async function removerEcossistema(botao, ecossistema, div) {
     botao.addEventListener('click', async () => {
 
-        let confirmar = confirm(`Tem certeza que deseja excluir a categoria ${categoria.nome}?`);
+        let confirmar = confirm(`Tem certeza que deseja excluir o ecossistema ${ecossistema.nome}?`);
 
         if (!confirmar) {
             return;
         }
 
         let respostaExcluir = await fetch(
-            `${API_CATEGORIA_URL}/${categoria.id}`,
+            `${API_ECOSSISTEMA_URL}/${ecossistema.id}`,
             {
                 method: 'DELETE'
             }

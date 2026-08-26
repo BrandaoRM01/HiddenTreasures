@@ -20,7 +20,7 @@ class CategoriaController:
         for obj in lista:
             categorias.append(obj.to_dict())
         
-        return jsonify(categorias)
+        return jsonify(categorias), 200
 
     def preparar_gerenciar_categorias(self):
         if not self.__usuario_pode_moderar():
@@ -98,10 +98,10 @@ class CategoriaController:
         categoria_atual = self.__dao.buscar_categoria_por_id(id_categoria)
 
         if not nome:
-            return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'})
+            return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'}), 400
         
         if nome.capitalize().strip() in nomes_categorias and nome.capitalize().strip() != categoria_atual['nome']:
-            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'})
+            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
         
         if not descricao:
             descricao = "Sem descrição"
@@ -113,4 +113,4 @@ class CategoriaController:
         )
 
         self.__dao.atualizar_categoria(categoria_atualizada)
-        return jsonify({'mensagem': 'Categoria atualizada com sucesso!', 'classe': 'success'})
+        return jsonify({'mensagem': 'Categoria atualizada com sucesso!', 'classe': 'success'}), 200

@@ -9,7 +9,7 @@
     </div>
 
     <div class="card p-3 mb-4 shadow">
-        <form method="POST" action="{{ url_for('ecossistemas.cadastrar_ecossistema') }}">
+        <form id="form-ecossistemas">
 
             <div class="mb-3">
                 <label for="nome" class="form-label">
@@ -26,55 +26,14 @@
         </form>
     </div>
 
-    <div class="card p-4 shadow">
-        {% if lista %}
+    <div id="lista-ecossistemas" class="card p-4 shadow">
 
-        {% for ecossistema in lista %}
-        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
-
-            <div>
-                <strong>{{ ecossistema.nome }}</strong>
-            </div>
-
-            <div class="d-flex gap-2">
-
-                <a href="{{ url_for('ecossistemas.atualizar_ecossistema', id=ecossistema.id) }}"
-                    class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
-
-                <form action="{{ url_for('ecossistemas.remover_ecossistema', id=ecossistema.id) }}" method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir o ecossistema {{ ecossistema.nome }}?');"
-                    style="margin: 0;">
-
-                    <button type="submit" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                        title="Excluir">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-        {% endfor %}
-
-        {% else %}
-
-        <div class="text-center py-5">
-
-            <div class="mb-3">
-                <i class="bi bi-tree" style="font-size: 50px; color: #6c757d;"></i>
-            </div>
-
-            <h4 class="mb-2">Nenhum ecossistema cadastrado</h4>
-
-            <p class="text-muted">
-                Comece criando um ecossistema para classificar os pontos naturais.
-            </p>
-
-        </div>
-
-        {% endif %}
     </div>
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/ecossistema/cadastrar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/ecossistema/listar.js') }}"></script>
+{% endblock js %}
