@@ -1,3 +1,5 @@
+export const API_CATEGORIA_URL = '/api/categorias';
+
 let input_foto = document.getElementById('foto-imagem');
 let preview_imagem = document.getElementById('preview-imagem');
 
@@ -87,3 +89,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+export function mostrarMensagem(mensagem, tipo = "success") {
+
+    const container = document.getElementById("container-alertas");
+
+    const alerta = document.createElement("div");
+    alerta.className = `alerta-toast alerta-${tipo}`;
+
+    let icone = "";
+
+    if (tipo === "success") {
+        icone = "bi bi-check-circle-fill";
+    } else if (tipo === "danger") {
+        icone = "bi bi-x-circle-fill";
+    } else if (tipo === "warning") {
+        icone = "bi bi-exclamation-triangle-fill";
+    } else if (tipo === "info") {
+        icone = "bi bi-info-circle-fill";
+    }
+
+    alerta.innerHTML = `
+        <i class="${icone} icone"></i>
+        <span class="mensagem">${mensagem}</span>
+        <button class="fechar">&times;</button>
+    `;
+
+    container.appendChild(alerta);
+
+    const fechar = alerta.querySelector(".fechar");
+
+    fechar.addEventListener("click", () => {
+        removerAlerta(alerta);
+    });
+
+    setTimeout(() => {
+        removerAlerta(alerta);
+    }, 4000);
+}
+
+
+function removerAlerta(alerta) {
+
+    alerta.style.animation = "desaparecerToast 0.3s ease";
+
+    setTimeout(() => {
+        alerta.remove();
+    }, 300);
+}

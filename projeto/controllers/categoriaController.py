@@ -1,6 +1,7 @@
-from flask import flash, render_template, redirect, session, url_for, request
+from flask import flash, render_template, redirect, session, url_for, request, jsonify
 from projeto.dao import CategoriaDAO
 from projeto.factorys import CategoriaFactory
+from projeto.models import categoria
 
 class CategoriaController:
 
@@ -12,34 +13,36 @@ class CategoriaController:
 
     def listar_categorias(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+        lista = self.__dao.carregar_categorias()
+        categorias = []
+
+        for obj in lista:
+            categorias.append(obj.to_dict())
         
-        return self.preparar_gerenciar_categorias()
-    
+        return jsonify(categorias)
+
     def preparar_gerenciar_categorias(self):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
-        lista = self.__dao.carregar_categorias()
-
-        return render_template('categoria/gerenciar_categorias.html', lista=lista)
+        return render_template('categoria/gerenciar_categorias.html')
     
     def cadastrar_categoria(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
         
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
+        dados = request.get_json()
+        nome = dados.get('nome')
+        descricao = dados.get('descricao')
 
         nomes_categorias = self.__dao.pegar_nomes_categorias()
 
         if not nome:
-            flash('O campo nome da categoria é obrigatório.', 'danger')
-            return redirect(url_for('categorias.gerenciar_categorias'))
+            return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_categorias:
-            flash('Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('categorias.gerenciar_categorias'))
+            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
 
         if not descricao:
             descricao = "Sem descrição"
@@ -51,17 +54,15 @@ class CategoriaController:
 
         self.__dao.cadastrar_categoria(nova_categoria)
 
-        flash('Categoria cadastrada com sucesso!', 'success')
-        return redirect(url_for('categorias.gerenciar_categorias'))
-    
+        return jsonify({'mensagem': 'Categoria cadastrada com sucesso!', 'classe': 'success'}), 200
+
     def remover_categoria(self, id_categoria):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
         
         self.__dao.remover_categoria(id_categoria)
 
-        flash('Categoria removida com sucesso!', 'success')
-        return redirect(url_for('categorias.gerenciar_categorias'))
+        return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 200
     
     def preparar_editar_categoria(self, id_categoria):
         if not self.__usuario_pode_moderar():
@@ -73,25 +74,34 @@ class CategoriaController:
             flash('Categoria não encontrada.', 'danger')
             return redirect(url_for('categorias.gerenciar_categorias'))
         return render_template('categoria/editar_categoria.html', categoria=categoria)
+
+    def buscar_categoria_por_id(self, id_categoria):
+        if not self.__usuario_pode_moderar():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+        categoria = self.__dao.buscar_categoria_por_id(id_categoria)
+
+        if not categoria:
+            return jsonify({'mensagem': 'Categoria não encontrada.', 'classe': 'danger'}), 400
+
+        return jsonify(categoria), 200
     
     def atualizar_categoria(self, id_categoria):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+           return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
         
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
+        dados = request.get_json()
+        nome = dados.get('nome')
+        descricao = dados.get('descricao')
 
         nomes_categorias = self.__dao.pegar_nomes_categorias()
 
         categoria_atual = self.__dao.buscar_categoria_por_id(id_categoria)
 
         if not nome:
-            flash('O campo nome da categoria é obrigatório.', 'danger')
-            return redirect(url_for('categorias.atualizar_categoria', id=id_categoria))
+            return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'})
         
         if nome.capitalize().strip() in nomes_categorias and nome.capitalize().strip() != categoria_atual['nome']:
-            flash('Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('categorias.atualizar_categoria', id=id_categoria))
+            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'})
         
         if not descricao:
             descricao = "Sem descrição"
@@ -103,6 +113,4 @@ class CategoriaController:
         )
 
         self.__dao.atualizar_categoria(categoria_atualizada)
-
-        flash('Categoria atualizada com sucesso!', 'success')
-        return redirect(url_for('categorias.gerenciar_categorias'))
+        return jsonify({'mensagem': 'Categoria atualizada com sucesso!', 'classe': 'success'})

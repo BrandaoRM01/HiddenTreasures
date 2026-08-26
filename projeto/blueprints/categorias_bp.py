@@ -7,22 +7,22 @@ controller = CategoriaController()
 
 @categorias_bp.route('/admin/gerenciar-categorias')
 def gerenciar_categorias():
-    return controller.listar_categorias()
+    return controller.preparar_gerenciar_categorias()
 
-@categorias_bp.route('/admin/cadastrar-categoria', methods=['POST', 'GET'])
-def cadastrar_categoria():
+@categorias_bp.route('/admin/atualizar-categoria/<int:id>')
+def atualizar_categoria(id):
+    return controller.preparar_editar_categoria(id)
+
+@categorias_bp.route('/api/categorias', methods=['GET', 'POST'])
+def api_categorias():
     if request.method == 'POST':
         return controller.cadastrar_categoria()
-    return controller.preparar_gerenciar_categorias()
+    return controller.listar_categorias()
 
-@categorias_bp.route('/admin/remover-categoria/<int:id>', methods=['POST', 'GET'])
-def remover_categoria(id):
-    if request.method == 'POST':
+@categorias_bp.route('/api/categorias/<int:id>', methods=['DELETE', 'PUT', 'GET'])
+def api_categoria_param(id):
+    if request.method == 'DELETE':
         return controller.remover_categoria(id)
-    return controller.preparar_gerenciar_categorias()
-
-@categorias_bp.route('/admin/atualizar-categoria/<int:id>', methods=['POST', 'GET'])
-def atualizar_categoria(id):
-    if request.method == 'POST':
+    elif request.method == 'PUT':
         return controller.atualizar_categoria(id)
-    return controller.preparar_editar_categoria(id)
+    return controller.buscar_categoria_por_id(id)

@@ -11,21 +11,20 @@
 
     <div class="card shadow p-4">
 
-        <form method="POST" action="{{ url_for('categorias.atualizar_categoria', id=categoria.id) }}">
+        <form id="form-editar">
 
             <div class="mb-3">
                 <label for="nome" class="form-label">
                     Nome da Categoria <span class="text-danger">*</span>
                 </label>
-                <input type="text" id="nome" name="nome" class="form-control" value="{{ categoria.nome }}" required>
+                <input type="text" id="nome" name="nome" class="form-control" required>
             </div>
 
             <div class="mb-3">
                 <label for="descricao" class="form-label">
                     Descrição
                 </label>
-                <textarea id="descricao" name="descricao" class="form-control"
-                    rows="3">{{ categoria.descricao }}</textarea>
+                <textarea id="descricao" name="descricao" class="form-control" rows="3"></textarea>
             </div>
 
             <div class="d-flex gap-2">
@@ -34,8 +33,8 @@
                     Salvar Alterações
                 </button>
 
-                <a href="{{ url_for('categorias.gerenciar_categorias') }}" class="btn btn-secondary w-100">
-                    Cancelar
+                <a id="voltar" class="btn btn-secondary w-100">
+                    Voltar
                 </a>
 
             </div>
@@ -47,3 +46,7 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/categoria/editar.js') }}"></script>
+{% endblock js %}
