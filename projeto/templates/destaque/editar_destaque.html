@@ -11,14 +11,14 @@
 
     <div class="card shadow p-4">
 
-        <form method="POST" action="{{ url_for('destaques.atualizar_destaque', id=destaque.id) }}">
+        <form id="form-editar">
 
             <div class="mb-3">
                 <label for="nome" class="form-label">
                     Nome do Destaque <span class="text-danger">*</span>
                 </label>
 
-                <input type="text" id="nome" name="nome" class="form-control" value="{{ destaque.nome }}" required>
+                <input type="text" id="nome" name="nome" class="form-control" required>
             </div>
 
             <div class="d-flex gap-2">
@@ -27,8 +27,8 @@
                     Salvar Alterações
                 </button>
 
-                <a href="{{ url_for('destaques.gerenciar_destaques') }}" class="btn btn-secondary w-100">
-                    Cancelar
+                <a id="voltar" class="btn btn-secondary w-100">
+                    Voltar
                 </a>
 
             </div>
@@ -40,3 +40,7 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/destaque/editar.js') }}"></script>
+{% endblock js %}

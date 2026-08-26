@@ -1,5 +1,6 @@
 export const API_CATEGORIA_URL = '/api/categorias';
 export const API_ECOSSISTEMA_URL = '/api/ecossistemas';
+export const API_DESTAQUE_URL = '/api/destaques';
 
 let input_foto = document.getElementById('foto-imagem');
 let preview_imagem = document.getElementById('preview-imagem');

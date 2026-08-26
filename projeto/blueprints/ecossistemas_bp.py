@@ -9,22 +9,8 @@ controller = EcossistemaController()
 def gerenciar_ecossistemas():
     return controller.preparar_gerenciar_ecossistemas()
 
-@ecossistemas_bp.route('/admin/cadastrar-ecossistema', methods=['POST', 'GET'])
-def cadastrar_ecossistema():
-    if request.method == 'POST':
-        return controller.cadastrar_ecossistema()
-    return controller.preparar_gerenciar_ecossistemas()
-
-@ecossistemas_bp.route('/admin/remover-ecossistema/<int:id>', methods=['POST', 'GET'])
-def remover_ecossistema(id):
-    if request.method == 'POST':
-        return controller.remover_ecossistema(id)
-    return controller.preparar_gerenciar_ecossistemas()
-
-@ecossistemas_bp.route('/admin/atualizar-ecossistema/<int:id>', methods=['POST', 'GET'])
+@ecossistemas_bp.route('/admin/atualizar-ecossistema/<int:id>')
 def atualizar_ecossistema(id):
-    if request.method == 'POST':
-        return controller.atualizar_ecossistema(id)
     return controller.preparar_editar_ecossistema(id)
 
 @ecossistemas_bp.route('/api/ecossistemas', methods=['GET', 'POST'])

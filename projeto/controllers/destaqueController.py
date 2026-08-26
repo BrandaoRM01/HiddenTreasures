@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, session, url_for, request
+from flask import flash, render_template, redirect, session, url_for, request, jsonify
 from projeto.dao import DestaqueDAO
 from projeto.factorys import DestaqueFactory
 
@@ -12,33 +12,36 @@ class DestaqueController:
 
     def listar_destaques(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        return self.preparar_gerenciar_destaques()
+        lista = self.__dao.carregar_destaques()
+        destaques = []
+
+        for obj in lista:
+            destaques.append(obj.to_dict())
+
+        return jsonify(destaques), 200
 
     def preparar_gerenciar_destaques(self):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
-
-        lista = self.__dao.carregar_destaques()
-
-        return render_template('destaque/gerenciar_destaques.html', lista=lista)
+        
+        return render_template('destaque/gerenciar_destaques.html')
 
     def cadastrar_destaque(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        nome = request.form.get('nome')
+        dados = request.get_json()
+        nome = dados.get('nome')
 
         nomes_destaques = self.__dao.pegar_nomes_destaques()
 
         if not nome:
-            flash('O campo nome do destaque é obrigatório.', 'danger')
-            return redirect(url_for('destaques.gerenciar_destaques'))
+            return jsonify({'mensagem': 'O campo nome do destaque é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_destaques:
-            flash('Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('destaques.gerenciar_destaques'))
+            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
 
         novo_destaque = DestaqueFactory.criar_destaque(
             nome=nome.capitalize().strip()
@@ -46,17 +49,15 @@ class DestaqueController:
 
         self.__dao.cadastrar_destaque(novo_destaque)
 
-        flash('Destaque cadastrado com sucesso!', 'success')
-        return redirect(url_for('destaques.gerenciar_destaques'))
+        return jsonify({'mensagem': 'Destaque cadastrado com sucesso!', 'classe': 'success'}), 200
 
     def remover_destaque(self, id_destaque):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
         self.__dao.remover_destaque(id_destaque)
 
-        flash('Destaque removido com sucesso!', 'success')
-        return redirect(url_for('destaques.gerenciar_destaques'))
+        return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_destaque(self, id_destaque):
         if not self.__usuario_pode_moderar():
@@ -68,27 +69,35 @@ class DestaqueController:
             flash('Destaque não encontrado.', 'danger')
             return redirect(url_for('destaques.gerenciar_destaques'))
 
-        return render_template('destaque/editar_destaque.html', destaque=destaque)
+        return render_template('destaque/editar_destaque.html')
+
+    def buscar_destaque_por_id(self, id):
+        if not self.__usuario_pode_moderar():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        destaque = self.__dao.buscar_destaque_por_id(id)
+
+        if not destaque:
+            return jsonify({'mensagem': 'Destaque não encontrado.', 'classe': 'danger'}), 400
+
+        return jsonify(destaque.to_dict()), 200
 
     def atualizar_destaque(self, id_destaque):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        nome = request.form.get('nome')
+        dados = request.get_json()
+        nome = dados.get('nome')
 
         nomes_destaques = self.__dao.pegar_nomes_destaques()
 
         destaque_atual = self.__dao.buscar_destaque_por_id(id_destaque)
 
         if not nome:
-            flash('O campo nome do destaque é obrigatório.', 'danger')
-            return redirect(url_for('destaques.atualizar_destaque', id_destaque=id_destaque)
-            )
+            return jsonify({'mensagem': 'O campo nome do destaque é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_destaques and nome.capitalize().strip() != destaque_atual.nome:
-            flash('Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('destaques.atualizar_destaque', id_destaque=id_destaque)
-            )
+            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
 
         destaque_atualizado = DestaqueFactory.criar_destaque(
             id=id_destaque,
@@ -97,5 +106,4 @@ class DestaqueController:
 
         self.__dao.atualizar_destaque(destaque_atualizado)
 
-        flash('Destaque atualizado com sucesso!', 'success')
-        return redirect(url_for('destaques.gerenciar_destaques'))
+        return jsonify({'mensagem': 'Destaque atualizado com sucesso!', 'classe': 'success'}), 200
