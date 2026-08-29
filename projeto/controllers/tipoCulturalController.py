@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, session, url_for, request
+from flask import flash, render_template, redirect, session, url_for, request, jsonify
 from projeto.dao import TipoCulturalDAO
 from projeto.factorys import TipoCulturalFactory
 
@@ -12,33 +12,35 @@ class TipoCulturalController:
 
     def listar_tipos_culturais(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+        lista = self.__dao.carregar_tipos_culturais()
+        tipos_culturais = []
 
-        return self.preparar_gerenciar_tipos()
+        for obj in lista:
+            tipos_culturais.append(obj.to_dict())
+
+        return jsonify(tipos_culturais), 200
 
     def preparar_gerenciar_tipos(self):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
 
-        lista = self.__dao.carregar_tipos_culturais()
-
-        return render_template('tipo_cultural/gerenciar_tipos_culturais.html', lista=lista)
+        return render_template('tipo_cultural/gerenciar_tipos_culturais.html')
 
     def cadastrar_tipo_cultural(self):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        nome = request.form.get('nome')
+        dados = request.get_json()
+        nome = dados.get('nome')
 
         nomes_tipos = self.__dao.pegar_nomes_tipos_culturais()
 
         if not nome:
-            flash('O campo nome do tipo cultural é obrigatório.', 'danger')
-            return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+            return jsonify({'mensagem': 'O campo nome do tipo cultural é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_tipos:
-            flash('Já existe um tipo cultural com esse nome.', 'danger')
-            return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+            return jsonify({'mensagem': 'Já existe um tipo cultural com esse nome.', 'classe': 'danger'}), 400
 
         novo_tipo = TipoCulturalFactory.criar_tipo_cultural(
             nome=nome.capitalize().strip()
@@ -46,47 +48,49 @@ class TipoCulturalController:
 
         self.__dao.cadastrar_tipo_cultural(novo_tipo)
 
-        flash('Tipo cultural cadastrado com sucesso!', 'success')
-        return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+        return jsonify({'mensagem': 'Tipo cultural cadastrado com sucesso!', 'classe': 'success'}), 200
 
     def remover_tipo_cultural(self, id_tipo):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
         self.__dao.remover_tipo_cultural(id_tipo)
 
-        flash('Tipo cultural removido com sucesso!', 'success')
-        return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+        return jsonify({'mensagem': 'Tipo cultural removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_tipo(self, id_tipo):
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
 
+        return render_template('tipo_cultural/editar_tipo_cultural.html')
+
+    def buscar_tipo_cultural_por_id(self, id_tipo):
+        if not self.__usuario_pode_moderar():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
         tipo = self.__dao.buscar_tipo_por_id(id_tipo)
 
         if not tipo:
-            flash('Tipo cultural não encontrado.', 'danger')
-            return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+            return jsonify({'mensagem': 'Tipo cultural não encontrado.', 'classe': 'danger'}), 400
 
-        return render_template('tipo_cultural/editar_tipo_cultural.html', tipo=tipo)
+        return jsonify(tipo.to_dict()), 200
 
     def atualizar_tipo_cultural(self, id_tipo):
         if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        nome = request.form.get('nome')
+        dados = request.get_json()
+        nome = dados.get('nome')
 
         nomes_tipos = self.__dao.pegar_nomes_tipos_culturais()
 
         tipo_atual = self.__dao.buscar_tipo_por_id(id_tipo)
 
         if not nome:
-            flash('O campo nome do tipo cultural é obrigatório.', 'danger')
-            return redirect(url_for('tipos_culturais.atualizar_tipo_cultural', id=id_tipo))
+            return jsonify({'mensagem': 'O campo nome do tipo cultural é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_tipos and nome.capitalize().strip() != tipo_atual.nome:
-            flash('Já existe um tipo cultural com esse nome.', 'danger')
-            return redirect(url_for('tipos_culturais.atualizar_tipo_cultural', id=id_tipo))
+            return jsonify({'mensagem': 'Já existe um tipo cultural com esse nome.', 'classe': 'danger'}), 400
 
         tipo_atualizado = TipoCulturalFactory.criar_tipo_cultural(
             nome=nome.capitalize().strip(),
@@ -95,5 +99,4 @@ class TipoCulturalController:
 
         self.__dao.atualizar_tipo_cultural(tipo_atualizado)
 
-        flash('Tipo cultural atualizado com sucesso!', 'success')
-        return redirect(url_for('tipos_culturais.gerenciar_tipos_culturais'))
+        return jsonify({'mensagem': 'Tipo cultural atualizado com sucesso!', 'classe': 'success'}), 200

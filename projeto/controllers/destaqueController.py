@@ -63,12 +63,6 @@ class DestaqueController:
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
 
-        destaque = self.__dao.buscar_destaque_por_id(id_destaque)
-
-        if not destaque:
-            flash('Destaque não encontrado.', 'danger')
-            return redirect(url_for('destaques.gerenciar_destaques'))
-
         return render_template('destaque/editar_destaque.html')
 
     def buscar_destaque_por_id(self, id):

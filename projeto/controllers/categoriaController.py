@@ -68,12 +68,7 @@ class CategoriaController:
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
 
-        categoria = self.__dao.buscar_categoria_por_id(id_categoria)
-
-        if not categoria:
-            flash('Categoria não encontrada.', 'danger')
-            return redirect(url_for('categorias.gerenciar_categorias'))
-        return render_template('categoria/editar_categoria.html', categoria=categoria)
+        return render_template('categoria/editar_categoria.html')
 
     def buscar_categoria_por_id(self, id_categoria):
         if not self.__usuario_pode_moderar():
