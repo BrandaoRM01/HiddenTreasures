@@ -10,13 +10,13 @@
     </div>
 
     <div class="card p-4 shadow">
-        <form method="POST" action="{{ url_for('promocoes.editar_promocao', id=promocao.id) }}">
+        <form id="form-editar">
 
             <div class="mb-3">
                 <label for="titulo" class="form-label">
                     Título da Promoção <span class="text-danger">*</span>
                 </label>
-                <input id="titulo" name="titulo" type="text" class="form-control" value="{{ promocao.titulo }}"
+                <input id="titulo" name="titulo" type="text" class="form-control"
                     placeholder="Digite o título da promoção" required>
             </div>
 
@@ -25,15 +25,15 @@
                     Descrição
                 </label>
                 <textarea id="descricao" name="descricao" class="form-control" rows="3"
-                    placeholder="Descreva a promoção">{{ promocao.descricao }}</textarea>
+                    placeholder="Descreva a promoção"></textarea>
             </div>
 
             <div class="mb-3">
                 <label for="desconto" class="form-label">
                     Desconto (%) <span class="text-danger">*</span>
                 </label>
-                <input id="desconto" name="desconto" type="number" step="0.01" class="form-control"
-                    value="{{ promocao.desconto }}" placeholder="Ex: 10" required>
+                <input id="desconto" name="desconto" type="number" step="0.01" class="form-control" placeholder="Ex: 10"
+                    required>
             </div>
 
             <div class="row">
@@ -42,8 +42,7 @@
                         <label for="data_inicio" class="form-label">
                             Data de Início <span class="text-danger">*</span>
                         </label>
-                        <input id="data_inicio" name="data_inicio" type="date" class="form-control"
-                            value="{{ promocao.data_inicio.strftime('%Y-%m-%d') }}" required>
+                        <input id="data_inicio" name="data_inicio" type="date" class="form-control" required>
                     </div>
                 </div>
 
@@ -52,8 +51,7 @@
                         <label for="data_fim" class="form-label">
                             Data de Fim <span class="text-danger">*</span>
                         </label>
-                        <input id="data_fim" name="data_fim" type="date" class="form-control"
-                            value="{{ promocao.data_fim.strftime('%Y-%m-%d') }}" required>
+                        <input id="data_fim" name="data_fim" type="date" class="form-control" required>
                     </div>
                 </div>
             </div>
@@ -63,8 +61,8 @@
                     Salvar Alterações
                 </button>
 
-                <a href="{{ url_for('promocoes.gerenciar_promocoes') }}" class="btn btn-secondary w-100">
-                    Cancelar
+                <a id="voltar" class="btn btn-secondary w-100">
+                    Voltar
                 </a>
             </div>
 
@@ -75,3 +73,7 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/promocao/editar.js') }}"></script>
+{% endblock js %}
