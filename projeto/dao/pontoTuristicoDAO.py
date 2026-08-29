@@ -163,6 +163,25 @@ class PontoTuristicoDAO(BaseDAO):
             conexao.close()
 
         return list(pontos_map.values())
+
+    def buscar_nomes_pontos(self):
+        sql = """
+            SELECT nome FROM vw_pontos_turisticos
+        """
+        lista = []
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql)
+            for linha in cursor.fetchall():
+                lista.append(linha['nome'])
+        finally:
+            cursor.close()
+            conexao.close()
+
+        return lista
     
     def listar_todos_pontos(self):
         sql = """

@@ -14,13 +14,13 @@ def atualizar_tipo_cultural(id):
     return controller.preparar_editar_tipo(id)
 
 @tipos_culturais_bp.route('/api/tipos_culturais', methods=['GET', 'POST'])
-def api_ecossistemas():
+def api_tipos_culturais():
     if request.method == 'POST':
         return controller.cadastrar_tipo_cultural()
     return controller.listar_tipos_culturais()
 
 @tipos_culturais_bp.route('/api/tipos_culturais/<int:id>', methods=['PUT', 'DELETE', 'GET'])
-def api_ecossistemas_param(id):
+def api_tipos_culturais_param(id):
     if request.method == 'DELETE':
         return controller.remover_tipo_cultural(id)
     elif request.method == 'PUT':

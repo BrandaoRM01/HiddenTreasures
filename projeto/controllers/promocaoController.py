@@ -46,6 +46,15 @@ class PromocaoController:
             promocoes.append(obj.to_dict())
 
         return jsonify(promocoes), 200
+
+    def listar_promocoes_ativas(self):
+        lista = self.__dao.listar_promocoes_ativas()
+        promocoes = []
+
+        for obj in lista:
+            promocoes.append(obj.to_dict())
+
+        return jsonify(promocoes), 200
     
     def cadastrar_promocao(self):
         if not self.__usuario_pode_moderar():

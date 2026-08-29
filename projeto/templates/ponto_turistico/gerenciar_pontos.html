@@ -7,13 +7,23 @@
     <div class="text-center mb-5">
         <h1 class="fw-bold">Gerenciar Pontos Turísticos</h1>
     </div>
-    <div class="card p-4 mb-4 shadow">
 
-        <form method="POST" enctype="multipart/form-data" action="{{ url_for('pontos.cadastrar_ponto') }}">
+    <div id="aviso-sem-categoria" class="card p-4 mb-4 shadow d-none">
+        <div class="alert alert-info text-center mb-3">
+            Você precisa cadastrar uma categoria antes de criar um ponto turístico.
+        </div>
+        <a id="cadastrar-categoria" class="btn btn-primary w-100">
+            Cadastrar Categoria
+        </a>
+    </div>
+
+    <div id="card-form-pontos" class="card p-4 mb-4 shadow">
+
+        <form id="form-pontos" enctype="multipart/form-data">
 
             <div class="text-center mb-4">
-                <img id="preview-imagem" src="{{ url_for('static', filename='img/default/hidden_treasures_logo.png') }}"
-                    class="rounded shadow" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
+                <img id="preview-imagem" class="rounded shadow"
+                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;">
 
                 <input name="foto" type="file" hidden id="foto-imagem" accept="image/*">
 
@@ -68,23 +78,15 @@
                     </div>
                 </div>
             </div>
-            {% if lista_promocoes %}
 
-            <div class="mb-3">
+            <div id="campo-promocao" class="mb-3 d-none">
                 <label for="promocao" class="form-label">
                     Promoção
                 </label>
                 <select id="promocao" name="promocao" class="form-control">
                     <option value="">Nenhuma</option>
-                    {% for promocao in lista_promocoes %}
-                    <option value="{{ promocao.id }}">{{ promocao.titulo }}</option>
-                    {% endfor %}
                 </select>
             </div>
-
-            {% endif %}
-
-            {% if lista_categorias %}
 
             <div class="mb-3">
                 <label for="categoria" class="form-label">
@@ -92,67 +94,34 @@
                 </label>
                 <select id="categoria" name="categoria" class="form-control" required>
                     <option value="">Selecione a categoria</option>
-                    {% for categoria in lista_categorias %}
-                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                    {% endfor %}
                 </select>
             </div>
 
-            {% if lista_destaques %}
-
-            <div class="mb-3">
+            <div id="campo-destaques" class="mb-3 d-none">
                 <label class="form-label">
                     Destaques <span class="text-muted">(máximo 3)</span>
                 </label>
-
-                <div class="d-flex flex-wrap gap-2">
-
-                    {% for destaque in lista_destaques %}
-
-                    <input type="checkbox" class="btn-check destaque-checkbox" id="destaque{{ destaque.id }}"
-                        name="destaques" value="{{ destaque.id }}" autocomplete="off">
-
-                    <label class="btn btn-outline-primary destaque-chip" for="destaque{{ destaque.id }}">
-                        {{ destaque.nome }}
-                    </label>
-
-                    {% endfor %}
-
-                </div>
+                <div id="lista-destaques" class="d-flex flex-wrap gap-2"></div>
             </div>
-
-            {% endif %}
 
             <div class="mb-3">
                 <label for="tipo_ponto" class="form-label">
                     Tipo do Ponto <span class="text-danger">*</span>
                 </label>
-
-                <select id="tipo_ponto" name="tipo_ponto" class="form-control" onchange="mostrarCampos()" required>
-
+                <select id="tipo_ponto" name="tipo_ponto" class="form-control" required>
                     <option value="cultural">Ponto Cultural</option>
                     <option value="natural">Ponto Natural</option>
-
                 </select>
             </div>
 
-            <div id="campos-natural">
+            <div id="campos-natural" class="d-none">
 
                 <div class="mb-3">
                     <label for="ecossistema" class="form-label">
                         Ecossistema
                     </label>
-
                     <select id="ecossistema" name="ecossistema" class="form-control">
-
                         <option value="">Selecione um ecossistema</option>
-
-                        {% for ecossistema in lista_ecossistemas %}
-                        <option value="{{ ecossistema.id }}">
-                            {{ ecossistema.nome }}
-                        </option>
-                        {% endfor %}
-
                     </select>
                 </div>
 
@@ -160,30 +129,20 @@
                     <label for="area_km" class="form-label">
                         Área (km²)
                     </label>
-
                     <input id="area_km" name="area_km" type="number" step="0.01" class="form-control"
                         placeholder="Ex: 125.50">
                 </div>
 
             </div>
 
-            <div id="campos-cultural" class="d-none">
+            <div id="campos-cultural">
 
                 <div class="mb-3">
                     <label for="tipo_cultural" class="form-label">
                         Tipo Cultural
                     </label>
-
                     <select id="tipo_cultural" name="tipo_cultural" class="form-control">
-
                         <option value="">Selecione um tipo</option>
-
-                        {% for tipo in lista_tipos_culturais %}
-                        <option value="{{ tipo.id }}">
-                            {{ tipo.nome }}
-                        </option>
-                        {% endfor %}
-
                     </select>
                 </div>
 
@@ -191,7 +150,6 @@
                     <label for="ano_fundacao" class="form-label">
                         Ano de Fundação
                     </label>
-
                     <input id="ano_fundacao" name="ano_fundacao" class="form-control" placeholder="Ex: 1895">
                 </div>
 
@@ -201,171 +159,17 @@
                 Adicionar
             </button>
 
-            {% else %}
-
-            <div class="alert alert-info text-center">
-                Você precisa cadastrar uma categoria antes de criar um ponto turístico.
-            </div>
-
-            <a href="{{ url_for('categorias.gerenciar_categorias') }}" class="btn btn-primary w-100 mb-3">
-                Cadastrar Categoria
-            </a>
-
-            {% endif %}
-
         </form>
     </div>
 
-    <div class="card p-3 shadow">
-
-        {% if lista_pontos %}
-
-        <div class="row g-3">
-
-            {% for ponto in lista_pontos %}
-
-            <div class="col-12">
-
-                <div class="card shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <div class="row align-items-center">
-
-                            <div class="col-lg-8">
-
-                                <div class="d-flex align-items-center gap-3">
-
-                                    <img src="{{ url_for('static', filename=ponto.url_imagem) }}" alt="{{ ponto.nome }}"
-                                        class="rounded shadow-sm"
-                                        style="width: 100px; height: 100px; object-fit: cover;">
-
-                                    <div>
-
-                                        <h5 class="fw-bold mb-1">
-                                            {{ ponto.nome }}
-                                        </h5>
-
-                                        <p class="text-muted mb-1">
-                                            <i class="bi bi-geo-alt-fill"></i>
-                                            {{ ponto.localizacao }}
-                                        </p>
-
-                                        <p class="mb-1">
-                                            <strong>Categoria:</strong>
-                                            {{ ponto.categoria.nome }}
-                                        </p>
-
-                                        <p class="mb-1">
-                                            <strong>Tipo:</strong>
-                                            {{ ponto.tipo_ponto().capitalize() }}
-                                        </p>
-
-                                        {% if ponto.promocao and ponto.promocao.titulo %}
-                                        <p class="mb-1">
-                                            <strong>Promoção:</strong>
-                                            {{ ponto.promocao.titulo }}
-                                        </p>
-                                        {% else %}
-                                        <p class="mb-1 text-muted">
-                                            Nenhuma promoção ativa
-                                        </p>
-                                        {% endif %}
-
-                                        {% if ponto.media_avaliacao is not none %}
-                                        <span class="badge text-warning">
-                                            ⭐ {{ "%.1f"|format(ponto.media_avaliacao) }}
-                                        </span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">
-                                            Sem avaliações
-                                        </span>
-                                        {% endif %}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-
-                                {% if ponto.status == 'aprovado' %}
-                                <span class="badge bg-success fs-6 mb-3">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    Aprovado
-                                </span>
-
-                                {% elif ponto.status == 'rejeitado' %}
-                                <span class="badge bg-danger fs-6 mb-3">
-                                    <i class="bi bi-x-circle-fill"></i>
-                                    Rejeitado
-                                </span>
-
-                                {% else %}
-                                <span class="badge bg-warning text-dark fs-6 mb-3">
-                                    <i class="bi bi-clock-fill"></i>
-                                    Pendente
-                                </span>
-                                {% endif %}
-
-                                <div class="d-flex flex-wrap justify-content-lg-end gap-2">
-                                    {% if ponto.status == 'aprovado' %}
-                                    <a href="{{ url_for('pontos.editar_ponto', id=ponto.id) }}" class="btn btn-warning">
-
-                                        <i class="bi bi-pencil-fill"></i>
-
-                                    </a>
-                                    {% endif %}
-
-                                    <form action="{{ url_for('pontos.remover_ponto', id=ponto.id) }}" method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir o ponto turístico {{ ponto.nome }}?');">
-
-                                        <button type="submit" class="btn btn-danger">
-
-                                            <i class="bi bi-trash-fill"></i>
-
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            {% endfor %}
-
-        </div>
-
-        {% else %}
-
-        <div class="text-center py-5">
-
-            <div class="mb-3">
-                <i class="bi bi-geo-alt display-1 text-secondary"></i>
-            </div>
-
-            <h4 class="mb-2">
-                Nenhum ponto cadastrado
-            </h4>
-
-            <p class="text-muted">
-                Comece cadastrando um ponto turístico para aparecer aqui.
-            </p>
-
-        </div>
-
-        {% endif %}
+    <div id="lista-pontos" class="card p-3 shadow">
 
     </div>
+</div>
 
-    {% endblock conteudo %}
+{% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/ponto_turistico/cadastrar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/ponto_turistico/listar.js') }}"></script>
+{% endblock js %}

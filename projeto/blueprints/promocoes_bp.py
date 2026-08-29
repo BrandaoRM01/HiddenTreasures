@@ -14,15 +14,19 @@ def editar_promocao(id):
     return controller.preparar_editar_promocao(id)
 
 @promocoes_bp.route('/api/promocoes', methods=['GET', 'POST'])
-def api_ecossistemas():
+def api_promocoes():
     if request.method == 'POST':
         return controller.cadastrar_promocao()
     return controller.listar_promocoes()
 
 @promocoes_bp.route('/api/promocoes/<int:id>', methods=['PUT', 'DELETE', 'GET'])
-def api_ecossistemas_param(id):
+def api_promocoes_param(id):
     if request.method == 'DELETE':
         return controller.remover_promocao(id)
     elif request.method == 'PUT':
         return controller.editar_promocao(id)
     return controller.buscar_promocao_por_id(id)
+
+@promocoes_bp.route('/api/promocoes/ativas', methods=['GET'])
+def api_promocoes_ativas():
+    return controller.listar_promocoes_ativas()

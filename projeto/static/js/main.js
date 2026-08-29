@@ -3,6 +3,7 @@ export const API_ECOSSISTEMA_URL = '/api/ecossistemas';
 export const API_DESTAQUE_URL = '/api/destaques';
 export const API_TIPO_CULTURAL_URL = '/api/tipos_culturais';
 export const API_PROMOCAO_URL = '/api/promocoes';
+export const API_PONTO_URL = '/api/pontos';
 
 let input_foto = document.getElementById('foto-imagem');
 let preview_imagem = document.getElementById('preview-imagem');
@@ -131,7 +132,6 @@ export function mostrarMensagem(mensagem, tipo = "success") {
         removerAlerta(alerta);
     }, 4000);
 }
-
 
 function removerAlerta(alerta) {
 
