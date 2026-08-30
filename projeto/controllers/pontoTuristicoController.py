@@ -176,25 +176,25 @@ class PontoTuristicoController:
 
         return jsonify({'logado': bool(session.get('usuario')), 'pontos': pontos}), 200
 
-    def preparar_detalhes_ponto(self, id_ponto):
+    def preparar_detalhes_ponto(self):
+        return render_template('ponto_turistico/detalhes_ponto.html')
+
+    def detalhes_ponto_api(self, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
-        usuario_email = None
-        avaliacao_usuario = None
 
         if not ponto:
-            return redirect(url_for('pontos.pontos'))
-        
-        if 'usuario' in session:
-            usuario_email = session['usuario']['email']
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
 
-        for avaliacao in ponto.avaliacoes:
-            if usuario_email and avaliacao.usuario.email == usuario_email:
-                avaliacao_usuario = avaliacao
-                break
+        favorito = False
+        if session.get('usuario'):
+            usuario = self.__dao_usuario.buscar_usuario_por_email(session['usuario']['email'])
+            favorito = any(p.id == ponto.id for p in usuario.pontos_favoritos)
 
-        ultimas_avaliacoes = ponto.avaliacoes[-5:]
+        dados = ponto.to_dict()
+        dados['favorito'] = favorito
+        dados['logado'] = bool(session.get('usuario'))
 
-        return render_template('ponto_turistico/detalhes_ponto.html', ponto=ponto, avaliacoes=ultimas_avaliacoes, avaliacao_usuario=avaliacao_usuario, quantidade=len(ponto.avaliacoes))
+        return jsonify(dados), 200
     
     def cadastrar_ponto(self):
         if 'usuario' not in session:

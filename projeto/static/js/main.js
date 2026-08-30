@@ -5,6 +5,7 @@ export const API_TIPO_CULTURAL_URL = '/api/tipos_culturais';
 export const API_PROMOCAO_URL = '/api/promocoes';
 export const API_PONTO_URL = '/api/pontos';
 export const API_USUARIO_URL = '/api/usuarios';
+export const API_AVALIACAO_URL = '/api/avaliacoes';
 
 let input_foto = document.getElementById('foto-imagem');
 let preview_imagem = document.getElementById('preview-imagem');
@@ -259,4 +260,31 @@ export function criarBotaoFavorito(ponto, aoAlternar) {
     });
 
     return botao;
+}
+export function inicializarEstrelas() {
+    let estrelas = document.querySelectorAll('.star');
+    let notaInput = document.getElementById('nota');
+
+    if (!estrelas.length || !notaInput) return;
+
+    function marcarEstrelas(valor) {
+        estrelas.forEach(s => {
+            s.classList.toggle('active', s.getAttribute('data-value') <= valor);
+        });
+    }
+
+    estrelas.forEach(star => {
+        star.addEventListener('click', function () {
+            notaInput.value = this.getAttribute('data-value');
+            marcarEstrelas(notaInput.value);
+        });
+
+        star.addEventListener('mouseover', function () {
+            marcarEstrelas(this.getAttribute('data-value'));
+        });
+
+        star.addEventListener('mouseout', function () {
+            marcarEstrelas(notaInput.value);
+        });
+    });
 }

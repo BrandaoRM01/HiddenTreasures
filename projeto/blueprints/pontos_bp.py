@@ -19,7 +19,7 @@ def pontos():
 
 @pontos_bp.route('/detalhes-ponto/<int:id>')
 def detalhes_ponto(id):
-    return controller.preparar_detalhes_ponto(id)
+    return controller.preparar_detalhes_ponto()
 
 @pontos_bp.route('/buscar-pontos', methods=['POST'])
 def buscar_pontos():
@@ -78,3 +78,7 @@ def api_pontos_aprovados():
 @pontos_bp.route('/api/pontos/index', methods=['GET'])
 def api_pontos_index():
     return controller.listar_index()
+
+@pontos_bp.route('/api/pontos/detalhes/<int:id>')
+def api_detalhes_ponto(id):
+    return controller.detalhes_ponto_api(id)
