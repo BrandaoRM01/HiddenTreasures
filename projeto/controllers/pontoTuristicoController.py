@@ -16,38 +16,49 @@ class PontoTuristicoController:
         self.__dao_ecossistema = EcossistemaDAO()
         self.__dao_destaque = DestaqueDAO()
 
-    def __listar_pontos(self):
-        return self.__dao_pontos.listar_pontos()
-    
     def __usuario_pode_moderar(self):
         return 'usuario' in session and session['usuario']['pode_moderar']
 
     def preparar_index(self):
-        pontos_promocao = []
+        return render_template('ponto_turistico/index.html')
 
+    def listar_index(self):
         top_pontos = self.__dao_pontos.listar_top_pontos()
         pontos = self.__dao_pontos.listar_pontos()
 
-        if not pontos:
-            pontos = None
-
-        if not top_pontos:
-            top_pontos = None
+        pontos_promocao = []
 
         if pontos:
             for ponto in pontos:
-                if ponto.promocao != None:
+                if ponto.promocao is not None:
                     pontos_promocao.append(ponto)
-        
+
         if session.get('usuario'):
             usuario_email = session['usuario']['email']
             usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-
             favoritos_ids = [ponto.id for ponto in usuario.pontos_favoritos]
         else:
             favoritos_ids = []
-   
-        return render_template('ponto_turistico/index.html', pontos_promocao=pontos_promocao, top_pontos=top_pontos, favoritos_ids=favoritos_ids)
+
+        top_pontos_json = []
+        for p in (top_pontos or []):
+            ponto = p.to_dict()
+            ponto['favorito'] = p.id in favoritos_ids
+            top_pontos_json.append(ponto)
+
+        pontos_promocao_json = []
+        for p in pontos_promocao:
+            ponto = p.to_dict()
+            ponto['favorito'] = p.id in favoritos_ids
+            pontos_promocao_json.append(ponto)
+
+        dados = {
+            'logado': bool(session.get('usuario')),
+            'top_pontos': top_pontos_json,
+            'pontos_promocao': pontos_promocao_json
+        }
+
+        return jsonify(dados), 200
 
     def preparar_sobre(self):
         return render_template('ponto_turistico/sobre.html')
@@ -105,9 +116,6 @@ class PontoTuristicoController:
             return render_template('erro.html')
         
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
-
-        if not ponto:
-            return render_template('erro.html')
 
         if ponto.sugerido_por:
             return redirect(url_for('pontos.editar_sugestao', id=id_ponto))

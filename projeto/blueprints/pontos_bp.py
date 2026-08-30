@@ -72,5 +72,9 @@ def api_alterar_status(id_ponto, status):
     return controller.alterar_status(id_ponto, status)
 
 @pontos_bp.route('/api/pontos/aprovados', methods=['GET'])
-def api_pontos_publicos():
+def api_pontos_aprovados():
     return controller.listar_pontos_aprovados()
+
+@pontos_bp.route('/api/pontos/index', methods=['GET'])
+def api_pontos_index():
+    return controller.listar_index()
