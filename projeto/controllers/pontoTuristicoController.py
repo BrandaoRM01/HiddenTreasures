@@ -146,7 +146,10 @@ class PontoTuristicoController:
         return jsonify(ponto.to_dict()), 200
 
     def preparar_pontos_turisticos(self):
-        lista_pontos = self.__listar_pontos()
+        return render_template('ponto_turistico/pontos.html')
+
+    def listar_pontos_aprovados(self):
+        lista = self.__dao_pontos.listar_pontos()
 
         if session.get('usuario'):
             usuario_email = session['usuario']['email']
@@ -156,7 +159,14 @@ class PontoTuristicoController:
         else:
             favoritos_ids = []
 
-        return render_template('ponto_turistico/pontos.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
+        pontos = []
+
+        for p in lista:
+            ponto = p.to_dict()
+            ponto['favorito'] = p.id in favoritos_ids
+            pontos.append(ponto)
+
+        return jsonify({'logado': bool(session.get('usuario')), 'pontos': pontos}), 200
 
     def preparar_detalhes_ponto(self, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)

@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, url_for, request, session
+from flask import flash, render_template, redirect, url_for, request, session, jsonify
 from projeto.dao import UserDAO, HistoricoSenhaDAO
 from projeto.factorys import UsuarioFactory
 from projeto.models import User, HistoricoSenha, usuario
@@ -345,28 +345,26 @@ class UserController:
     
     def alterar_favorito(self):
         if 'usuario' not in session:
-            return render_template('erro.html')
-        
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
         usuario_email = session['usuario']['email']
-        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-        ponto_id = request.form.get('ponto_id')
+
+        dados = request.get_json()
+        ponto_id = dados.get('ponto_id')
 
         if not ponto_id:
-            flash('Ponto turístico não encontrado', 'danger')
+            return jsonify({'mensagem': 'Ponto turístico não encontrado', 'classe': 'danger'}), 400
 
         if self.__dao_usuario.verificar_favorito(usuario_email, ponto_id):
             self.__dao_usuario.deletar_favorito(usuario_email, ponto_id)
-
-            usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-            session['usuario'] = usuario.to_dict()
-
-            flash('Ponto turístico desfavoritado com sucesso', 'success')
-            return redirect(request.referrer or url_for('pontos.index'))
-          
-        self.__dao_usuario.adicionar_favorito(ponto_id, usuario_email)
+            favorito = False
+            mensagem = 'Ponto turístico desfavoritado com sucesso'
+        else:
+            self.__dao_usuario.adicionar_favorito(ponto_id, usuario_email)
+            favorito = True
+            mensagem = 'Ponto turístico favoritado com sucesso!'
 
         usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
         session['usuario'] = usuario.to_dict()
 
-        flash('Ponto turístico favoritado com sucesso!', 'success')
-        return redirect(request.referrer or url_for('pontos.index'))
+        return jsonify({'mensagem': mensagem, 'classe': 'success', 'favorito': favorito}), 200
