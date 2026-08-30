@@ -76,16 +76,23 @@ class UserController:
     def preparar_pagina_anterior(self):
         return redirect(request.referrer or url_for('pontos.index'))
 
-    def preparar_favoritos(self, email):
+    def preparar_favoritos(self):
         if 'usuario' not in session:
             return render_template('erro.html')
-        
-        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
-        favoritos = usuario.pontos_favoritos
+        return render_template('ponto_turistico/favoritos.html')
+
+    def listar_favoritos(self):
+        if 'usuario' not in session:
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        usuario_email = session['usuario']['email']
+        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+
+        favoritos = [ponto.to_dict() for ponto in usuario.pontos_favoritos]
+
+        return jsonify(favoritos), 200
         
-        return render_template('ponto_turistico/favoritos.html', favoritos=favoritos)
-    
     def cadastrar_usuario(self):
         email = request.form.get('email')
         senha = request.form.get('senha')

@@ -1,4 +1,4 @@
-import { API_PONTO_URL, API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, criarBotaoFavorito } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarPontosAprovados();
@@ -157,47 +157,4 @@ function criarCardPonto(ponto, logado) {
     coluna.appendChild(card);
 
     return coluna;
-}
-
-function criarBotaoFavorito(ponto) {
-    let botao = document.createElement('button');
-    botao.type = 'button';
-    botao.className = 'btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center';
-    botao.style.width = '40px';
-    botao.style.height = '40px';
-
-    let coracao = document.createElement('span');
-    coracao.style.fontSize = '20px';
-    atualizarCoracao(coracao, ponto.favorito);
-
-    botao.appendChild(coracao);
-
-    botao.addEventListener('click', async () => {
-        let resposta = await fetch(`${API_USUARIO_URL}/favoritos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ponto_id: ponto.id })
-        });
-
-        let dadosResposta = await resposta.json();
-
-        if (resposta.ok) {
-            ponto.favorito = dadosResposta.favorito;
-            atualizarCoracao(coracao, ponto.favorito);
-        }
-
-        mostrarMensagem(dadosResposta.mensagem, dadosResposta.classe);
-    });
-
-    return botao;
-}
-
-function atualizarCoracao(coracao, favorito) {
-    if (favorito) {
-        coracao.style.color = 'red';
-        coracao.textContent = '❤️';
-    } else {
-        coracao.style.color = 'gray';
-        coracao.textContent = '🤍';
-    }
 }

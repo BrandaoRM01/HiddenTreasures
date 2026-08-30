@@ -142,3 +142,121 @@ function removerAlerta(alerta) {
         alerta.remove();
     }, 300);
 }
+
+export function criarFaixaDestaques(destaques) {
+    let faixa = document.createElement('div');
+    faixa.className = 'position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1';
+    faixa.style.background = 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)';
+
+    destaques.forEach(destaque => {
+        let badge = document.createElement('span');
+        badge.className = 'badge bg-dark bg-opacity-75 text-white';
+        badge.textContent = `#${destaque.nome}`;
+        faixa.appendChild(badge);
+    });
+
+    return faixa;
+}
+
+export function criarAvaliacao(ponto) {
+    let avaliacao = document.createElement('p');
+    avaliacao.className = 'text-warning';
+
+    let media = ponto.media_avaliacao !== null && ponto.media_avaliacao !== undefined ? Number(ponto.media_avaliacao) : null;
+
+    if (media !== null) {
+        avaliacao.textContent = `⭐ ${media.toFixed(1)}`;
+    } else {
+        avaliacao.textContent = '⭐ Nenhuma avaliação';
+    }
+
+    return avaliacao;
+}
+
+export function criarPreco(ponto) {
+    let preco = document.createElement('p');
+    preco.className = 'preco mb-0';
+
+    let custoEntrada = Number(ponto.custo_entrada);
+
+    if (custoEntrada) {
+        if (ponto.promocao) {
+            let precoAntigo = document.createElement('span');
+            precoAntigo.className = 'preco-antigo';
+            precoAntigo.textContent = `R$ ${custoEntrada.toFixed(2)}`;
+
+            let valorComDesconto = custoEntrada * (1 - Number(ponto.promocao.desconto) / 100);
+
+            let precoPromocao = document.createElement('span');
+            precoPromocao.className = 'preco-promocao';
+            precoPromocao.textContent = `R$ ${valorComDesconto.toFixed(2)}`;
+
+            preco.appendChild(precoAntigo);
+            preco.appendChild(precoPromocao);
+        } else {
+            preco.textContent = `R$ ${custoEntrada.toFixed(2)}`;
+        }
+    } else {
+        let precoGratuito = document.createElement('span');
+        precoGratuito.className = 'preco-promocao';
+        precoGratuito.textContent = 'Gratuito';
+        preco.appendChild(precoGratuito);
+    }
+
+    return preco;
+}
+
+export function criarBotaoDetalhes(ponto) {
+    let botao = document.createElement('a');
+    botao.href = `/detalhes-ponto/${ponto.id}`;
+    botao.className = 'btn btn-primary w-100 mt-2';
+    botao.textContent = 'Ver detalhes';
+    return botao;
+}
+
+export function atualizarCoracao(coracao, favorito) {
+    if (favorito) {
+        coracao.style.color = 'red';
+        coracao.textContent = '❤️';
+    } else {
+        coracao.style.color = 'gray';
+        coracao.textContent = '🤍';
+    }
+}
+
+export function criarBotaoFavorito(ponto, aoAlternar) {
+    let botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center';
+    botao.style.width = '40px';
+    botao.style.height = '40px';
+
+    let coracao = document.createElement('span');
+    coracao.style.fontSize = '20px';
+    atualizarCoracao(coracao, ponto.favorito);
+
+    botao.appendChild(coracao);
+
+    botao.addEventListener('click', async () => {
+        let resposta = await fetch(`${API_USUARIO_URL}/favoritos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ponto_id: ponto.id })
+        });
+
+        let dadosResposta = await resposta.json();
+
+        if (resposta.ok) {
+            ponto.favorito = dadosResposta.favorito;
+            atualizarCoracao(coracao, ponto.favorito);
+
+            if (aoAlternar) {
+                aoAlternar(ponto.favorito);
+            }
+        }
+
+        mostrarMensagem(dadosResposta.mensagem, dadosResposta.classe);
+    });
+
+    return botao;
+}
