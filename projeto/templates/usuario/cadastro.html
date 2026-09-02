@@ -13,13 +13,12 @@
 
             <h3 class="text-center mb-4">Cadastro</h3>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('user.cadastro') }}">
+            <form id="form-cadastro">
 
                 <div class="row align-items-start mb-3">
 
                     <div class="col-md-4 text-center">
-                        <img id="preview-imagem" src="{{ url_for('static', filename='img/default/user_foto.webp') }}"
-                            class="rounded-circle shadow"
+                        <img id="preview-imagem" class="rounded-circle shadow"
                             style="width: 100px; height: 100px; object-fit: cover; object-position: top; cursor: pointer;">
 
                         <input name="foto" type="file" hidden id="foto-imagem" accept="image/*">
@@ -53,8 +52,7 @@
                             <input name="senha" type="password" class="form-control" id="senha">
 
                             <span class="input-group-text toggle-password" data-target="senha" style="cursor:pointer;">
-                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-senha"
-                                    width="20">
+                                <img id="eye-senha" width="20">
                             </span>
                         </div>
                     </div>
@@ -67,8 +65,7 @@
 
                             <span class="input-group-text toggle-password" data-target="confirmar_senha"
                                 style="cursor:pointer;">
-                                <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
-                                    id="eye-confirmar_senha" width="20">
+                                <img id="eye-confirmar_senha" width="20">
                             </span>
                         </div>
                     </div>
@@ -79,7 +76,7 @@
             </form>
 
             <p class="text-center mt-3">
-                Já tem conta? <a href="{{ url_for('user.login') }}">Entrar</a>
+                Já tem conta? <a id="login">Entrar</a>
             </p>
 
         </div>
@@ -87,3 +84,8 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/usuario/cadastrar.js') }}"></script>
+{% endblock js %}

@@ -51,6 +51,17 @@ def alterar_permissao(email):
 def favoritos():
     return controller.preparar_favoritos()
 
+@user_bp.route('/api/usuarios', methods=['GET', 'POST'])
+def api_usuarios():
+    if request.method == 'POST':
+        return controller.cadastrar_usuario()
+    return controller.listar_usuarios()
+
+@user_bp.route('/api/usuarios/auth', methods=['GET', 'POST'])
+def api_usuarios_auth():
+    if request.method == 'POST':
+        return controller.autenticar_usuario()
+
 @user_bp.route('/api/usuarios/favoritos', methods=['GET', 'POST'])
 def api_favoritos():
     if request.method == 'POST':

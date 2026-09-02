@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (input.type === 'password') {
+            if (input.type == 'password') {
                 input.type = 'text';
                 icon.src = '/static/img/default/close_eye.svg';
             } else {
@@ -106,13 +106,13 @@ export function mostrarMensagem(mensagem, tipo = "success") {
 
     let icone = "";
 
-    if (tipo === "success") {
+    if (tipo == "success") {
         icone = "bi bi-check-circle-fill";
-    } else if (tipo === "danger") {
+    } else if (tipo == "danger") {
         icone = "bi bi-x-circle-fill";
-    } else if (tipo === "warning") {
+    } else if (tipo == "warning") {
         icone = "bi bi-exclamation-triangle-fill";
-    } else if (tipo === "info") {
+    } else if (tipo == "info") {
         icone = "bi bi-info-circle-fill";
     }
 

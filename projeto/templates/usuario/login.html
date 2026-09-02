@@ -12,7 +12,7 @@
         <div class="card shadow p-4">
             <h3 class="text-center mb-4">Login</h3>
 
-            <form method="POST" action="{{ url_for('user.login') }}">
+            <form id="form-login">
                 <div class="mb-3">
                     <label>Email <span class="text-danger">*</span></label>
                     <input name="email" type="email" class="form-control">
@@ -26,8 +26,7 @@
 
                         <span class="input-group-text toggle-password" data-target="login_senha"
                             style="cursor:pointer;">
-                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-login_senha"
-                                width="20">
+                            <img id="eye-login_senha" width="20">
                         </span>
                     </div>
                 </div>
@@ -36,16 +35,21 @@
             </form>
 
             <div class="text-center mt-2">
-                <a href="{{ url_for('historico_senhas.recuperar_senha') }}" class="text-decoration-none">
+                <a id="esqueceu_senha" class="text-decoration-none">
                     Esqueceu a senha?
                 </a>
             </div>
 
             <p class="text-center mt-3">
-                Não tem conta? <a href="{{ url_for('user.cadastro') }}">Cadastre-se</a>
+                Não tem conta? <a id="cadastro">Cadastre-se</a>
             </p>
         </div>
     </div>
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/usuario/login.js') }}"></script>
+{% endblock js %}

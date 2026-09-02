@@ -73,9 +73,6 @@ class UserController:
         usuarios = self.__dao_usuario.listar_usuarios()
         return render_template('usuario/gerenciar_usuarios.html', usuarios=usuarios)
     
-    def preparar_pagina_anterior(self):
-        return redirect(request.referrer or url_for('pontos.index'))
-
     def preparar_favoritos(self):
         if 'usuario' not in session:
             return render_template('erro.html')
@@ -105,23 +102,19 @@ class UserController:
         lista_usernames = self.__dao_usuario.pegar_usernames()
 
         if usuario:
-            flash('Email já cadastrado. Por favor, use outro email ou faça login.', 'danger')
-            return redirect(url_for('user.cadastro'))
+            return jsonify({'mensagem': 'Email já cadastrado. Por favor, use outro email ou faça login.', 'classe': 'danger'}), 400
 
         if not email or not senha or not confirmar_senha or not username:
-            flash('Informe os campos que são obrigatórios.', 'danger')
-            return redirect(url_for('user.cadastro'))
+            return jsonify({'mensagem': 'Informe os campos que são obrigatórios.', 'classe': 'danger'}), 400
         
         if self.__validar_email(email):
-            return redirect(url_for('user.cadastro'))
-        
+            return jsonify({'mensagem': 'Email inválido. Por favor, informe um email válido.', 'classe': 'danger'}), 400
+
         if username.capitalize().strip() in lista_usernames:
-            flash('Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'danger')
-            return redirect(url_for('user.cadastro'))
+            return jsonify({'mensagem': 'Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
 
         if senha != confirmar_senha:
-            flash('As senhas não coincidem. Por favor, tente novamente.', 'danger')
-            return redirect(url_for('user.cadastro'))
+            return jsonify({'mensagem': 'As senhas não coincidem. Por favor, tente novamente.', 'classe': 'danger'}), 400
         
         usuario_senha = UsuarioFactory.criar_usuario(
             email=email,
@@ -131,7 +124,7 @@ class UserController:
         senha_hash = generate_password_hash(senha)
 
         if not self.__verificar_senha(usuario_senha, senha, senha_hash):
-            return redirect(url_for('user.cadastro'))
+            return jsonify({'mensagem': 'Erro ao verificar a senha.', 'classe': 'danger'}), 400
 
         if not foto or foto.filename == "":
             nome_arquivo = "img/default/user_foto.webp"
@@ -157,34 +150,29 @@ class UserController:
         historico = HistoricoSenha(novo_usuario, senha_hash)
         self.__dao_historico_senha.inserir_nova_senha(historico)
 
-        flash('Cadastro realizado com sucesso! Faça login para acessar sua conta.', 'success')
-
-        return redirect(url_for('user.login'))
+        return jsonify({'mensagem': 'Cadastro realizado com sucesso! Faça login para continuar.', 'classe': 'success'}), 200
     
     def autenticar_usuario(self):
-        email = request.form.get('email')
-        senha = request.form.get('senha')
+        dados = request.get_json()
+        email = dados.get('email')
+        senha = dados.get('senha')
 
         if not email or not senha:
-            flash('Todos os campos são obrigatórios.', 'danger')
-            return redirect(url_for('user.login'))
+            return jsonify({'mensagem': 'Todos os campos são obrigatórios.', 'classe': 'danger'}), 400
         
         if self.__validar_email(email):
-            return redirect(url_for('user.login'))
+            return jsonify({'mensagem': 'Email inválido. Por favor, informe um email válido.', 'classe': 'danger'}), 400
      
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            flash ('Usuário não encontrado. Por favor, verifique o email e tente novamente.', 'danger')
-            return redirect(url_for('user.login'))
+            return jsonify({'mensagem': 'Usuário não encontrado. Por favor, verifique o email e tente novamente.', 'classe': 'danger'}), 400
 
         if check_password_hash(usuario.senha_hash, senha):
-            flash(f'Bem vindo, {usuario.username}!', 'success')
             session['usuario'] = usuario.to_dict()
-            return redirect(url_for('pontos.index'))
+            return jsonify({'mensagem': f'Bem vindo, {usuario.username}!', 'classe': 'success'}), 200
         
-        flash('Usuário ou senha incorretos. Por favor, tente novamente.', 'danger')
-        return redirect(url_for('user.login'))
+        return jsonify({'mensagem': 'Usuário ou senha incorretos. Por favor, tente novamente.', 'classe': 'danger'}), 400
     
     def logout_usuario(self):
         if 'usuario' not in session:
