@@ -11,8 +11,6 @@ class EcossistemaController:
         return 'usuario' in session and session['usuario']['pode_moderar']
 
     def listar_ecossistemas(self):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
         lista = self.__dao.carregar_ecossistemas()
         ecossistemas = []
 
