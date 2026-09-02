@@ -19,6 +19,9 @@ class PontoTuristicoController:
     def __usuario_pode_moderar(self):
         return 'usuario' in session and session['usuario']['pode_moderar']
 
+    def __status_valido(self, status):
+        return status in ['aprovado', 'rejeitado']
+ 
     def preparar_index(self):
         return render_template('ponto_turistico/index.html')
 
@@ -365,7 +368,7 @@ class PontoTuristicoController:
     def editar_ponto(self, id_ponto):
         if 'usuario' not in session:
             return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-    
+
         nome = request.form.get('nome')
         localizacao = request.form.get('localizacao')
         descricao = request.form.get('descricao')
@@ -380,10 +383,11 @@ class PontoTuristicoController:
         ecossistema_id = request.form.get('ecossistema')
         area_km = request.form.get('area_km')
         destaques_ids = request.form.getlist('destaques')
+        status_recebido = request.form.get('status')
 
         if not nome or not localizacao or not descricao or not categoria_id:
             return jsonify({'mensagem': 'Por favor, preencha todos os campos obrigatórios.', 'classe': 'danger'}), 400
-      
+
         if not custo_entrada:
             custo_entrada = 0.0
         else:
@@ -391,7 +395,7 @@ class PontoTuristicoController:
                 custo_entrada = float(custo_entrada)
             except (ValueError, TypeError):
                 return jsonify({'mensagem': 'Por favor, insira um valor válido para o custo de entrada.', 'classe': 'danger'}), 400
-            
+
         if tipo_ponto == 'natural':
             if not area_km:
                 area_km = 0.0
@@ -400,7 +404,7 @@ class PontoTuristicoController:
                     area_km = float(area_km)
                 except (ValueError, TypeError):
                     return jsonify({'mensagem': 'Por favor, insira um valor válido para a área.', 'classe': 'danger'}), 400
-            
+
         if not horario_funcionamento:
             horario_funcionamento = "Não informado"
 
@@ -417,6 +421,10 @@ class PontoTuristicoController:
 
         if not session['usuario']['pode_moderar']:
             ponto_existente.status = 'pendente'
+        elif status_recebido:
+            if not self.__status_valido(status_recebido):
+                return jsonify({'mensagem': 'Status inválido. Informe um status válido.', 'classe': 'danger'}), 400
+            ponto_existente.status = status_recebido
 
         nome_antigo = os.path.basename(ponto_existente.url_imagem)
         nome_antigo_ponto = ponto_existente.nome

@@ -5,7 +5,6 @@ const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
 
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarPonto();
-    await carregarAvaliacoes();
 });
 
 async function carregarPonto() {
@@ -20,6 +19,12 @@ async function carregarPonto() {
     montarImagem(ponto);
     montarInfo(ponto);
     montarSecaoAvaliar(ponto);
+
+    if (ponto.status == 'aprovado') {
+        await carregarAvaliacoes();
+    } else {
+        document.getElementById('secao-avaliacoes-preview').classList.add('d-none');
+    }
 }
 
 function montarImagem(ponto) {
@@ -156,11 +161,11 @@ function montarInfo(ponto) {
 
     container.appendChild(criarParagrafo('Categoria', ponto.categoria.nome));
 
-    if (ponto.tipo_ponto === 'cultural') {
-        container.appendChild(criarParagrafo('Tipo Cultural', ponto.tipo_cultural ? ponto.tipo_cultural.nome : 'Não especificado'));
+    if (ponto.tipo_ponto == 'cultural') {
+        container.appendChild(criarParagrafo('Tipo Cultural', ponto.tipo_cultural ? ponto.tipo_cultural.nome : 'Não informado'));
         container.appendChild(criarParagrafo('Ano de Fundação', ponto.ano_fundacao || 'Não informado'));
-    } else if (ponto.tipo_ponto === 'natural') {
-        container.appendChild(criarParagrafo('Ecossistema', ponto.ecossistema ? ponto.ecossistema.nome : 'Não especificado'));
+    } else if (ponto.tipo_ponto == 'natural') {
+        container.appendChild(criarParagrafo('Ecossistema', ponto.ecossistema ? ponto.ecossistema.nome : 'Não informado'));
         container.appendChild(criarParagrafo('Área', ponto.area_km ? `${ponto.area_km} km²` : 'Não informada'));
     }
 

@@ -67,10 +67,6 @@ def api_pontos_sugestoes():
 def api_minhas_sugestoes():
     return controller.listar_sugestoes_usuario()
 
-@pontos_bp.route('/api/pontos/<int:id_ponto>/status/<string:status>', methods=['PUT'])
-def api_alterar_status(id_ponto, status):
-    return controller.alterar_status(id_ponto, status)
-
 @pontos_bp.route('/api/pontos/aprovados', methods=['GET'])
 def api_pontos_aprovados():
     return controller.listar_pontos_aprovados()
