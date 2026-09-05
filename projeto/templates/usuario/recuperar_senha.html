@@ -17,25 +17,27 @@
                 Digite seu email para receber o link de redefinição.
             </p>
 
-            <form method="POST" action="{{ url_for('historico_senhas.recuperar_senha') }}">
+            <form id="form-recuperar-senha">
 
                 <div class="mb-3">
                     <label>Email <span class="text-danger">*</span></label>
                     <input name="email" type="email" class="form-control" required>
                 </div>
 
-                <button class="btn btn-primary w-100">
+                <button type="submit" class="btn btn-primary w-100">
                     Enviar link
                 </button>
 
             </form>
 
             <p class="text-center mt-3">
-                <a href="{{ url_for('user.login') }}">Voltar ao login</a>
+                <a id="voltar">Voltar ao login</a>
             </p>
 
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ url_for('static', filename='js/usuario/recuperar_senha.js') }}"></script>
 
 {% endblock conteudo %}

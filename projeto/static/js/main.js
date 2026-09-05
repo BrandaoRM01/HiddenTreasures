@@ -6,6 +6,8 @@ export const API_PROMOCAO_URL = '/api/promocoes';
 export const API_PONTO_URL = '/api/pontos';
 export const API_USUARIO_URL = '/api/usuarios';
 export const API_AVALIACAO_URL = '/api/avaliacoes';
+export const API_RECUPERACAO_URL = '/api/recuperacao-senha';
+export const API_REDEFINICAO_URL = '/api/redefinir-senha';
 
 let input_foto = document.getElementById('foto-imagem');
 let preview_imagem = document.getElementById('preview-imagem');

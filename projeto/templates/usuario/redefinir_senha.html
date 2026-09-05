@@ -13,7 +13,7 @@
 
             <h3 class="text-center mb-3">Redefinir Senha</h3>
 
-            <form method="POST" action="{{ url_for('historico_senhas.redefinir_senha', token=token) }}">
+            <form id="form-redefinir-senha" data-token="{{ token }}">
 
                 <div class="mb-3">
                     <label>Nova senha <span class="text-danger">*</span></label>
@@ -23,8 +23,7 @@
 
                         <span class="input-group-text toggle-password" data-target="reset_senha"
                             style="cursor:pointer;">
-                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}" id="eye-reset_senha"
-                                width="20">
+                            <img id="eye-reset_senha" width="20">
                         </span>
                     </div>
                 </div>
@@ -37,13 +36,12 @@
 
                         <span class="input-group-text toggle-password" data-target="reset_confirmar_senha"
                             style="cursor:pointer;">
-                            <img src="{{ url_for('static', filename='img/default/open_eye.svg') }}"
-                                id="eye-reset_confirmar_senha" width="20">
+                            <img id="eye-reset_confirmar_senha" width="20">
                         </span>
                     </div>
                 </div>
 
-                <button class="btn btn-primary w-100">
+                <button type="submit" class="btn btn-primary w-100">
                     Alterar senha
                 </button>
 
@@ -52,5 +50,7 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ url_for('static', filename='js/usuario/redefinir_senha.js') }}"></script>
 
 {% endblock conteudo %}
