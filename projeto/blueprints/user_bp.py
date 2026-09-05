@@ -1,26 +1,20 @@
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request, session
 from projeto.controllers import UserController
 
 user_bp = Blueprint('user', __name__)
 
 controller = UserController()
 
-@user_bp.route('/login', methods=['GET', 'POST'])
+@user_bp.route('/login')
 def login():
-    if request.method == 'POST':
-        return controller.autenticar_usuario()
     return controller.preparar_login()
 
-@user_bp.route('/cadastro', methods=['GET', 'POST'])
+@user_bp.route('/cadastro')
 def cadastro():
-    if request.method == 'POST':
-        return controller.cadastrar_usuario()
     return controller.preparar_cadastro()
 
-@user_bp.route('/editar-perfil', methods=['POST', 'GET'])
+@user_bp.route('/editar-perfil')
 def editar_perfil():
-    if request.method == 'POST':
-        return controller.editar_perfil()
     return controller.preparar_editar_perfil()
 
 @user_bp.route('/logout')
@@ -43,10 +37,6 @@ def gerenciar_usuarios():
 def excluir_usuario(email):
     return controller.excluir_usuario(email)
 
-@user_bp.route('/admin/alterar-permissao/<email>', methods=['GET'])
-def alterar_permissao(email):
-    return controller.alterar_permissao(email)
-
 @user_bp.route('/favoritos')
 def favoritos():
     return controller.preparar_favoritos()
@@ -56,6 +46,19 @@ def api_usuarios():
     if request.method == 'POST':
         return controller.cadastrar_usuario()
     return controller.listar_usuarios()
+
+@user_bp.route('/api/usuarios/<email>', methods=['GET', 'PUT', 'DELETE'])
+def api_usuarios_param(email):
+    if email == 'me':
+        if 'usuario' not in session:
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+        email = session['usuario']['email']
+
+    if request.method == 'PUT':
+        return controller.editar_usuario(email)
+    elif request.method == 'DELETE':
+        return controller.remover_usuario(email)
+    return controller.buscar_usuario_por_email(email)
 
 @user_bp.route('/api/usuarios/auth', methods=['GET', 'POST'])
 def api_usuarios_auth():
@@ -67,7 +70,3 @@ def api_favoritos():
     if request.method == 'POST':
         return controller.alterar_favorito()
     return controller.listar_favoritos()
-
-@user_bp.route('/api/usuarios/favoritos', methods=['POST'])
-def api_alterar_favorito():
-    return controller.alterar_favorito()

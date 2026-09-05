@@ -21,20 +21,18 @@ class UserController:
 
     def __verificar_senha(self, usuario, senha, senha_hash):
         if len(senha) < 8:
-            flash('A senha deve ter pelo menos 8 caracteres.', 'danger')
-            return False
+            return False, 'A senha deve ter pelo menos 8 caracteres.'
 
         senhas_antigas = self.__dao_historico_senha.listar_senhas_usuario(usuario.email)
 
         for hash_antigo in senhas_antigas:
             if check_password_hash(hash_antigo, senha):
-                flash('Você não pode reutilizar uma das suas últimas cinco senhas.', 'danger')
-                return False
+                return False, 'Você não pode reutilizar uma das suas últimas cinco senhas.'
 
         if len(senhas_antigas) >= 5:
             self.__dao_historico_senha.remover_senha_antiga(usuario.email)
 
-        return True
+        return True, None
     
     def __validar_email(self, email):
         try:
@@ -42,7 +40,6 @@ class UserController:
             return False
         except EmailNotValidError as e:
             print(f'Email inválido: {str(e)}')
-            flash('Informe um tipo de email válido!', 'danger')
             return True
 
     def preparar_cadastro(self):
@@ -70,8 +67,7 @@ class UserController:
         if not self.__usuario_pode_moderar():
             return render_template('erro.html')
         
-        usuarios = self.__dao_usuario.listar_usuarios()
-        return render_template('usuario/gerenciar_usuarios.html', usuarios=usuarios)
+        return render_template('usuario/gerenciar_usuarios.html')
     
     def preparar_favoritos(self):
         if 'usuario' not in session:
@@ -89,6 +85,23 @@ class UserController:
         favoritos = [ponto.to_dict() for ponto in usuario.pontos_favoritos]
 
         return jsonify(favoritos), 200
+
+    def listar_usuarios(self):
+        if not self.__usuario_pode_gerenciar_usuarios():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        lista = self.__dao_usuario.listar_usuarios()
+        usuarios = []
+
+        for obj in lista:
+            usuarios.append(obj.to_dict())
+
+        dados = {
+            'usuario_logado': session['usuario'],
+            'usuarios': usuarios
+        }
+
+        return jsonify(dados), 200
         
     def cadastrar_usuario(self):
         email = request.form.get('email')
@@ -183,127 +196,121 @@ class UserController:
         flash('Logout realizado com sucesso.', 'success')
         return redirect(url_for('pontos.index'))
     
-    def excluir_usuario(self, email):
-        if not self.__usuario_pode_gerenciar_usuarios():
-            return render_template('erro.html')
+    def remover_usuario(self, email):
+        if 'usuario' not in session:
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        self.__dao_usuario.excluir_usuario(email)
-        flash('Usuário excluído com sucesso.', 'success')
-        return redirect(url_for('user.gerenciar_usuarios'))
-    
-    def apagar_perfil(self, email):
-        if not self.__usuario_pode_gerenciar_usuarios() and session['usuario']['email'] != email:
-            return render_template('erro.html')
+        email_sessao = session['usuario']['email']
+        proprio_perfil = (email == email_sessao)
 
-        self.__dao_usuario.excluir_usuario(email)
-        session.pop('usuario', None)
-        flash('Perfil excluído com sucesso.', 'success')
-        return redirect(url_for('pontos.index'))
-    
-    def alterar_permissao(self, usuario_email):
-        if not self.__usuario_pode_gerenciar_usuarios():
-            return render_template('erro.html')
-        
-        if usuario_email == session['usuario']['email']:
-            flash('Você não pode alterar sua própria permissão de usuário', 'danger')
-            return redirect(url_for('user.gerenciar_usuarios'))
+        if not proprio_perfil and not self.__usuario_pode_gerenciar_usuarios():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)  
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            flash('Usuário não encontrado', 'danger')
-            return redirect(url_for('user.gerenciar_usuarios'))
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
 
-        if usuario.tipo_usuario() == 'admin':
-            self.__dao_usuario.alterar_permissao_usuario(usuario, 'user')
+        if not proprio_perfil and usuario.tipo_usuario() == 'superadmin':
+            return jsonify({'mensagem': 'Não é possível excluir um superadmin.', 'classe': 'danger'}), 400
+
+        self.__dao_usuario.excluir_usuario(email)
+
+        if proprio_perfil:
+            session.pop('usuario', None)
+            return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 200
+
+        return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 200
             
-            flash('Permissão alterada com sucesso', 'success')
-            return redirect(url_for('user.gerenciar_usuarios'))
-        else:
-            self.__dao_usuario.alterar_permissao_usuario(usuario, 'admin')
-            
-            flash('Permissão alterada com sucesso', 'success')
-            return redirect(url_for('user.gerenciar_usuarios'))
-        
-    def editar_perfil(self):
+    def editar_usuario(self, email):
         if 'usuario' not in session:
-            return render_template('erro.html')
-        
-        email = session['usuario']['email']
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        email_sessao = session['usuario']['email']
+        proprio_perfil = (email == email_sessao)
+
+        if not proprio_perfil and not self.__usuario_pode_gerenciar_usuarios():
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        if not usuario:
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
+
+        tipo_usuario_recebido = request.form.get('tipo_usuario')
+
+        if not proprio_perfil:
+            if usuario.tipo_usuario() == 'superadmin':
+                return jsonify({'mensagem': 'Não é possível alterar a permissão de um superadmin.', 'classe': 'danger'}), 400
+
+            if tipo_usuario_recebido not in ['user', 'admin']:
+                return jsonify({'mensagem': 'Tipo de usuário inválido.', 'classe': 'danger'}), 400
+
+            self.__dao_usuario.alterar_permissao_usuario(usuario, tipo_usuario_recebido)
+
+            return jsonify({'mensagem': 'Permissão alterada com sucesso!', 'classe': 'success'}), 200
+
+        if tipo_usuario_recebido:
+            return jsonify({'mensagem': 'Você não pode alterar sua própria permissão.', 'classe': 'danger'}), 400
+
         username = request.form.get('username')
         senha = request.form.get('senha')
         confirmar_senha = request.form.get('confirmar_senha')
         foto = request.files.get('foto')
 
-        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
         lista_usernames = self.__dao_usuario.pegar_usernames()
 
         if not username:
-            flash('Informe o campo obrigatório.', 'danger')
-            return redirect(url_for('user.editar_perfil'))
-        
-        if not usuario:
-            flash('Usuário não encontrado no sistema.', 'danger')
-            return redirect(url_for('pontos.index'))
+            return jsonify({'mensagem': 'Informe o campo obrigatório.', 'classe': 'danger'}), 400
 
         username_ajustado = username.capitalize().strip()
 
-        if username_ajustado in lista_usernames and username_ajustado != session['usuario']['username']:
-            flash('Username já está em uso por outro usuário. Tente outro nome.', 'danger')
-            return redirect(url_for('user.editar_perfil'))
-        
+        if username_ajustado in lista_usernames and username_ajustado != usuario.username:
+            return jsonify({'mensagem': 'Username já está em uso por outro usuário. Tente outro nome.', 'classe': 'danger'}), 400
+
         senha_hash = usuario.senha_hash
         senha_alterada = False
 
         if senha and confirmar_senha:
             if senha != confirmar_senha:
-                flash('As senhas não coincidem.', 'danger')
-                return redirect(url_for('user.editar_perfil'))
+                return jsonify({'mensagem': 'As senhas não coincidem.', 'classe': 'danger'}), 400
 
             senha_hash_nova = generate_password_hash(senha)
 
-            if not self.__verificar_senha(usuario, senha, senha_hash_nova):
-                return redirect(url_for('user.editar_perfil'))
-            
+            senha_valida, mensagem_erro = self.__verificar_senha(usuario, senha, senha_hash_nova)
+
+            if not senha_valida:
+                return jsonify({'mensagem': mensagem_erro, 'classe': 'danger'}), 400
+
             senha_hash = senha_hash_nova
             senha_alterada = True
 
         if senha and not confirmar_senha:
-            flash('Se você quer mudar sua senha, informe também a confirmação de senha.', 'danger')
-            return redirect(url_for('user.editar_perfil'))
+            return jsonify({'mensagem': 'Se você quer mudar sua senha, informe também a confirmação de senha.', 'classe': 'danger'}), 400
 
         username_antigo = usuario.username
         nome_antigo = os.path.basename(usuario.url_foto)
 
         if not foto or foto.filename == "":
-            
-            if username_antigo != username_ajustado:
+            if username_antigo != username_ajustado and "default" not in usuario.url_foto:
+                extensao = os.path.splitext(nome_antigo)[1]
+                nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
+                novo_nome = f"{nome_ajustado_file}{extensao}"
 
-                if "default" not in usuario.url_foto:
-                    extensao = os.path.splitext(nome_antigo)[1]
-                    nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
+                caminho_antigo = os.path.join(Config.UPLOAD_USER, nome_antigo)
+                caminho_novo = os.path.join(Config.UPLOAD_USER, novo_nome)
 
-                    novo_nome = f"{nome_ajustado_file}{extensao}"
+                if os.path.exists(caminho_antigo):
+                    if os.path.exists(caminho_novo):
+                        os.remove(caminho_novo)
+                    os.rename(caminho_antigo, caminho_novo)
 
-                    caminho_antigo = os.path.join(Config.UPLOAD_USER, nome_antigo)
-                    caminho_novo = os.path.join(Config.UPLOAD_USER, novo_nome)
-
-                    if os.path.exists(caminho_antigo):
-                        if os.path.exists(caminho_novo):
-                            os.remove(caminho_novo)
-
-                        os.rename(caminho_antigo, caminho_novo)
-
-                    nome_arquivo = f"uploads/user/{novo_nome}"
-                else:
-                    nome_arquivo = usuario.url_foto
+                nome_arquivo = f"uploads/user/{novo_nome}"
             else:
                 nome_arquivo = usuario.url_foto
-
         else:
             extensao = os.path.splitext(foto.filename)[1]
             nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
-
             novo_nome = f"{nome_ajustado_file}{extensao}"
             caminho = os.path.join(Config.UPLOAD_USER, novo_nome)
 
@@ -317,14 +324,12 @@ class UserController:
 
             nome_arquivo = f"uploads/user/{novo_nome}"
 
-        tipo_usuario = session['usuario']['tipo_usuario']
-
         usuario_atualizado = UsuarioFactory.criar_usuario(
-            email=email,
+            email=usuario.email,
             senha_hash=senha_hash,
             url_foto=nome_arquivo,
             username=username_ajustado,
-            tipo_usuario=tipo_usuario
+            tipo_usuario=usuario.tipo_usuario()
         )
 
         self.__dao_usuario.editar_usuario(usuario_atualizado)
@@ -335,8 +340,7 @@ class UserController:
 
         session['usuario'] = usuario_atualizado.to_dict()
 
-        flash('Usuário atualizado com sucesso!', 'success')
-        return redirect(url_for('pontos.index'))
+        return jsonify({'mensagem': 'Usuário atualizado com sucesso!', 'classe': 'success'}), 200
     
     def alterar_favorito(self):
         if 'usuario' not in session:
@@ -363,3 +367,14 @@ class UserController:
         session['usuario'] = usuario.to_dict()
 
         return jsonify({'mensagem': mensagem, 'classe': 'success', 'favorito': favorito}), 200
+
+    def buscar_usuario_por_email(self, email):
+        if 'usuario' not in session:
+            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        if not usuario:
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
+
+        return jsonify(usuario.to_dict()), 200
