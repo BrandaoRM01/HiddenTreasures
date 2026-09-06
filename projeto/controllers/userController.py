@@ -1,8 +1,10 @@
-from flask import flash, render_template, redirect, url_for, request, session, jsonify
+from flask import render_template, request, jsonify
 from projeto.dao import UserDAO, HistoricoSenhaDAO
 from projeto.factorys import UsuarioFactory
 from projeto.models import User, HistoricoSenha, usuario
 from projeto.config import Config
+from projeto.config import JWT
+from projeto.decoradores import login_required, admin_required, superadmin_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from email_validator import validate_email, EmailNotValidError
@@ -12,12 +14,6 @@ class UserController:
     def __init__(self):
         self.__dao_usuario = UserDAO()
         self.__dao_historico_senha = HistoricoSenhaDAO()
-
-    def __usuario_pode_moderar(self):
-        return 'usuario' in session and session['usuario']['pode_moderar']
-    
-    def __usuario_pode_gerenciar_usuarios(self):
-        return 'usuario' in session and session['usuario']['pode_gerenciar_usuarios']
 
     def __verificar_senha(self, usuario, senha, senha_hash):
         if len(senha) < 8:
@@ -33,7 +29,7 @@ class UserController:
             self.__dao_historico_senha.remover_senha_antiga(usuario.email)
 
         return True, None
-    
+
     def __validar_email(self, email):
         try:
             validate_email(email)
@@ -43,53 +39,30 @@ class UserController:
             return True
 
     def preparar_cadastro(self):
-        if 'usuario' in session:
-            return render_template('erro.html')
         return render_template('usuario/cadastro.html')
-    
-    def preparar_login(self):
-        if 'usuario' in session:
-            return render_template('erro.html')
-        return render_template('usuario/login.html')
-    
-    def preparar_editar_perfil(self):
-        if 'usuario' not in session:
-            return render_template('erro.html')
-        
-        return render_template('usuario/editar_perfil.html')
-    
-    def preparar_painel_admin(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-        return render_template('usuario/painel_admin.html')
-    
-    def preparar_gerenciar_usuarios(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-        
-        return render_template('usuario/gerenciar_usuarios.html')
-    
-    def preparar_favoritos(self):
-        if 'usuario' not in session:
-            return render_template('erro.html')
 
+    def preparar_login(self):
+        return render_template('usuario/login.html')
+
+    def preparar_editar_perfil(self):
+        return render_template('usuario/editar_perfil.html')
+
+    def preparar_painel_admin(self):
+        return render_template('usuario/painel_admin.html')
+
+    def preparar_gerenciar_usuarios(self):
+        return render_template('usuario/gerenciar_usuarios.html')
+
+    def preparar_favoritos(self):
         return render_template('ponto_turistico/favoritos.html')
 
-    def listar_favoritos(self):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
-        usuario_email = session['usuario']['email']
-        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-
+    @login_required
+    def listar_favoritos(self, usuario):
         favoritos = [ponto.to_dict() for ponto in usuario.pontos_favoritos]
-
         return jsonify(favoritos), 200
 
-    def listar_usuarios(self):
-        if not self.__usuario_pode_gerenciar_usuarios():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @superadmin_required
+    def listar_usuarios(self, usuario_logado):
         lista = self.__dao_usuario.listar_usuarios()
         usuarios = []
 
@@ -97,19 +70,19 @@ class UserController:
             usuarios.append(obj.to_dict())
 
         dados = {
-            'usuario_logado': session['usuario'],
+            'usuario_logado': usuario_logado.to_dict(),
             'usuarios': usuarios
         }
 
         return jsonify(dados), 200
-        
+
     def cadastrar_usuario(self):
         email = request.form.get('email')
         senha = request.form.get('senha')
         confirmar_senha = request.form.get('confirmar_senha')
         username = request.form.get('username')
         foto = request.files.get('foto')
-        
+
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         lista_usernames = self.__dao_usuario.pegar_usernames()
@@ -119,7 +92,7 @@ class UserController:
 
         if not email or not senha or not confirmar_senha or not username:
             return jsonify({'mensagem': 'Informe os campos que são obrigatórios.', 'classe': 'danger'}), 400
-        
+
         if self.__validar_email(email):
             return jsonify({'mensagem': 'Email inválido. Por favor, informe um email válido.', 'classe': 'danger'}), 400
 
@@ -128,7 +101,7 @@ class UserController:
 
         if senha != confirmar_senha:
             return jsonify({'mensagem': 'As senhas não coincidem. Por favor, tente novamente.', 'classe': 'danger'}), 400
-        
+
         usuario_senha = UsuarioFactory.criar_usuario(
             email=email,
             username=username.capitalize().strip()
@@ -144,7 +117,7 @@ class UserController:
         else:
             extensao = os.path.splitext(foto.filename)[1]
             nome_ajustado = secure_filename(username.lower().replace(" ", "_"))
-            
+
             nome_arquivo = f"uploads/user/{nome_ajustado}{extensao}"
 
             caminho = os.path.join(Config.UPLOAD_USER, f"{nome_ajustado}{extensao}")
@@ -164,7 +137,7 @@ class UserController:
         self.__dao_historico_senha.inserir_nova_senha(historico)
 
         return jsonify({'mensagem': 'Cadastro realizado com sucesso! Faça login para continuar.', 'classe': 'success'}), 200
-    
+
     def autenticar_usuario(self):
         dados = request.get_json()
         email = dados.get('email')
@@ -172,38 +145,35 @@ class UserController:
 
         if not email or not senha:
             return jsonify({'mensagem': 'Todos os campos são obrigatórios.', 'classe': 'danger'}), 400
-        
+
         if self.__validar_email(email):
             return jsonify({'mensagem': 'Email inválido. Por favor, informe um email válido.', 'classe': 'danger'}), 400
-     
+
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
             return jsonify({'mensagem': 'Usuário não encontrado. Por favor, verifique o email e tente novamente.', 'classe': 'danger'}), 400
 
         if check_password_hash(usuario.senha_hash, senha):
-            session['usuario'] = usuario.to_dict()
-            return jsonify({'mensagem': f'Bem vindo, {usuario.username}!', 'classe': 'success'}), 200
-        
+            token = JWT.gerar_token(usuario)
+            return jsonify({'mensagem': f'Bem vindo, {usuario.username}!', 'classe': 'success', 'token': token}), 200
+
         return jsonify({'mensagem': 'Usuário ou senha incorretos. Por favor, tente novamente.', 'classe': 'danger'}), 400
-    
+
     def logout_usuario(self):
-        if 'usuario' not in session:
-            flash('Você precisa estar logado para sair de sua conta!', 'danger')
-            return redirect(url_for('pontos.index'))
-        
-        session.pop('usuario', None)
-        flash('Logout realizado com sucesso.', 'success')
-        return redirect(url_for('pontos.index'))
-    
-    def remover_usuario(self, email):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
+        return jsonify({'mensagem': 'Logout realizado com sucesso.', 'classe': 'success'}), 200
 
-        email_sessao = session['usuario']['email']
-        proprio_perfil = (email == email_sessao)
+    @login_required
+    def me(self, usuario):
+        return jsonify(usuario.to_dict()), 200
 
-        if not proprio_perfil and not self.__usuario_pode_gerenciar_usuarios():
+    @login_required
+    def remover_usuario(self, usuario_logado, email):
+        if email == 'me':
+            email = usuario_logado.email
+        proprio_perfil = (email == usuario_logado.email)
+
+        if not proprio_perfil and not usuario_logado.pode_gerenciar_usuarios():
             return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
@@ -217,19 +187,17 @@ class UserController:
         self.__dao_usuario.excluir_usuario(email)
 
         if proprio_perfil:
-            session.pop('usuario', None)
             return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 200
 
         return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 200
-            
-    def editar_usuario(self, email):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        email_sessao = session['usuario']['email']
-        proprio_perfil = (email == email_sessao)
+    @login_required
+    def editar_usuario(self, usuario_logado, email):
+        if email == 'me':
+            email = usuario_logado.email
+        proprio_perfil = (email == usuario_logado.email)
 
-        if not proprio_perfil and not self.__usuario_pode_gerenciar_usuarios():
+        if not proprio_perfil and not usuario_logado.pode_gerenciar_usuarios():
             return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
@@ -338,40 +306,31 @@ class UserController:
             historico = HistoricoSenha(usuario_atualizado, senha_hash)
             self.__dao_historico_senha.inserir_nova_senha(historico)
 
-        session['usuario'] = usuario_atualizado.to_dict()
-
         return jsonify({'mensagem': 'Usuário atualizado com sucesso!', 'classe': 'success'}), 200
-    
-    def alterar_favorito(self):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
-        usuario_email = session['usuario']['email']
-
+    @login_required
+    def alterar_favorito(self, usuario):
         dados = request.get_json()
         ponto_id = dados.get('ponto_id')
 
         if not ponto_id:
             return jsonify({'mensagem': 'Ponto turístico não encontrado', 'classe': 'danger'}), 400
 
-        if self.__dao_usuario.verificar_favorito(usuario_email, ponto_id):
-            self.__dao_usuario.deletar_favorito(usuario_email, ponto_id)
+        if self.__dao_usuario.verificar_favorito(usuario.email, ponto_id):
+            self.__dao_usuario.deletar_favorito(usuario.email, ponto_id)
             favorito = False
             mensagem = 'Ponto turístico desfavoritado com sucesso'
         else:
-            self.__dao_usuario.adicionar_favorito(ponto_id, usuario_email)
+            self.__dao_usuario.adicionar_favorito(ponto_id, usuario.email)
             favorito = True
             mensagem = 'Ponto turístico favoritado com sucesso!'
 
-        usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-        session['usuario'] = usuario.to_dict()
-
         return jsonify({'mensagem': mensagem, 'classe': 'success', 'favorito': favorito}), 200
 
-    def buscar_usuario_por_email(self, email):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @login_required
+    def buscar_usuario_por_email(self, usuario_logado, email):
+        if email == 'me':
+            email = usuario_logado.email
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:

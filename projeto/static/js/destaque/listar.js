@@ -1,4 +1,4 @@
-import { API_DESTAQUE_URL, mostrarMensagem } from '../main.js';
+import { API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarDestaques();
@@ -8,7 +8,7 @@ export async function listarDestaques() {
     const lista = document.getElementById('lista-destaques');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_DESTAQUE_URL);
+    let resposta = await apiFetch(API_DESTAQUE_URL);
 
     let dados = await resposta.json();
 
@@ -106,7 +106,7 @@ async function removerDestaque(botao, destaque, div) {
             return;
         }
 
-        let respostaExcluir = await fetch(
+        let respostaExcluir = await apiFetch(
             `${API_DESTAQUE_URL}/${destaque.id}`,
             {
                 method: 'DELETE'

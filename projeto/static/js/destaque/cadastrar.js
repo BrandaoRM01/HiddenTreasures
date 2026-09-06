@@ -1,4 +1,4 @@
-import { API_DESTAQUE_URL, mostrarMensagem } from '../main.js';
+import { API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { listarDestaques } from './listar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'nome': formDestaques.nome.value
         }
 
-        let resp = await fetch(API_DESTAQUE_URL, {
+        let resp = await apiFetch(API_DESTAQUE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

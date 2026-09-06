@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, request
 from projeto.controllers import UserController
 
 user_bp = Blueprint('user', __name__)
@@ -17,13 +17,9 @@ def cadastro():
 def editar_perfil():
     return controller.preparar_editar_perfil()
 
-@user_bp.route('/logout')
+@user_bp.route('/logout', methods=['POST'])
 def logout():
     return controller.logout_usuario()
-
-@user_bp.route('/apagar-perfil/<email>', methods=['GET'])
-def apagar_perfil(email):
-    return controller.apagar_perfil(email)
 
 @user_bp.route('/admin/painel-admin')
 def painel_admin():
@@ -32,10 +28,6 @@ def painel_admin():
 @user_bp.route('/admin/gerenciar-usuarios')
 def gerenciar_usuarios():
     return controller.preparar_gerenciar_usuarios()
-
-@user_bp.route('/admin/excluir-usuario/<email>', methods=['GET'])
-def excluir_usuario(email):
-    return controller.excluir_usuario(email)
 
 @user_bp.route('/favoritos')
 def favoritos():
@@ -49,21 +41,19 @@ def api_usuarios():
 
 @user_bp.route('/api/usuarios/<email>', methods=['GET', 'PUT', 'DELETE'])
 def api_usuarios_param(email):
-    if email == 'me':
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-        email = session['usuario']['email']
-
     if request.method == 'PUT':
         return controller.editar_usuario(email)
     elif request.method == 'DELETE':
         return controller.remover_usuario(email)
     return controller.buscar_usuario_por_email(email)
 
-@user_bp.route('/api/usuarios/auth', methods=['GET', 'POST'])
+@user_bp.route('/api/usuarios/auth', methods=['POST'])
 def api_usuarios_auth():
-    if request.method == 'POST':
-        return controller.autenticar_usuario()
+    return controller.autenticar_usuario()
+
+@user_bp.route('/api/usuarios/me', methods=['GET'])
+def api_usuarios_me():
+    return controller.me()
 
 @user_bp.route('/api/usuarios/favoritos', methods=['GET', 'POST'])
 def api_favoritos():

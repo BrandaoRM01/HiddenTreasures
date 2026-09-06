@@ -1,4 +1,4 @@
-import { API_PROMOCAO_URL, mostrarMensagem } from "../main.js";
+import { API_PROMOCAO_URL, mostrarMensagem, apiFetch } from "../main.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const formEditar = document.getElementById('form-editar');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let id = window.location.pathname.split("/").pop();
 
-    let resp = await fetch(`${API_PROMOCAO_URL}/${id}`);
+    let resp = await apiFetch(`${API_PROMOCAO_URL}/${id}`);
     let promocao = await resp.json();
 
     formEditar.titulo.value = promocao.titulo;
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'data_fim': formEditar.data_fim.value
         }
 
-        let resp = await fetch(`${API_PROMOCAO_URL}/${promocao.id}`, {
+        let resp = await apiFetch(`${API_PROMOCAO_URL}/${promocao.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

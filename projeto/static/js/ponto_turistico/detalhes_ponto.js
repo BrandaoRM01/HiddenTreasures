@@ -1,4 +1,4 @@
-import { API_PONTO_URL, API_AVALIACAO_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, API_AVALIACAO_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { montarSecaoAvaliar } from '../avaliacao/cadastrar.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function carregarPonto() {
-    let resposta = await fetch(`${API_PONTO_URL}/detalhes/${idPonto}`);
+    let resposta = await apiFetch(`${API_PONTO_URL}/detalhes/${idPonto}`);
     let ponto = await resposta.json();
 
     if (!resposta.ok) {
@@ -188,7 +188,7 @@ function criarEstrelasTexto(nota) {
 }
 
 export async function carregarAvaliacoes() {
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
     let dados = await resposta.json();
 
     if (!resposta.ok) return;
@@ -222,7 +222,7 @@ export async function carregarAvaliacoes() {
 
     let preview = dados.avaliacoes.slice(0, 5);
 
-    if (preview.length === 0 && !dados.avaliacao_usuario) {
+    if (preview.length == 0 && !dados.avaliacao_usuario) {
         let vazio = document.createElement('div');
         vazio.className = 'alert alert-secondary text-center';
         vazio.textContent = 'Nenhuma avaliação ainda. Seja o primeiro!';
@@ -368,7 +368,7 @@ async function excluirAvaliacao(usuarioEmail, username) {
 
     if (!confirm(mensagem)) return;
 
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?usuario_email=${encodeURIComponent(usuarioEmail)}`, {
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?usuario_email=${encodeURIComponent(usuarioEmail)}`, {
         method: 'DELETE'
     });
 

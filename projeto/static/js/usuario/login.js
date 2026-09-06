@@ -1,4 +1,4 @@
-import { API_PONTO_URL, API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { apiFetch, API_USUARIO_URL, mostrarMensagem } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     let formLogin = document.getElementById('form-login');
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'senha': formLogin.senha.value
         }
 
-        let resp = await fetch(`${API_USUARIO_URL}/auth`, {
+        let resp = await apiFetch(`${API_USUARIO_URL}/auth`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
@@ -29,11 +29,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         let dadosLogin = await resp.json();
 
         if (resp.ok) {
-            mostrarMensagem(dadosLogin.mensagem, dadosLogin.classe);
+            localStorage.setItem('token', dadosLogin.token);
 
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1500);
+            sessionStorage.setItem('mensagemPendente', JSON.stringify({
+                mensagem: dadosLogin.mensagem,
+                classe: dadosLogin.classe
+            }));
+
+            window.location.href = '/';
         }
         else {
             mostrarMensagem(dadosLogin.mensagem, dadosLogin.classe);

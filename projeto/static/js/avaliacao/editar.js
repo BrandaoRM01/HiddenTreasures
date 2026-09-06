@@ -1,4 +1,4 @@
-import { API_AVALIACAO_URL, inicializarEstrelas, mostrarMensagem } from '../main.js';
+import { API_AVALIACAO_URL, inicializarEstrelas, mostrarMensagem, apiFetch } from '../main.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
 
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const voltar = document.getElementById('voltar');
     voltar.href = `/detalhes-ponto/${idPonto}`;
 
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
     let dados = await resposta.json();
 
     if (!resposta.ok || !dados.avaliacao_usuario) {
@@ -68,7 +68,7 @@ async function enviarEdicao(evento) {
         return;
     }
 
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`, {
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nota, comentario })

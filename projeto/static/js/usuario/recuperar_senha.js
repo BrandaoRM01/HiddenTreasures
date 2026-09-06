@@ -1,4 +1,4 @@
-import { mostrarMensagem, API_RECUPERACAO_URL } from '../main.js';
+import { mostrarMensagem, API_RECUPERACAO_URL, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     let voltarLogin = document.getElementById('voltar');
@@ -15,7 +15,7 @@ async function enviarRecuperacao(evento) {
         'email': form.email.value
     };
 
-    let resposta = await fetch(API_RECUPERACAO_URL, {
+    let resposta = await apiFetch(API_RECUPERACAO_URL, {
         method: 'POST',
         body: JSON.stringify(dados),
         headers: {

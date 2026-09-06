@@ -1,14 +1,12 @@
-from flask import flash, render_template, redirect, session, url_for, request, jsonify
+from flask import render_template, request, jsonify
 from projeto.dao import DestaqueDAO
 from projeto.factorys import DestaqueFactory
+from projeto.decoradores import admin_required
 
 class DestaqueController:
 
     def __init__(self):
         self.__dao = DestaqueDAO()
-
-    def __usuario_pode_moderar(self):
-        return 'usuario' in session and session['usuario']['pode_moderar']
 
     def listar_destaques(self):
         lista = self.__dao.carregar_destaques()
@@ -20,15 +18,10 @@ class DestaqueController:
         return jsonify(destaques), 200
 
     def preparar_gerenciar_destaques(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-        
         return render_template('destaque/gerenciar_destaques.html')
 
-    def cadastrar_destaque(self):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def cadastrar_destaque(self, usuario):
         dados = request.get_json()
         nome = dados.get('nome')
 
@@ -48,24 +41,17 @@ class DestaqueController:
 
         return jsonify({'mensagem': 'Destaque cadastrado com sucesso!', 'classe': 'success'}), 200
 
-    def remover_destaque(self, id_destaque):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def remover_destaque(self, usuario, id_destaque):
         self.__dao.remover_destaque(id_destaque)
 
         return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_destaque(self, id_destaque):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-
         return render_template('destaque/editar_destaque.html')
 
-    def buscar_destaque_por_id(self, id):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def buscar_destaque_por_id(self, usuario, id):
         destaque = self.__dao.buscar_destaque_por_id(id)
 
         if not destaque:
@@ -73,10 +59,8 @@ class DestaqueController:
 
         return jsonify(destaque.to_dict()), 200
 
-    def atualizar_destaque(self, id_destaque):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def atualizar_destaque(self, usuario, id_destaque):
         dados = request.get_json()
         nome = dados.get('nome')
 

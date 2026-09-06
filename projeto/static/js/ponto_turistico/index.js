@@ -1,11 +1,11 @@
-import { API_PONTO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito } from '../main.js';
+import { API_PONTO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarIndex();
 });
 
 async function carregarIndex() {
-    let resposta = await fetch(`${API_PONTO_URL}/index`);
+    let resposta = await apiFetch(`${API_PONTO_URL}/index`);
     let dados = await resposta.json();
 
     montarTopPontos(dados.top_pontos, dados.logado);

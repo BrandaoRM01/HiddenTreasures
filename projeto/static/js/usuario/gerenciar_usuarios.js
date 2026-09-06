@@ -1,4 +1,4 @@
-import { API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { API_USUARIO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 let usuarioLogado = null;
 
@@ -10,7 +10,7 @@ export async function listarUsuarios() {
     let lista = document.getElementById('lista-usuarios');
     lista.innerHTML = '';
 
-    let resposta = await fetch(`${API_USUARIO_URL}`);
+    let resposta = await apiFetch(`${API_USUARIO_URL}`);
     let dados = await resposta.json();
 
     usuarioLogado = dados.usuario_logado;
@@ -48,7 +48,7 @@ function criarLinhaUsuario(usuario) {
     infoWrapper.appendChild(textos);
     linha.appendChild(infoWrapper);
 
-    let podeGerenciar = atual.tipo_usuario === 'superadmin' && usuario.tipo_usuario !== 'superadmin';
+    let podeGerenciar = atual.tipo_usuario == 'superadmin' && usuario.tipo_usuario !== 'superadmin';
 
     if (podeGerenciar) {
         let acoes = document.createElement('div');
@@ -56,10 +56,10 @@ function criarLinhaUsuario(usuario) {
 
         let botaoPermissao = document.createElement('button');
         botaoPermissao.type = 'button';
-        botaoPermissao.className = usuario.tipo_usuario === 'admin'
+        botaoPermissao.className = usuario.tipo_usuario == 'admin'
             ? 'btn btn-secondary btn-sm flex-fill'
             : 'btn btn-warning btn-sm flex-fill';
-        botaoPermissao.textContent = usuario.tipo_usuario === 'admin' ? 'Remover Admin' : 'Tornar Admin';
+        botaoPermissao.textContent = usuario.tipo_usuario == 'admin' ? 'Remover Admin' : 'Tornar Admin';
         botaoPermissao.addEventListener('click', () => alterarPermissao(usuario, linha));
 
         let botaoExcluir = document.createElement('button');
@@ -78,12 +78,12 @@ function criarLinhaUsuario(usuario) {
 }
 
 async function alterarPermissao(usuario, linha) {
-    let novoTipo = usuario.tipo_usuario === 'admin' ? 'user' : 'admin';
+    let novoTipo = usuario.tipo_usuario == 'admin' ? 'user' : 'admin';
 
     let formData = new FormData();
     formData.append('tipo_usuario', novoTipo);
 
-    let resposta = await fetch(`${API_USUARIO_URL}/${usuario.email}`, {
+    let resposta = await apiFetch(`${API_USUARIO_URL}/${usuario.email}`, {
         method: 'PUT',
         body: formData
     });
@@ -103,7 +103,7 @@ async function excluirUsuario(usuario, linha) {
     let confirmar = confirm(`Tem certeza que deseja excluir o usuário ${usuario.username}?`);
     if (!confirmar) return;
 
-    let resposta = await fetch(`${API_USUARIO_URL}/${usuario.email}`, {
+    let resposta = await apiFetch(`${API_USUARIO_URL}/${usuario.email}`, {
         method: 'DELETE'
     });
 

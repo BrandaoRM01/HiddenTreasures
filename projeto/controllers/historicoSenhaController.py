@@ -1,4 +1,4 @@
-from flask import render_template, request, session, jsonify
+from flask import render_template, request, jsonify
 from projeto.config import Config
 from projeto.dao import UserDAO, HistoricoSenhaDAO
 from projeto.factorys import UsuarioFactory, HistoricoSenhaFactory
@@ -64,14 +64,9 @@ class HistoricoSenhaController:
             return False
 
     def preparar_recuperar_senha(self):
-        if 'usuario' in session:
-            return render_template('erro.html')
         return render_template('usuario/recuperar_senha.html')
 
     def preparar_redefinir_senha(self, token):
-        if 'usuario' in session:
-            return render_template('erro.html')
-
         usuario = self.__dao.buscar_por_token(token)
 
         if not usuario:

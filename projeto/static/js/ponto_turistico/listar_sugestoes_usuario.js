@@ -1,4 +1,4 @@
-import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarCategorias();
@@ -35,7 +35,7 @@ export async function listarSugestoes() {
     let lista = document.getElementById('lista-sugestoes');
     lista.innerHTML = '';
 
-    let resposta = await fetch(`${API_PONTO_URL}/minhas-sugestoes`);
+    let resposta = await apiFetch(`${API_PONTO_URL}/minhas-sugestoes`);
     let dados = await resposta.json();
 
     if (dados.length == 0) {
@@ -195,7 +195,7 @@ function removerSugestao(botao, ponto, coluna) {
         let confirmar = confirm(`Tem certeza que deseja excluir a sugestão ${ponto.nome}?`);
         if (!confirmar) return;
 
-        let resposta = await fetch(`${API_PONTO_URL}/${ponto.id}`, { method: 'DELETE' });
+        let resposta = await apiFetch(`${API_PONTO_URL}/${ponto.id}`, { method: 'DELETE' });
         let dados = await resposta.json();
 
         coluna.remove();
@@ -204,7 +204,7 @@ function removerSugestao(botao, ponto, coluna) {
 }
 
 async function carregarCategorias() {
-    let resposta = await fetch(API_CATEGORIA_URL);
+    let resposta = await apiFetch(API_CATEGORIA_URL);
     let categorias = await resposta.json();
 
     if (categorias.length == 0) {
@@ -223,7 +223,7 @@ async function carregarCategorias() {
 }
 
 async function carregarPromocoes() {
-    let resposta = await fetch(`${API_PROMOCAO_URL}/ativas`);
+    let resposta = await apiFetch(`${API_PROMOCAO_URL}/ativas`);
     let promocoes = await resposta.json();
     if (promocoes.length == 0) return;
 
@@ -238,7 +238,7 @@ async function carregarPromocoes() {
 }
 
 async function carregarEcossistemas() {
-    let resposta = await fetch(API_ECOSSISTEMA_URL);
+    let resposta = await apiFetch(API_ECOSSISTEMA_URL);
     let ecossistemas = await resposta.json();
     let select = document.getElementById('ecossistema');
     ecossistemas.forEach(ecossistema => {
@@ -250,7 +250,7 @@ async function carregarEcossistemas() {
 }
 
 async function carregarTiposCulturais() {
-    let resposta = await fetch(API_TIPO_CULTURAL_URL);
+    let resposta = await apiFetch(API_TIPO_CULTURAL_URL);
     let tiposCulturais = await resposta.json();
     let select = document.getElementById('tipo_cultural');
     tiposCulturais.forEach(tipo => {
@@ -262,7 +262,7 @@ async function carregarTiposCulturais() {
 }
 
 async function carregarDestaques() {
-    let resposta = await fetch(API_DESTAQUE_URL);
+    let resposta = await apiFetch(API_DESTAQUE_URL);
     let destaques = await resposta.json();
     if (destaques.length == 0) return;
 

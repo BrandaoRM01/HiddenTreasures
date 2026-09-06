@@ -1,4 +1,4 @@
-import { API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { API_USUARIO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     let formCadastro = document.getElementById('form-cadastro');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let dados = new FormData(formCadastro);
 
-        let resp = await fetch(API_USUARIO_URL, {
+        let resp = await apiFetch(API_USUARIO_URL, {
             method: 'POST',
             body: dados
         });
@@ -27,11 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         let dadosCadastro = await resp.json();
 
         if (resp.ok) {
-            mostrarMensagem(dadosCadastro.mensagem, dadosCadastro.classe);
+            sessionStorage.setItem('mensagemPendente', JSON.stringify({
+                mensagem: dadosCadastro.mensagem,
+                classe: dadosCadastro.classe
+            }));
 
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 1500);
+            window.location.href = '/login';
         }
         else {
             mostrarMensagem(dadosCadastro.mensagem, dadosCadastro.classe);

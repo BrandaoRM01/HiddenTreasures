@@ -1,4 +1,4 @@
-import { API_TIPO_CULTURAL_URL, mostrarMensagem } from '../main.js';
+import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { listarTiposCulturais } from './listar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'nome': formTipoCultural.nome.value
         }
 
-        let resp = await fetch(API_TIPO_CULTURAL_URL, {
+        let resp = await apiFetch(API_TIPO_CULTURAL_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

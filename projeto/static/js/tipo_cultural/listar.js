@@ -1,4 +1,4 @@
-import { API_TIPO_CULTURAL_URL, mostrarMensagem } from '../main.js';
+import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarTiposCulturais();
@@ -8,7 +8,7 @@ export async function listarTiposCulturais() {
     const lista = document.getElementById('lista-tipo-cultural');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_TIPO_CULTURAL_URL);
+    let resposta = await apiFetch(API_TIPO_CULTURAL_URL);
 
     let dados = await resposta.json();
 
@@ -106,7 +106,7 @@ async function removertipo_cultural(botao, tipo_cultural, div) {
             return;
         }
 
-        let respostaExcluir = await fetch(
+        let respostaExcluir = await apiFetch(
             `${API_TIPO_CULTURAL_URL}/${tipo_cultural.id}`,
             {
                 method: 'DELETE'

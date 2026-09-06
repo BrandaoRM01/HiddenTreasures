@@ -1,4 +1,4 @@
-import { API_AVALIACAO_URL, mostrarMensagem, inicializarEstrelas } from '../main.js';
+import { API_AVALIACAO_URL, mostrarMensagem, inicializarEstrelas, apiFetch } from '../main.js';
 import { carregarAvaliacoes } from '../ponto_turistico/detalhes_ponto.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
@@ -116,7 +116,7 @@ async function enviarAvaliacao(evento) {
         return;
     }
 
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`, {
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nota, comentario })

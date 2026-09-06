@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function atualizarCamposPonto() {
 
-            if (tipoPonto.value === 'natural') {
+            if (tipoPonto.value == 'natural') {
                 camposNatural.classList.remove('d-none');
                 camposCultural.classList.add('d-none');
             } else {
@@ -289,4 +289,18 @@ export function inicializarEstrelas() {
             marcarEstrelas(notaInput.value);
         });
     });
+}
+
+export async function apiFetch(url, opcoes = {}) {
+    let token = localStorage.getItem('token');
+
+    opcoes.headers = {
+        ...(opcoes.headers || {})
+    };
+
+    if (token) {
+        opcoes.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return fetch(url, opcoes);
 }

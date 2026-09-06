@@ -1,4 +1,4 @@
-import { API_CATEGORIA_URL, mostrarMensagem } from '../main.js';
+import { API_CATEGORIA_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarCategorias();
@@ -8,7 +8,7 @@ export async function listarCategorias() {
     const lista = document.getElementById('lista-categorias');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_CATEGORIA_URL);
+    let resposta = await apiFetch(API_CATEGORIA_URL);
 
     let dados = await resposta.json();
 
@@ -114,7 +114,7 @@ async function removerCategoria(botao, categoria, div) {
             return;
         }
 
-        let respostaExcluir = await fetch(
+        let respostaExcluir = await apiFetch(
             `${API_CATEGORIA_URL}/${categoria.id}`,
             {
                 method: 'DELETE'

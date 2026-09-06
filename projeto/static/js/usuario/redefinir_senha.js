@@ -1,4 +1,4 @@
-import { mostrarMensagem, API_REDEFINICAO_URL } from '../main.js';
+import { mostrarMensagem, API_REDEFINICAO_URL, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     let olho1 = document.getElementById('eye-reset_senha');
@@ -19,7 +19,7 @@ async function redefinirSenha(evento) {
         'confirmar_senha': form.confirmar_senha.value
     }
 
-    let resposta = await fetch(`${API_REDEFINICAO_URL}/${token}`, {
+    let resposta = await apiFetch(`${API_REDEFINICAO_URL}/${token}`, {
         method: 'POST',
         body: JSON.stringify(dados),
         headers: {
@@ -29,11 +29,15 @@ async function redefinirSenha(evento) {
 
     let dadosResp = await resposta.json();
 
-    mostrarMensagem(dadosResp.mensagem, dadosResp.classe);
-
     if (resposta.ok) {
-        setTimeout(() => {
-            window.location.href = '/login';
-        }, 1500);
+        sessionStorage.setItem('mensagemPendente', JSON.stringify({
+            mensagem: dadosResp.mensagem,
+            classe: dadosResp.classe
+        }));
+
+        window.location.href = '/login';
+    }
+    else {
+        mostrarMensagem(dadosResp.mensagem, dadosResp.classe);
     }
 }

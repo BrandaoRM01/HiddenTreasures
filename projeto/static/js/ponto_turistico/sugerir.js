@@ -1,4 +1,4 @@
-import { API_PONTO_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { listarSugestoes } from './listar_sugestoes_usuario.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let dados = new FormData(form);
 
-        let resposta = await fetch(API_PONTO_URL, {
+        let resposta = await apiFetch(API_PONTO_URL, {
             method: 'POST',
             body: dados
         });

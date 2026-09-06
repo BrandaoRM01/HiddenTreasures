@@ -1,4 +1,4 @@
-import { API_PONTO_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 const API_SUGESTOES_URL = `${API_PONTO_URL}/sugestoes`;
 
@@ -10,7 +10,7 @@ export async function listarSugestoes() {
     let lista = document.getElementById('lista-sugestoes');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_SUGESTOES_URL);
+    let resposta = await apiFetch(API_SUGESTOES_URL);
     let dados = await resposta.json();
 
     if (dados.length == 0) {
@@ -215,7 +215,7 @@ async function alterarStatusSugestao(ponto, status) {
         formData.append('destaques', destaque.id);
     });
 
-    let resposta = await fetch(`${API_PONTO_URL}/${ponto.id}`, {
+    let resposta = await apiFetch(`${API_PONTO_URL}/${ponto.id}`, {
         method: 'PUT',
         body: formData
     });
@@ -236,7 +236,7 @@ async function removerSugestao(ponto, coluna) {
         return;
     }
 
-    let resposta = await fetch(`${API_PONTO_URL}/${ponto.id}`, {
+    let resposta = await apiFetch(`${API_PONTO_URL}/${ponto.id}`, {
         method: 'DELETE'
     });
 

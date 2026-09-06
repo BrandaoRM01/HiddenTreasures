@@ -1,4 +1,4 @@
-import { API_PONTO_URL, criarBotaoFavorito } from '../main.js';
+import { API_PONTO_URL, criarBotaoFavorito, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarPontosAprovados();
@@ -8,7 +8,7 @@ async function listarPontosAprovados() {
     let container = document.getElementById('lista-pontos-aprovados');
     container.innerHTML = '';
 
-    let resposta = await fetch(`${API_PONTO_URL}/aprovados`);
+    let resposta = await apiFetch(`${API_PONTO_URL}/aprovados`);
     let dados = await resposta.json();
 
     let logado = dados.logado;

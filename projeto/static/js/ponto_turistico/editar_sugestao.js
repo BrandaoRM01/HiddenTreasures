@@ -1,4 +1,4 @@
-import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem } from '../main.js';
+import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     voltar.href = '/sugerir-ponto';
     let id = window.location.pathname.split('/').pop();
 
-    let resposta = await fetch(`${API_PONTO_URL}/${id}`);
+    let resposta = await apiFetch(`${API_PONTO_URL}/${id}`);
     let ponto = await resposta.json();
 
     let form = document.getElementById('form-editar');
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         camposCultural.classList.toggle('d-none', ehNatural);
     });
 
-    let respostaCategorias = await fetch(API_CATEGORIA_URL);
+    let respostaCategorias = await apiFetch(API_CATEGORIA_URL);
     let selectCategoria = document.getElementById('categoria');
     let categorias = await respostaCategorias.json();
 
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectCategoria.appendChild(option);
     });
 
-    let respostaPromocoes = await fetch(`${API_PROMOCAO_URL}/ativas`);
+    let respostaPromocoes = await apiFetch(`${API_PROMOCAO_URL}/ativas`);
     let selectPromocao = document.getElementById('promocao');
     let promocoes = await respostaPromocoes.json();
 
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectPromocao.appendChild(option);
     });
 
-    let respostaEcossistemas = await fetch(API_ECOSSISTEMA_URL);
+    let respostaEcossistemas = await apiFetch(API_ECOSSISTEMA_URL);
     let selectEcossistema = document.getElementById('ecossistema');
     let ecossistemas = await respostaEcossistemas.json();
 
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectEcossistema.appendChild(option);
     });
 
-    let respostaTiposCulturais = await fetch(API_TIPO_CULTURAL_URL);
+    let respostaTiposCulturais = await apiFetch(API_TIPO_CULTURAL_URL);
     let selectTipoCultural = document.getElementById('tipo_cultural');
     let tiposCulturais = await respostaTiposCulturais.json();
 
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectTipoCultural.appendChild(option);
     });
 
-    let respostaDestaques = await fetch(API_DESTAQUE_URL);
+    let respostaDestaques = await apiFetch(API_DESTAQUE_URL);
     let listaDestaques = document.getElementById('lista-destaques');
     let destaques = await respostaDestaques.json();
 
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let dados = new FormData(form);
 
-        let respostaEditar = await fetch(`${API_PONTO_URL}/${ponto.id}`, {
+        let respostaEditar = await apiFetch(`${API_PONTO_URL}/${ponto.id}`, {
             method: 'PUT',
             body: dados
         });

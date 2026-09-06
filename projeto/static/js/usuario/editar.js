@@ -1,4 +1,4 @@
-import { API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { API_USUARIO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarPerfil();
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function carregarPerfil() {
-    let resposta = await fetch(`${API_USUARIO_URL}/me`);
+    let resposta = await apiFetch(`${API_USUARIO_URL}/me`);
     let usuario = await resposta.json();
 
     document.getElementById('texto-email').textContent = usuario.email;
@@ -35,7 +35,7 @@ async function editarPerfil(evento) {
     let form = document.getElementById('form-editar-perfil');
     let formData = new FormData(form);
 
-    let resposta = await fetch(`${API_USUARIO_URL}/me`, {
+    let resposta = await apiFetch(`${API_USUARIO_URL}/me`, {
         method: 'PUT',
         body: formData
     });
@@ -46,10 +46,14 @@ async function editarPerfil(evento) {
         document.getElementById('perfil_senha').value = '';
         document.getElementById('perfil_confirmar_senha').value = '';
 
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 1500);
-    }
+        sessionStorage.setItem('mensagemPendente', JSON.stringify({
+            mensagem: dados.mensagem,
+            classe: dados.classe
+        }));
 
-    mostrarMensagem(dados.mensagem, dados.classe);
+        window.location.href = '/';
+    }
+    else {
+        mostrarMensagem(dados.mensagem, dados.classe);
+    }
 }

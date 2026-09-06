@@ -1,4 +1,4 @@
-import { API_PROMOCAO_URL, mostrarMensagem } from '../main.js';
+import { API_PROMOCAO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarPromocoes();
@@ -13,7 +13,7 @@ export async function listarPromocoes() {
     const lista = document.getElementById('lista-promocoes');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_PROMOCAO_URL);
+    let resposta = await apiFetch(API_PROMOCAO_URL);
 
     let dados = await resposta.json();
 
@@ -134,7 +134,7 @@ async function removerPromocao(botao, promocao, div) {
             return;
         }
 
-        let respostaExcluir = await fetch(
+        let respostaExcluir = await apiFetch(
             `${API_PROMOCAO_URL}/${promocao.id}`,
             {
                 method: 'DELETE'

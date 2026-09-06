@@ -1,4 +1,4 @@
-import { API_CATEGORIA_URL, mostrarMensagem } from '../main.js';
+import { API_CATEGORIA_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { listarCategorias } from './listar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'descricao': formCategoria.descricao.value
         }
 
-        let resp = await fetch(API_CATEGORIA_URL, {
+        let resp = await apiFetch(API_CATEGORIA_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

@@ -1,4 +1,4 @@
-import { API_USUARIO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito } from '../main.js';
+import { API_USUARIO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarFavoritos();
@@ -8,7 +8,7 @@ async function listarFavoritos() {
     let container = document.getElementById('lista-favoritos');
     container.innerHTML = '';
 
-    let resposta = await fetch(`${API_USUARIO_URL}/favoritos`);
+    let resposta = await apiFetch(`${API_USUARIO_URL}/favoritos`);
     let favoritos = await resposta.json();
 
     if (favoritos.length == 0) {

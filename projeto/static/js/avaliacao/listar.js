@@ -1,4 +1,4 @@
-import { API_AVALIACAO_URL, mostrarMensagem } from '../main.js';
+import { API_AVALIACAO_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
 
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function carregarAvaliacoes() {
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
     let dados = await resposta.json();
 
     if (!resposta.ok) {
@@ -169,7 +169,7 @@ async function excluirAvaliacao(usuarioEmail, username) {
 
     if (!confirm(mensagem)) return;
 
-    let resposta = await fetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?usuario_email=${encodeURIComponent(usuarioEmail)}`, {
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?usuario_email=${encodeURIComponent(usuarioEmail)}`, {
         method: 'DELETE'
     });
 

@@ -1,4 +1,4 @@
-import { API_ECOSSISTEMA_URL, mostrarMensagem } from '../main.js';
+import { API_ECOSSISTEMA_URL, mostrarMensagem, apiFetch } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await listarEcossistemas();
@@ -8,7 +8,7 @@ export async function listarEcossistemas() {
     const lista = document.getElementById('lista-ecossistemas');
     lista.innerHTML = '';
 
-    let resposta = await fetch(API_ECOSSISTEMA_URL);
+    let resposta = await apiFetch(API_ECOSSISTEMA_URL);
 
     let dados = await resposta.json();
 
@@ -106,7 +106,7 @@ async function removerEcossistema(botao, ecossistema, div) {
             return;
         }
 
-        let respostaExcluir = await fetch(
+        let respostaExcluir = await apiFetch(
             `${API_ECOSSISTEMA_URL}/${ecossistema.id}`,
             {
                 method: 'DELETE'

@@ -1,7 +1,8 @@
-from flask import render_template, redirect, url_for, request, session, jsonify
+from flask import render_template, redirect, url_for, request, jsonify
 from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO, TipoCulturalDAO, EcossistemaDAO, DestaqueDAO
 from projeto.factorys import PontoTuristicoFactory, CategoriaFactory, PromocaoFactory, TipoCulturalFactory, EcossistemaFactory
 from projeto.config import Config
+from projeto.decoradores import login_required, admin_required, usuario_opcional
 from werkzeug.utils import secure_filename
 import os
 
@@ -16,16 +17,14 @@ class PontoTuristicoController:
         self.__dao_ecossistema = EcossistemaDAO()
         self.__dao_destaque = DestaqueDAO()
 
-    def __usuario_pode_moderar(self):
-        return 'usuario' in session and session['usuario']['pode_moderar']
-
     def __status_valido(self, status):
         return status in ['aprovado', 'rejeitado']
- 
+
     def preparar_index(self):
         return render_template('ponto_turistico/index.html')
 
-    def listar_index(self):
+    @usuario_opcional
+    def listar_index(self, usuario):
         top_pontos = self.__dao_pontos.listar_top_pontos()
         pontos = self.__dao_pontos.listar_pontos()
 
@@ -36,9 +35,7 @@ class PontoTuristicoController:
                 if ponto.promocao is not None:
                     pontos_promocao.append(ponto)
 
-        if session.get('usuario'):
-            usuario_email = session['usuario']['email']
-            usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+        if usuario:
             favoritos_ids = [ponto.id for ponto in usuario.pontos_favoritos]
         else:
             favoritos_ids = []
@@ -56,7 +53,7 @@ class PontoTuristicoController:
             pontos_promocao_json.append(ponto)
 
         dados = {
-            'logado': bool(session.get('usuario')),
+            'logado': bool(usuario),
             'top_pontos': top_pontos_json,
             'pontos_promocao': pontos_promocao_json
         }
@@ -67,88 +64,48 @@ class PontoTuristicoController:
         return render_template('ponto_turistico/sobre.html')
 
     def preparar_gerenciar_pontos(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-
         return render_template('ponto_turistico/gerenciar_pontos.html')
 
-    def listar_pontos_gerenciar(self):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def listar_pontos_gerenciar(self, usuario):
         lista = self.__dao_pontos.listar_todos_pontos()
         pontos = [obj.to_dict() for obj in lista]
 
         return jsonify(pontos), 200
 
     def preparar_gerenciar_sugestoes(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-
         return render_template('ponto_turistico/gerenciar_sugestoes.html')
 
-    def listar_sugestoes(self):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def listar_sugestoes(self, usuario):
         lista = self.__dao_pontos.listar_pontos_sugeridos()
         sugestoes = [obj.to_dict() for obj in lista]
 
         return jsonify(sugestoes), 200
-    
-    def preparar_sugerir_ponto(self):
-        if 'usuario' not in session:
-            return render_template('erro.html')
-        
-        if self.__usuario_pode_moderar():
-            return redirect(url_for('pontos.gerenciar_pontos'))
 
+    def preparar_sugerir_ponto(self):
         return render_template('ponto_turistico/sugerir_ponto.html')
 
-    def listar_sugestoes_usuario(self):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
-        lista = self.__dao_pontos.listar_sugestoes_usuario(session['usuario']['email'])
+    @login_required
+    def listar_sugestoes_usuario(self, usuario):
+        lista = self.__dao_pontos.listar_sugestoes_usuario(usuario.email)
         sugestoes = [obj.to_dict() for obj in lista]
 
         return jsonify(sugestoes), 200
 
     def preparar_editar_ponto(self, id_ponto):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-        
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
-        if ponto.sugerido_por:
+        if ponto and ponto.sugerido_por:
             return redirect(url_for('pontos.editar_sugestao', id=id_ponto))
 
         return render_template('ponto_turistico/editar_ponto.html')
-    
+
     def preparar_editar_sugestao(self, id_ponto):
-        if 'usuario' not in session:
-            return render_template('erro.html')
-        
-        ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
-
-        if not ponto:
-            return render_template('erro.html')
-
-        if session['usuario']['email'] != ponto.sugerido_por:
-            if not session['usuario']['pode_moderar']:
-                return redirect(url_for('pontos.sugerir_ponto'))
-            else:
-                return redirect(url_for('pontos.gerenciar_sugestoes'))
-            
-        if session['usuario']['email'] == ponto.sugerido_por and ponto.status == 'aprovado':
-            return redirect(url_for('pontos.sugerir_ponto'))
-
         return render_template('ponto_turistico/editar_sugestao.html')
 
-    def buscar_ponto(self, id_ponto):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @login_required
+    def buscar_ponto(self, usuario, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
@@ -159,13 +116,11 @@ class PontoTuristicoController:
     def preparar_pontos_turisticos(self):
         return render_template('ponto_turistico/pontos.html')
 
-    def listar_pontos_aprovados(self):
+    @usuario_opcional
+    def listar_pontos_aprovados(self, usuario):
         lista = self.__dao_pontos.listar_pontos()
 
-        if session.get('usuario'):
-            usuario_email = session['usuario']['email']
-            usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
-
+        if usuario:
             favoritos_ids = [ponto.id for ponto in usuario.pontos_favoritos]
         else:
             favoritos_ids = []
@@ -177,39 +132,37 @@ class PontoTuristicoController:
             ponto['favorito'] = p.id in favoritos_ids
             pontos.append(ponto)
 
-        return jsonify({'logado': bool(session.get('usuario')), 'pontos': pontos}), 200
+        return jsonify({'logado': bool(usuario), 'pontos': pontos}), 200
 
     def preparar_detalhes_ponto(self):
         return render_template('ponto_turistico/detalhes_ponto.html')
 
-    def detalhes_ponto_api(self, id_ponto):
+    @usuario_opcional
+    def detalhes_ponto_api(self, usuario, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
             return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
 
         favorito = False
-        if session.get('usuario'):
-            usuario = self.__dao_usuario.buscar_usuario_por_email(session['usuario']['email'])
+        if usuario:
             favorito = any(p.id == ponto.id for p in usuario.pontos_favoritos)
 
         dados = ponto.to_dict()
         dados['favorito'] = favorito
-        dados['logado'] = bool(session.get('usuario'))
+        dados['logado'] = bool(usuario)
 
         return jsonify(dados), 200
-    
-    def cadastrar_ponto(self):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-        
-        if not session['usuario']['pode_moderar']:
+
+    @login_required
+    def cadastrar_ponto(self, usuario):
+        if not usuario.pode_moderar():
             status = 'pendente'
-            sugerido_por = session['usuario']['email']
+            sugerido_por = usuario.email
         else:
             status = 'aprovado'
             sugerido_por = None
-        
+
         nome = request.form.get('nome')
         localizacao = request.form.get('localizacao')
         descricao = request.form.get('descricao')
@@ -223,7 +176,7 @@ class PontoTuristicoController:
         ano_fundacao = request.form.get('ano_fundacao')
         ecossistema_id = request.form.get('ecossistema')
         area_km = request.form.get('area_km')
-        destaques_ids = request.form.getlist('destaques')   
+        destaques_ids = request.form.getlist('destaques')
 
         if not nome or not localizacao or not descricao or not categoria_id:
             return jsonify({'mensagem': 'Por favor, preencha todos os campos obrigatórios.', 'classe': 'danger'}), 400
@@ -232,7 +185,7 @@ class PontoTuristicoController:
 
         if nome.capitalize().strip() in nomes_pontos:
             return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 400
-        
+
         if not custo_entrada:
             custo_entrada = 0.0
         else:
@@ -240,7 +193,7 @@ class PontoTuristicoController:
                 custo_entrada = float(custo_entrada)
             except (ValueError, TypeError):
                 return jsonify({'mensagem': 'Por favor, insira um valor válido para o custo de entrada.', 'classe': 'danger'}), 400
-            
+
         if tipo_ponto == 'natural':
             if not area_km:
                 area_km = 0.0
@@ -249,7 +202,7 @@ class PontoTuristicoController:
                     area_km = float(area_km)
                 except (ValueError, TypeError):
                     return jsonify({'mensagem': 'Por favor, insira um valor válido para a área.', 'classe': 'danger'}), 400
-            
+
         if not horario_funcionamento:
             horario_funcionamento = "Não informado"
 
@@ -258,7 +211,7 @@ class PontoTuristicoController:
         else:
             extensao = os.path.splitext(foto.filename)[1]
             nome_ajustado = secure_filename(nome.lower().replace(" ", "_"))
-            
+
             nome_arquivo = f"uploads/pontos/{nome_ajustado}{extensao}"
 
             caminho = os.path.join(Config.UPLOAD_PONTOS, f"{nome_ajustado}{extensao}")
@@ -269,7 +222,7 @@ class PontoTuristicoController:
 
         if not categoria_dados:
             return jsonify({'mensagem': 'Categoria selecionada não encontrada.', 'classe': 'danger'}), 400
-        
+
         categoria = CategoriaFactory.criar_categoria(
             id=categoria_dados['id'],
             nome=categoria_dados['nome'],
@@ -348,27 +301,23 @@ class PontoTuristicoController:
         self.__dao_pontos.cadastrar_ponto(novo_ponto, destaques_ids)
 
         return jsonify({'mensagem': 'Ponto turístico cadastrado com sucesso!', 'classe': 'success'}), 200
-    
-    def remover_ponto(self, id_ponto):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-        
+
+    @login_required
+    def remover_ponto(self, usuario, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
             return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
 
-        if not session['usuario']['pode_moderar'] and session['usuario']['email'] == ponto.sugerido_por and ponto.status == 'aprovado':
+        if not usuario.pode_moderar() and usuario.email == ponto.sugerido_por and ponto.status == 'aprovado':
             return jsonify({'mensagem': 'Você não pode excluir sua sugestão porque ela já foi aprovada!', 'classe': 'danger'}), 400
 
         self.__dao_pontos.excluir_ponto(id_ponto)
 
         return jsonify({'mensagem': 'Ponto turístico excluído com sucesso!', 'classe': 'success'}), 200
-    
-    def editar_ponto(self, id_ponto):
-        if 'usuario' not in session:
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
 
+    @login_required
+    def editar_ponto(self, usuario, id_ponto):
         nome = request.form.get('nome')
         localizacao = request.form.get('localizacao')
         descricao = request.form.get('descricao')
@@ -419,7 +368,7 @@ class PontoTuristicoController:
         if nome.capitalize().strip() in nomes_pontos and nome.capitalize().strip() != nome_atual:
             return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 400
 
-        if not session['usuario']['pode_moderar']:
+        if not usuario.pode_moderar():
             ponto_existente.status = 'pendente'
         elif status_recebido:
             if not self.__status_valido(status_recebido):
@@ -432,7 +381,7 @@ class PontoTuristicoController:
         nome_ajustado = nome.capitalize().strip()
 
         if not foto or foto.filename == "":
-            
+
             if nome_antigo_ponto != nome_ajustado:
 
                 if ponto_existente.url_imagem and "default" not in ponto_existente.url_imagem:
@@ -560,7 +509,7 @@ class PontoTuristicoController:
         self.__dao_pontos.atualizar_ponto(ponto_atualizado, imagem_antiga, destaques_ids)
 
         return jsonify({'mensagem': 'Ponto turístico atualizado com sucesso!', 'classe': 'success'}), 200
-        
+
     def listar_pontos_busca(self):
         escrita = request.form.get('escrita')
         filtro = request.form.get('filtro')
@@ -573,20 +522,10 @@ class PontoTuristicoController:
 
         lista_pontos = self.__dao_pontos.buscar_pontos(escrita, filtro)
 
-        if session.get('usuario'):
-            usuario_email = session['usuario']['email']
-            usuario = self.__dao_usuario.buscar_usuario_por_email(usuario_email)
+        return render_template('ponto_turistico/pontos_busca.html', lista_pontos=lista_pontos, favoritos_ids=[])
 
-            favoritos_ids = [ponto.id for ponto in usuario.pontos_favoritos]
-        else:
-            favoritos_ids = []
-
-        return render_template('ponto_turistico/pontos_busca.html', lista_pontos=lista_pontos, favoritos_ids=favoritos_ids)
-    
-    def alterar_status(self, id_ponto, status):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def alterar_status(self, usuario, id_ponto, status):
         if status not in ['aprovado', 'rejeitado']:
             return jsonify({'mensagem': 'Status inválido. Informe um status válido.', 'classe': 'danger'}), 400
 

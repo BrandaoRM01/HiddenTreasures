@@ -1,4 +1,4 @@
-import { API_CATEGORIA_URL, mostrarMensagem } from "../main.js";
+import { API_CATEGORIA_URL, mostrarMensagem, apiFetch } from "../main.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const formEditar = document.getElementById('form-editar');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let id = window.location.pathname.split("/").pop();
 
-    let resp = await fetch(`${API_CATEGORIA_URL}/${id}`);
+    let resp = await apiFetch(`${API_CATEGORIA_URL}/${id}`);
     let categoria = await resp.json();
 
     formEditar.nome.value = categoria.nome;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'descricao': formEditar.descricao.value
         }
 
-        let resp = await fetch(`${API_CATEGORIA_URL}/${categoria.id}`, {
+        let resp = await apiFetch(`${API_CATEGORIA_URL}/${categoria.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

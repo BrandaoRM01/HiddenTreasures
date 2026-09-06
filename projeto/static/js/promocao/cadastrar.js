@@ -1,4 +1,4 @@
-import { API_PROMOCAO_URL, mostrarMensagem } from '../main.js';
+import { API_PROMOCAO_URL, mostrarMensagem, apiFetch } from '../main.js';
 import { listarPromocoes } from './listar.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'data_fim': formPromocoes.data_fim.value
         }
 
-        let resp = await fetch(API_PROMOCAO_URL, {
+        let resp = await apiFetch(API_PROMOCAO_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

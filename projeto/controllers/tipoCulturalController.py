@@ -1,14 +1,12 @@
-from flask import flash, render_template, redirect, session, url_for, request, jsonify
+from flask import render_template, request, jsonify
 from projeto.dao import TipoCulturalDAO
 from projeto.factorys import TipoCulturalFactory
+from projeto.decoradores import admin_required
 
 class TipoCulturalController:
 
     def __init__(self):
         self.__dao = TipoCulturalDAO()
-
-    def __usuario_pode_moderar(self):
-        return 'usuario' in session and session['usuario']['pode_moderar']
 
     def listar_tipos_culturais(self):
         lista = self.__dao.carregar_tipos_culturais()
@@ -20,15 +18,10 @@ class TipoCulturalController:
         return jsonify(tipos_culturais), 200
 
     def preparar_gerenciar_tipos(self):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-
         return render_template('tipo_cultural/gerenciar_tipos_culturais.html')
 
-    def cadastrar_tipo_cultural(self):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def cadastrar_tipo_cultural(self, usuario):
         dados = request.get_json()
         nome = dados.get('nome')
 
@@ -48,24 +41,17 @@ class TipoCulturalController:
 
         return jsonify({'mensagem': 'Tipo cultural cadastrado com sucesso!', 'classe': 'success'}), 200
 
-    def remover_tipo_cultural(self, id_tipo):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def remover_tipo_cultural(self, usuario, id_tipo):
         self.__dao.remover_tipo_cultural(id_tipo)
 
         return jsonify({'mensagem': 'Tipo cultural removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_tipo(self, id_tipo):
-        if not self.__usuario_pode_moderar():
-            return render_template('erro.html')
-
         return render_template('tipo_cultural/editar_tipo_cultural.html')
 
-    def buscar_tipo_cultural_por_id(self, id_tipo):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def buscar_tipo_cultural_por_id(self, usuario, id_tipo):
         tipo = self.__dao.buscar_tipo_por_id(id_tipo)
 
         if not tipo:
@@ -73,10 +59,8 @@ class TipoCulturalController:
 
         return jsonify(tipo.to_dict()), 200
 
-    def atualizar_tipo_cultural(self, id_tipo):
-        if not self.__usuario_pode_moderar():
-            return jsonify({'mensagem': 'você não tem permissão', 'classe': 'danger'}), 403
-
+    @admin_required
+    def atualizar_tipo_cultural(self, usuario, id_tipo):
         dados = request.get_json()
         nome = dados.get('nome')
 

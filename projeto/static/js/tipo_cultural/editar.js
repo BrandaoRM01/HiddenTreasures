@@ -1,4 +1,4 @@
-import { API_TIPO_CULTURAL_URL, mostrarMensagem } from "../main.js";
+import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch } from "../main.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const formEditar = document.getElementById('form-editar');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let id = window.location.pathname.split("/").pop();
 
-    let resp = await fetch(`${API_TIPO_CULTURAL_URL}/${id}`);
+    let resp = await apiFetch(`${API_TIPO_CULTURAL_URL}/${id}`);
     let tipo_cultural = await resp.json();
 
     formEditar.nome.value = tipo_cultural.nome;
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'nome': formEditar.nome.value
         }
 
-        let resp = await fetch(`${API_TIPO_CULTURAL_URL}/${tipo_cultural.id}`, {
+        let resp = await apiFetch(`${API_TIPO_CULTURAL_URL}/${tipo_cultural.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
