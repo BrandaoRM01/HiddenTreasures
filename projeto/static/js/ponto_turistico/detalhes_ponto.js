@@ -1,7 +1,8 @@
-import { API_PONTO_URL, API_AVALIACAO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, API_AVALIACAO_URL, mostrarMensagem, apiFetch, usuarioModerador, criarBadgeStatus, criarDropdownAcoesAdmin, criarDropdownFiltroStatus } from '../main.js';
 import { montarSecaoAvaliar } from '../avaliacao/cadastrar.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
+let filtroStatusAtual = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarPonto();
@@ -188,7 +189,14 @@ function criarEstrelasTexto(nota) {
 }
 
 export async function carregarAvaliacoes() {
-    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let moderador = await usuarioModerador();
+
+    let url = `${API_AVALIACAO_URL}/ponto/${idPonto}`;
+    if (!moderador) {
+        url += '?status=aprovado';
+    }
+
+    let resposta = await apiFetch(url);
     let dados = await resposta.json();
 
     if (!resposta.ok) return;
@@ -206,12 +214,26 @@ export async function carregarAvaliacoes() {
     titulo.textContent = 'Avaliações';
     cabecalho.appendChild(titulo);
 
+    let acoesCabecalho = document.createElement('div');
+    acoesCabecalho.className = 'd-flex gap-2 align-items-center';
+
+    if (moderador) {
+        acoesCabecalho.appendChild(criarDropdownFiltroStatus(filtroStatusAtual, async (valor) => {
+            filtroStatusAtual = valor;
+            await carregarAvaliacoes();
+        }));
+    }
+
     if (quantidade >= 5) {
         let link = document.createElement('a');
         link.href = `/avaliacoes-ponto/${idPonto}`;
         link.className = 'btn btn-outline-primary btn-sm';
         link.textContent = 'Ver mais';
-        cabecalho.appendChild(link);
+        acoesCabecalho.appendChild(link);
+    }
+
+    if (acoesCabecalho.childElementCount > 0) {
+        cabecalho.appendChild(acoesCabecalho);
     }
 
     container.appendChild(cabecalho);
@@ -220,12 +242,18 @@ export async function carregarAvaliacoes() {
         container.appendChild(criarCardAvaliacaoUsuario(dados.avaliacao_usuario));
     }
 
-    let preview = dados.avaliacoes.slice(0, 5);
+    let avaliacoesFiltradas = (moderador && filtroStatusAtual)
+        ? dados.avaliacoes.filter(a => a.status == filtroStatusAtual)
+        : dados.avaliacoes;
+
+    let preview = avaliacoesFiltradas.slice(0, 5);
 
     if (preview.length == 0 && !dados.avaliacao_usuario) {
         let vazio = document.createElement('div');
         vazio.className = 'alert alert-secondary text-center';
-        vazio.textContent = 'Nenhuma avaliação ainda. Seja o primeiro!';
+        vazio.textContent = filtroStatusAtual
+            ? 'Nenhuma avaliação encontrada para esse filtro.'
+            : 'Nenhuma avaliação ainda. Seja o primeiro!';
         container.appendChild(vazio);
         return;
     }
@@ -302,12 +330,18 @@ function criarCardAvaliacaoUsuario(avaliacaoUsuario) {
     topo.appendChild(criarInfoUsuario(avaliacaoUsuario.usuario, avaliacaoUsuario.data_avaliacao, true));
     topo.appendChild(acoes);
 
+    let notaLinha = document.createElement('div');
+    notaLinha.className = 'd-flex justify-content-between align-items-center mb-1';
+
     let nota = document.createElement('p');
-    nota.className = 'text-warning mb-1';
+    nota.className = 'text-warning mb-0';
     nota.textContent = criarEstrelasTexto(avaliacaoUsuario.nota);
 
+    notaLinha.appendChild(nota);
+    notaLinha.appendChild(criarBadgeStatus(avaliacaoUsuario.status));
+
     corpo.appendChild(topo);
-    corpo.appendChild(nota);
+    corpo.appendChild(notaLinha);
 
     if (avaliacaoUsuario.comentario) {
         let comentario = document.createElement('p');
@@ -332,6 +366,13 @@ function criarCardAvaliacao(avaliacao, usuarioAdmin) {
     topo.appendChild(criarInfoUsuario(avaliacao.usuario, avaliacao.data_avaliacao, false));
 
     if (usuarioAdmin) {
+        let acoes = document.createElement('div');
+        acoes.className = 'd-flex gap-2';
+
+        if (avaliacao.status == 'pendente') {
+            acoes.appendChild(criarDropdownAcoesAdmin(avaliacao, idPonto, carregarAvaliacoes));
+        }
+
         let botaoExcluir = document.createElement('button');
         botaoExcluir.className = 'btn btn-danger btn-sm d-flex align-items-center justify-content-center';
         botaoExcluir.title = 'Excluir';
@@ -341,15 +382,25 @@ function criarCardAvaliacao(avaliacao, usuarioAdmin) {
         botaoExcluir.appendChild(iconeExcluir);
         botaoExcluir.addEventListener('click', () => excluirAvaliacao(avaliacao.usuario.email, avaliacao.usuario.username));
 
-        topo.appendChild(botaoExcluir);
+        acoes.appendChild(botaoExcluir);
+        topo.appendChild(acoes);
     }
 
+    let notaLinha = document.createElement('div');
+    notaLinha.className = 'd-flex justify-content-between align-items-center mb-1';
+
     let nota = document.createElement('p');
-    nota.className = 'text-warning mb-1';
+    nota.className = 'text-warning mb-0';
     nota.textContent = criarEstrelasTexto(avaliacao.nota);
 
+    notaLinha.appendChild(nota);
+
+    if (usuarioAdmin) {
+        notaLinha.appendChild(criarBadgeStatus(avaliacao.status));
+    }
+
     corpo.appendChild(topo);
-    corpo.appendChild(nota);
+    corpo.appendChild(notaLinha);
 
     if (avaliacao.comentario) {
         let comentario = document.createElement('p');

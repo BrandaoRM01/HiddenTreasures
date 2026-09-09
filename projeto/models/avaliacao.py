@@ -2,12 +2,13 @@ from .usuario import Usuario
 
 class Avaliacao:
 
-    def __init__(self, usuario: Usuario, ponto_id, nota, data_avaliacao, comentario=None):
+    def __init__(self, usuario: Usuario, ponto_id, nota, data_avaliacao, comentario=None, status='pendente'):
         self.__usuario = usuario
         self.__ponto_id = ponto_id
         self.__nota = nota
         self.__data_avaliacao = data_avaliacao
         self.__comentario = comentario
+        self.__status = status
 
     @property
     def usuario(self):
@@ -28,6 +29,10 @@ class Avaliacao:
     @property
     def comentario(self):
         return self.__comentario
+
+    @property
+    def status(self):
+        return self.__status
     
     @usuario.setter
     def usuario(self, valor):
@@ -49,11 +54,16 @@ class Avaliacao:
     def comentario(self, valor):
         self.__comentario = valor
 
+    @status.setter
+    def status(self, valor):
+        self.__status = valor
+
     def to_dict(self):
         return {
             'usuario': self.__usuario.to_dict(),
             'ponto_id': self.__ponto_id,
             'nota': self.__nota,
             'data_avaliacao': self.__data_avaliacao.isoformat(),
-            'comentario': self.__comentario
+            'comentario': self.__comentario,
+            'status': self.__status
         }

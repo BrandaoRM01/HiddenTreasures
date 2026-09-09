@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const voltar = document.getElementById('voltar');
     voltar.href = `/detalhes-ponto/${idPonto}`;
 
-    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?status=aprovado`);
     let dados = await resposta.json();
 
     if (!resposta.ok || !dados.avaliacao_usuario) {

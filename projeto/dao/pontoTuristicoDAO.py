@@ -144,6 +144,7 @@ class PontoTuristicoDAO(BaseDAO):
                         usuario=usuario,
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
+                        status=linha['status_avaliacao'],
                         data_avaliacao=linha['data_avaliacao'],
                         comentario=linha['comentario']
                     )
@@ -209,7 +210,8 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
@@ -254,7 +256,8 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
@@ -307,7 +310,8 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
                     )
 
                     if not any(a.usuario.email == usuario.email and a.data_avaliacao == avaliacao.data_avaliacao for a in ponto.avaliacoes):
@@ -567,7 +571,8 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
                     )
                     pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
 
@@ -612,7 +617,8 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
@@ -657,7 +663,9 @@ class PontoTuristicoDAO(BaseDAO):
                         ponto_id=linha['ponto_id'],
                         nota=linha['nota'],
                         data_avaliacao=linha['data_avaliacao'],
-                        comentario=linha['comentario']
+                        comentario=linha['comentario'],
+                        status=linha['status_avaliacao']
+
                     )
                     if avaliacao not in pontos_map[ponto_id].avaliacoes:
                         pontos_map[ponto_id].adicionar_avaliacao(avaliacao)

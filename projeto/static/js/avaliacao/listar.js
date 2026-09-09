@@ -1,6 +1,7 @@
-import { API_AVALIACAO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_AVALIACAO_URL, mostrarMensagem, apiFetch, usuarioModerador, criarBadgeStatus, criarDropdownAcoesAdmin, criarDropdownFiltroStatus } from '../main.js';
 
 const idPonto = window.location.pathname.split('/').filter(Boolean).pop();
+let filtroStatusAtual = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-voltar').addEventListener('click', () => {
@@ -10,7 +11,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function carregarAvaliacoes() {
-    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}`);
+    let moderador = await usuarioModerador();
+
+    let url = `${API_AVALIACAO_URL}/ponto/${idPonto}`;
+    if (!moderador) {
+        url += '?status=aprovado';
+    } else if (filtroStatusAtual) {
+        url += `?status=${filtroStatusAtual}`;
+    }
+
+    let resposta = await apiFetch(url);
     let dados = await resposta.json();
 
     if (!resposta.ok) {
@@ -19,6 +29,16 @@ async function carregarAvaliacoes() {
     }
 
     document.getElementById('titulo-avaliacoes').innerHTML = `Avaliações de <strong>${dados.ponto_nome}</strong>`;
+
+    let filtroContainer = document.getElementById('filtro-status-container');
+    filtroContainer.innerHTML = '';
+
+    if (moderador) {
+        filtroContainer.appendChild(criarDropdownFiltroStatus(filtroStatusAtual, async (valor) => {
+            filtroStatusAtual = valor;
+            await carregarAvaliacoes();
+        }));
+    }
 
     montarAvaliacaoUsuario(dados.avaliacao_usuario, dados.logado);
     montarListaAvaliacoes(dados.avaliacoes, dados.usuario_admin);
@@ -80,12 +100,18 @@ function montarAvaliacaoUsuario(avaliacaoUsuario, logado) {
     topo.appendChild(infoUsuario);
     topo.appendChild(acoes);
 
+    let notaLinha = document.createElement('div');
+    notaLinha.className = 'd-flex justify-content-between align-items-center mb-1';
+
     let nota = document.createElement('p');
-    nota.className = 'text-warning mb-1';
+    nota.className = 'text-warning mb-0';
     nota.textContent = criarEstrelas(avaliacaoUsuario.nota);
 
+    notaLinha.appendChild(nota);
+    notaLinha.appendChild(criarBadgeStatus(avaliacaoUsuario.status));
+
     corpo.appendChild(topo);
-    corpo.appendChild(nota);
+    corpo.appendChild(notaLinha);
 
     if (avaliacaoUsuario.comentario) {
         let comentario = document.createElement('p');
@@ -104,7 +130,7 @@ function montarListaAvaliacoes(avaliacoes, usuarioAdmin) {
     if (!avaliacoes || avaliacoes.length == 0) {
         let vazio = document.createElement('div');
         vazio.className = 'alert alert-secondary text-center';
-        vazio.textContent = 'Nenhuma avaliação ainda. Seja o primeiro!';
+        vazio.textContent = 'Nenhuma avaliação encontrada!';
         lista.appendChild(vazio);
         return;
     }
@@ -137,20 +163,38 @@ function criarCardAvaliacao(avaliacao, usuarioAdmin) {
     topo.appendChild(infoUsuario);
 
     if (usuarioAdmin) {
+        let acoes = document.createElement('div');
+        acoes.className = 'd-flex gap-2';
+
+        if (avaliacao.status == 'pendente') {
+            acoes.appendChild(criarDropdownAcoesAdmin(avaliacao, idPonto, carregarAvaliacoes));
+        }
+
         let botaoExcluir = document.createElement('button');
         botaoExcluir.className = 'btn btn-danger btn-sm d-flex align-items-center justify-content-center';
         botaoExcluir.title = 'Excluir';
         botaoExcluir.innerHTML = '<i class="bi bi-trash"></i>';
         botaoExcluir.addEventListener('click', () => excluirAvaliacao(avaliacao.usuario.email, avaliacao.usuario.username));
-        topo.appendChild(botaoExcluir);
+
+        acoes.appendChild(botaoExcluir);
+        topo.appendChild(acoes);
     }
 
+    let notaLinha = document.createElement('div');
+    notaLinha.className = 'd-flex justify-content-between align-items-center mb-1';
+
     let nota = document.createElement('p');
-    nota.className = 'text-warning mb-1';
+    nota.className = 'text-warning mb-0';
     nota.textContent = criarEstrelas(avaliacao.nota);
 
+    notaLinha.appendChild(nota);
+
+    if (usuarioAdmin) {
+        notaLinha.appendChild(criarBadgeStatus(avaliacao.status));
+    }
+
     corpo.appendChild(topo);
-    corpo.appendChild(nota);
+    corpo.appendChild(notaLinha);
 
     if (avaliacao.comentario) {
         let comentario = document.createElement('p');

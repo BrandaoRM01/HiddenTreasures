@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
     ponto_id INT NOT NULL,
     nota INT NOT NULL CHECK (nota >= 1 AND nota <= 5),
     comentario TEXT,
+    status ENUM('pendente', 'aprovado', 'rejeitado') NOT NULL DEFAULT 'pendente',
     data_avaliacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (usuario_email, ponto_id),
@@ -156,7 +157,7 @@ SELECT
     a.nota,
     a.data_avaliacao,
     a.comentario,
-
+    a.status AS status_avaliacao,
     u.email,
     u.username,
     u.url_foto,
@@ -188,6 +189,7 @@ SELECT
     a.nota,
     a.data_avaliacao,
     a.comentario,
+    a.status,
 
     u.username AS usuario_username,
     u.url_foto AS usuario_url_foto,

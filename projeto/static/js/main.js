@@ -304,3 +304,135 @@ export async function apiFetch(url, opcoes = {}) {
 
     return fetch(url, opcoes);
 }
+
+export async function usuarioModerador() {
+    let token = localStorage.getItem('token');
+    if (!token) return false;
+
+    let resposta = await apiFetch(`${API_USUARIO_URL}/me`);
+    if (!resposta.ok) return false;
+
+    let usuario = await resposta.json();
+    return usuario.tipo_usuario == 'admin' || usuario.tipo_usuario == 'superadmin';
+}
+
+export function criarBadgeStatus(status) {
+    let cores = {
+        aprovado: 'bg-success',
+        pendente: 'bg-secondary',
+        rejeitado: 'bg-danger'
+    };
+
+    let badge = document.createElement('span');
+    badge.className = `badge ${cores[status] || 'bg-secondary'}`;
+    badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    return badge;
+}
+
+export async function alterarStatusAvaliacao(idPonto, avaliacao, status) {
+    let dados = {
+        nota: avaliacao.nota,
+        comentario: avaliacao.comentario,
+        status: status
+    };
+
+    let resposta = await apiFetch(`${API_AVALIACAO_URL}/ponto/${idPonto}?usuario_email=${encodeURIComponent(avaliacao.usuario.email)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+
+    let dadosResposta = await resposta.json();
+    mostrarMensagem(dadosResposta.mensagem, dadosResposta.classe);
+
+    return resposta.ok;
+}
+
+export function criarDropdownAcoesAdmin(avaliacao, idPonto, aoAlterar) {
+    let dropdown = document.createElement('div');
+    dropdown.className = 'dropdown';
+
+    let botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'btn btn-sm btn-light';
+    botao.setAttribute('data-bs-toggle', 'dropdown');
+    botao.innerHTML = '<i class="bi bi-three-dots-vertical"></i>';
+
+    let menu = document.createElement('ul');
+    menu.className = 'dropdown-menu dropdown-menu-end';
+
+    let criarItem = (texto, classeCor, statusAlvo, precisaConfirmar) => {
+        let item = document.createElement('li');
+        let link = document.createElement('a');
+        link.href = '#';
+        link.className = `dropdown-item ${classeCor}`;
+        link.textContent = texto;
+
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            if (precisaConfirmar) {
+                let confirmar = confirm(`Deseja realmente rejeitar a avaliação de ${avaliacao.usuario.username}?`);
+                if (!confirmar) return;
+            }
+
+            let ok = await alterarStatusAvaliacao(idPonto, avaliacao, statusAlvo);
+            if (ok) await aoAlterar();
+        });
+
+        item.appendChild(link);
+        return item;
+    };
+
+    menu.appendChild(criarItem('Aprovar', 'text-success', 'aprovado', false));
+    menu.appendChild(criarItem('Rejeitar', 'text-danger', 'rejeitado', true));
+
+    dropdown.appendChild(botao);
+    dropdown.appendChild(menu);
+
+    return dropdown;
+}
+
+export function criarDropdownFiltroStatus(filtroAtual, aoSelecionar) {
+    let dropdown = document.createElement('div');
+    dropdown.className = 'dropdown';
+
+    let opcoes = [
+        { texto: 'Todas', valor: '' },
+        { texto: 'Aprovadas', valor: 'aprovado' },
+        { texto: 'Pendentes', valor: 'pendente' },
+        { texto: 'Rejeitadas', valor: 'rejeitado' }
+    ];
+
+    let opcaoAtual = opcoes.find(o => o.valor === filtroAtual) || opcoes[0];
+
+    let botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'btn btn-outline-secondary btn-sm dropdown-toggle';
+    botao.setAttribute('data-bs-toggle', 'dropdown');
+    botao.textContent = opcaoAtual.texto;
+
+    let menu = document.createElement('ul');
+    menu.className = 'dropdown-menu dropdown-menu-end';
+
+    opcoes.forEach(opcao => {
+        let item = document.createElement('li');
+        let link = document.createElement('a');
+        link.href = '#';
+        link.className = 'dropdown-item';
+        link.textContent = opcao.texto;
+
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            aoSelecionar(opcao.valor);
+        });
+
+        item.appendChild(link);
+        menu.appendChild(item);
+    });
+
+    dropdown.appendChild(botao);
+    dropdown.appendChild(menu);
+
+    return dropdown;
+}

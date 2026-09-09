@@ -12,15 +12,17 @@ class AvaliacaoDAO(BaseDAO):
                 usuario_email,
                 ponto_id,
                 nota,
+                status,
                 data_avaliacao,
                 comentario
             )
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         valores = [
             nova_avaliacao.usuario.email,
             nova_avaliacao.ponto_id,
             nova_avaliacao.nota,
+            nova_avaliacao.status,
             nova_avaliacao.data_avaliacao,
             nova_avaliacao.comentario
         ]
@@ -35,14 +37,18 @@ class AvaliacaoDAO(BaseDAO):
             cursor.close()
             conexao.close()
 
-    def listar_avaliacoes_por_ponto(self, ponto_id, usuario_email=None):
+    def listar_avaliacoes_por_ponto(self, ponto_id, usuario_email=None, status=None):
         sql = """
             SELECT *
             FROM vw_avaliacoes
             WHERE ponto_id = %s
         """
-        
+
         valores = [ponto_id]
+
+        if status:
+            sql += " AND status = %s"
+            valores.append(status)
 
         if usuario_email:
             sql += " AND usuario_email != %s"
@@ -51,7 +57,7 @@ class AvaliacaoDAO(BaseDAO):
         sql += """
             ORDER BY data_avaliacao DESC
         """
-       
+
         avaliacoes_ponto = []
 
         conexao = self._get_connection()
@@ -73,7 +79,8 @@ class AvaliacaoDAO(BaseDAO):
                     ponto_id=linha['ponto_id'],
                     nota=linha['nota'],
                     data_avaliacao=linha['data_avaliacao'],
-                    comentario=linha['comentario']
+                    comentario=linha['comentario'],
+                    status=linha['status']
                 )
                 avaliacoes_ponto.append(avaliacao)
 
@@ -112,6 +119,7 @@ class AvaliacaoDAO(BaseDAO):
                     usuario=usuario,
                     ponto_id=linha['ponto_id'],
                     nota=linha['nota'],
+                    status=linha['status'],
                     data_avaliacao=linha['data_avaliacao'],
                     comentario=linha['comentario']
                 )
@@ -128,12 +136,14 @@ class AvaliacaoDAO(BaseDAO):
             SET 
                 nota = %s,
                 comentario = %s,
+                status = %s,
                 data_avaliacao = %s
             WHERE usuario_email = %s AND ponto_id = %s
         """
         valores = [
             avaliacao_atualizada.nota,
             avaliacao_atualizada.comentario,
+            avaliacao_atualizada.status,
             avaliacao_atualizada.data_avaliacao,
             avaliacao_atualizada.usuario.email,
             avaliacao_atualizada.ponto_id
@@ -206,6 +216,7 @@ class AvaliacaoDAO(BaseDAO):
                     usuario=usuario,
                     ponto_id=linha['ponto_id'],
                     nota=linha['nota'],
+                    status=linha['status'],
                     data_avaliacao=linha['data_avaliacao'],
                     comentario=linha['comentario']
                 )
