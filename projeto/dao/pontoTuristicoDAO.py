@@ -720,3 +720,116 @@ class PontoTuristicoDAO(BaseDAO):
     def __atualizar_destaques_ponto(self, cursor, id_ponto, destaques_ids):
         self.__remover_destaques_ponto(cursor, id_ponto)
         self.__salvar_destaques_ponto(cursor, id_ponto, destaques_ids)
+
+    def listar_pontos_busca(self, busca=None, categoria=None, tipo=None, localizacao=None,
+                   status=None, apenas_aprovados=True, page=1, limit=10):
+        condicoes = []
+        valores = []
+
+        if apenas_aprovados:
+            condicoes.append("status = 'aprovado'")
+        elif status:
+            condicoes.append("status = %s")
+            valores.append(status)
+
+        if busca:
+            condicoes.append("nome LIKE %s")
+            valores.append(f"%{busca}%")
+
+        if categoria:
+            condicoes.append("categoria_nome LIKE %s")
+            valores.append(f"%{categoria}%")
+
+        if tipo:
+            condicoes.append("tipo_ponto = %s")
+            valores.append(tipo)
+
+        if localizacao:
+            condicoes.append("localizacao LIKE %s")
+            valores.append(f"%{localizacao}%")
+
+        where_sql = " AND ".join(condicoes) if condicoes else "1=1"
+
+        if limit < 1:
+            limit = 10
+        elif limit > 100:
+            limit = 100
+
+        if page < 1:
+            page = 1
+
+        offset = (page - 1) * limit
+
+        pontos_map = {}
+        ids_pagina = []
+        total = 0
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            sql_total = f"""
+                SELECT COUNT(DISTINCT id) AS total
+                FROM vw_pontos_turisticos
+                WHERE {where_sql}
+            """
+            cursor.execute(sql_total, valores)
+            total = cursor.fetchone()['total']
+
+            sql_ids = f"""
+                SELECT DISTINCT id
+                FROM vw_pontos_turisticos
+                WHERE {where_sql}
+                ORDER BY nome ASC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(sql_ids, valores + [limit, offset])
+            ids_pagina = [linha['id'] for linha in cursor.fetchall()]
+
+            if ids_pagina:
+                placeholders = ",".join(["%s"] * len(ids_pagina))
+                sql_dados = f"""
+                    SELECT *
+                    FROM vw_pontos_turisticos
+                    WHERE id IN ({placeholders})
+                """
+                cursor.execute(sql_dados, ids_pagina)
+
+                for linha in cursor.fetchall():
+                    ponto_id = linha['id']
+                    if ponto_id not in pontos_map:
+                        pontos_map[ponto_id] = self.__criar_ponto_turistico(linha)
+
+                    if linha['usuario_email'] and linha['ponto_id']:
+                        usuario = UsuarioFactory.criar_usuario(
+                            email=linha['email'],
+                            username=linha['username'],
+                            url_foto=linha['url_foto'],
+                            tipo_usuario=linha['tipo_usuario']
+                        )
+
+                        avaliacao = AvaliacaoFactory.criar_avaliacao(
+                            usuario=usuario,
+                            ponto_id=linha['ponto_id'],
+                            nota=linha['nota'],
+                            data_avaliacao=linha['data_avaliacao'],
+                            comentario=linha['comentario'],
+                            status=linha['status_avaliacao']
+                        )
+                        if avaliacao not in pontos_map[ponto_id].avaliacoes:
+                            pontos_map[ponto_id].adicionar_avaliacao(avaliacao)
+
+                    if linha['destaque_nome']:
+                        destaque = DestaqueFactory.criar_destaque(
+                            id=linha['destaque_id'],
+                            nome=linha['destaque_nome']
+                        )
+                        if linha['destaque_id'] and not any(d.id == linha['destaque_id'] for d in pontos_map[ponto_id].destaques):
+                            pontos_map[ponto_id].adicionar_destaque(destaque)
+        finally:
+            cursor.close()
+            conexao.close()
+
+        pontos_ordenados = sorted(pontos_map.values(), key=lambda ponto: ids_pagina.index(ponto.id))
+
+        return pontos_ordenados, total, page, limit

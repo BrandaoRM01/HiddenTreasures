@@ -49,7 +49,7 @@ def editar_sugestao_pagina(id):
 def api_pontos():
     if request.method == 'POST':
         return controller.cadastrar_ponto()
-    return controller.listar_pontos_gerenciar()
+    return controller.listar_pontos()
 
 @pontos_bp.route('/api/pontos/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def api_pontos_param(id):
@@ -66,10 +66,6 @@ def api_pontos_sugestoes():
 @pontos_bp.route('/api/pontos/minhas-sugestoes', methods=['GET'])
 def api_minhas_sugestoes():
     return controller.listar_sugestoes_usuario()
-
-@pontos_bp.route('/api/pontos/aprovados', methods=['GET'])
-def api_pontos_aprovados():
-    return controller.listar_pontos_aprovados()
 
 @pontos_bp.route('/api/pontos/index', methods=['GET'])
 def api_pontos_index():

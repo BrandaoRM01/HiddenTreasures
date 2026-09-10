@@ -59,25 +59,6 @@
 
                 </ul>
 
-                <form class="d-flex align-items-center me-3" method="POST"
-                    action="{{ url_for('pontos.buscar_pontos') }}">
-
-                    <select class="form-select form-select-sm me-1" name="filtro"
-                        style="width: 75px; font-size: 0.7rem; height: 32px; padding: 0.2rem 0.3rem;">
-                        <option value="nome" selected>Nome</option>
-                        <option value="categoria">Categoria</option>
-                        <option value="localizacao">Local</option>
-                    </select>
-
-                    <input class="form-control form-control-sm me-1" type="search" name="escrita"
-                        placeholder="Buscar..."
-                        style="width: 120px; font-size: 0.7rem; height: 32px; padding: 0.2rem 0.4rem;">
-
-                    <button class="btn btn-primary btn-sm" type="submit" style="padding: 0.2rem 0.4rem; height: 30px;">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-
                 <div id="area-auth" class="d-none">
                     <div class="d-flex gap-2">
                         <a href="#" id="link-login" class="btn btn-outline-primary">Login</a>

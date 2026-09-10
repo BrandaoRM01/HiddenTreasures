@@ -18,10 +18,64 @@ class PontoTuristicoController:
         self.__dao_destaque = DestaqueDAO()
 
     def __status_valido(self, status):
-        return status in ['aprovado', 'rejeitado']
+        return status in ['aprovado', 'rejeitado', 'pendente']
 
     def preparar_index(self):
         return render_template('ponto_turistico/index.html')
+
+    @usuario_opcional
+    def listar_pontos(self, usuario):
+        busca = request.args.get('busca')
+        categoria = request.args.get('categoria')
+        tipo = request.args.get('tipo')
+        localizacao = request.args.get('localizacao')
+        status = request.args.get('status')
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 10, type=int)
+
+        eh_admin = bool(usuario) and usuario.pode_moderar()
+
+        if eh_admin:
+            if status and not self.__status_valido(status):
+                return jsonify({'mensagem': 'Status inválido.', 'classe': 'danger'}), 400
+            status_filtro = status       
+            apenas_aprovados = False
+        else:
+            status_filtro = None
+            apenas_aprovados = True         
+
+        lista, total, page, limit = self.__dao_pontos.listar_pontos_busca(
+            busca=busca,
+            categoria=categoria,
+            tipo=tipo,
+            localizacao=localizacao,
+            status=status_filtro,
+            apenas_aprovados=apenas_aprovados,
+            page=page,
+            limit=limit
+        )
+
+        if usuario:
+            favoritos_ids = [p.id for p in usuario.pontos_favoritos]
+        else:
+            favoritos_ids = []
+
+        pontos = []
+        for p in lista:
+            ponto = p.to_dict()
+            ponto['favorito'] = p.id in favoritos_ids
+            pontos.append(ponto)
+
+        return jsonify({
+            'logado': bool(usuario),
+            'pontos': pontos,
+            'paginacao': {
+                'page': page,
+                'limit': limit,
+                'total': total,
+                'total_paginas': (total + limit - 1) // limit
+            }
+        }), 200
 
     @usuario_opcional
     def listar_index(self, usuario):
@@ -66,13 +120,6 @@ class PontoTuristicoController:
     def preparar_gerenciar_pontos(self):
         return render_template('ponto_turistico/gerenciar_pontos.html')
 
-    @admin_required
-    def listar_pontos_gerenciar(self, usuario):
-        lista = self.__dao_pontos.listar_todos_pontos()
-        pontos = [obj.to_dict() for obj in lista]
-
-        return jsonify(pontos), 200
-
     def preparar_gerenciar_sugestoes(self):
         return render_template('ponto_turistico/gerenciar_sugestoes.html')
 
@@ -115,24 +162,6 @@ class PontoTuristicoController:
 
     def preparar_pontos_turisticos(self):
         return render_template('ponto_turistico/pontos.html')
-
-    @usuario_opcional
-    def listar_pontos_aprovados(self, usuario):
-        lista = self.__dao_pontos.listar_pontos()
-
-        if usuario:
-            favoritos_ids = [ponto.id for ponto in usuario.pontos_favoritos]
-        else:
-            favoritos_ids = []
-
-        pontos = []
-
-        for p in lista:
-            ponto = p.to_dict()
-            ponto['favorito'] = p.id in favoritos_ids
-            pontos.append(ponto)
-
-        return jsonify({'logado': bool(usuario), 'pontos': pontos}), 200
 
     def preparar_detalhes_ponto(self):
         return render_template('ponto_turistico/detalhes_ponto.html')
@@ -509,20 +538,6 @@ class PontoTuristicoController:
         self.__dao_pontos.atualizar_ponto(ponto_atualizado, imagem_antiga, destaques_ids)
 
         return jsonify({'mensagem': 'Ponto turístico atualizado com sucesso!', 'classe': 'success'}), 200
-
-    def listar_pontos_busca(self):
-        escrita = request.form.get('escrita')
-        filtro = request.form.get('filtro')
-
-        if not escrita or not filtro:
-            return redirect(url_for('pontos.index'))
-
-        if escrita:
-            escrita = escrita.capitalize().strip()
-
-        lista_pontos = self.__dao_pontos.buscar_pontos(escrita, filtro)
-
-        return render_template('ponto_turistico/pontos_busca.html', lista_pontos=lista_pontos, favoritos_ids=[])
 
     @admin_required
     def alterar_status(self, usuario, id_ponto, status):

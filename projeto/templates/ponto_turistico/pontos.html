@@ -13,7 +13,33 @@
         <h1 class="fw-bold">Todos os Pontos Turísticos</h1>
     </div>
 
+    <form id="form-filtro-pontos" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" id="filtro-busca" class="form-control" placeholder="Buscar por nome">
+        </div>
+        <div class="col-md-3">
+            <select id="filtro-categoria" class="form-select">
+                <option value="">Todas as categorias</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select id="filtro-tipo" class="form-select">
+                <option value="">Todos os tipos</option>
+                <option value="cultural">Cultural</option>
+                <option value="natural">Natural</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" id="filtro-localizacao" class="form-control" placeholder="Localização">
+        </div>
+        <div class="col-md-1 d-grid">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
     <div id="lista-pontos-aprovados" class="row"></div>
+
+    <nav id="paginacao-pontos" class="mt-4"></nav>
 
 </div>
 

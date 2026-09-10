@@ -1,8 +1,11 @@
 import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
 
+let paginaAtual = 1;
+
 document.addEventListener('DOMContentLoaded', async () => {
     await listarPontos();
     await carregarCategorias();
+    await carregarCategoriasFiltro();
     await carregarPromocoes();
     await carregarEcossistemas();
     await carregarTiposCulturais();
@@ -33,7 +36,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         camposCultural.classList.toggle('d-none', ehNatural);
     });
 
+    document.getElementById('form-filtro-pontos').addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        paginaAtual = 1;
+        await listarPontos();
+    });
 });
+
+function montarQueryString() {
+    let busca = document.getElementById('filtro-busca').value.trim();
+    let categoria = document.getElementById('filtro-categoria').value;
+    let tipo = document.getElementById('filtro-tipo').value;
+    let localizacao = document.getElementById('filtro-localizacao').value.trim();
+    let status = document.getElementById('filtro-status').value;
+
+    let parametros = new URLSearchParams();
+    parametros.set('page', paginaAtual);
+    parametros.set('limit', 10);
+
+    if (busca) parametros.set('busca', busca);
+    if (categoria) parametros.set('categoria', categoria);
+    if (tipo) parametros.set('tipo', tipo);
+    if (localizacao) parametros.set('localizacao', localizacao);
+    if (status) parametros.set('status', status);
+
+    return parametros.toString();
+}
 
 export async function listarPontos() {
     let lista = document.getElementById('lista-pontos');
@@ -41,10 +69,12 @@ export async function listarPontos() {
 
     document.getElementById('preview-imagem').src = '/static/img/default/hidden_treasures_logo.png';
 
-    let resposta = await apiFetch(API_PONTO_URL);
+    let queryString = montarQueryString();
+    let resposta = await apiFetch(`${API_PONTO_URL}?${queryString}`);
     let dados = await resposta.json();
+    let pontos = dados.pontos;
 
-    if (dados.length == 0) {
+    if (pontos.length == 0) {
 
         let div = document.createElement('div');
         div.className = 'text-center py-5';
@@ -54,11 +84,11 @@ export async function listarPontos() {
 
         let h4 = document.createElement('h4');
         h4.className = 'mb-2 mt-3';
-        h4.textContent = 'Nenhum ponto cadastrado';
+        h4.textContent = 'Nenhum ponto encontrado';
 
         let p = document.createElement('p');
         p.className = 'text-muted';
-        p.textContent = 'Comece cadastrando um ponto turístico para aparecer aqui.';
+        p.textContent = 'Ajuste os filtros ou cadastre um novo ponto turístico.';
 
         div.appendChild(icone);
         div.appendChild(h4);
@@ -66,13 +96,14 @@ export async function listarPontos() {
 
         lista.appendChild(div);
 
+        renderizarPaginacao(dados.paginacao);
         return;
     }
 
     let linha = document.createElement('div');
     linha.className = 'row g-3';
 
-    dados.forEach(ponto => {
+    pontos.forEach(ponto => {
 
         let coluna = document.createElement('div');
         coluna.className = 'col-12';
@@ -198,6 +229,41 @@ export async function listarPontos() {
     });
 
     lista.appendChild(linha);
+
+    renderizarPaginacao(dados.paginacao);
+}
+
+function renderizarPaginacao(paginacao) {
+    let nav = document.getElementById('paginacao-pontos');
+    nav.innerHTML = '';
+
+    if (!paginacao || paginacao.total_paginas <= 1) {
+        return;
+    }
+
+    let lista = document.createElement('ul');
+    lista.className = 'pagination justify-content-center';
+
+    for (let pagina = 1; pagina <= paginacao.total_paginas; pagina++) {
+        let item = document.createElement('li');
+        item.className = `page-item ${pagina == paginacao.page ? 'active' : ''}`;
+
+        let link = document.createElement('a');
+        link.className = 'page-link';
+        link.href = '#';
+        link.textContent = pagina;
+
+        link.addEventListener('click', async (evento) => {
+            evento.preventDefault();
+            paginaAtual = pagina;
+            await listarPontos();
+        });
+
+        item.appendChild(link);
+        lista.appendChild(item);
+    }
+
+    nav.appendChild(lista);
 }
 
 function removerPonto(botao, ponto, coluna) {
@@ -236,6 +302,20 @@ async function carregarCategorias() {
     categorias.forEach(categoria => {
         let option = document.createElement('option');
         option.value = categoria.id;
+        option.textContent = categoria.nome;
+        select.appendChild(option);
+    });
+}
+
+async function carregarCategoriasFiltro() {
+    let resposta = await apiFetch(API_CATEGORIA_URL);
+    let categorias = await resposta.json();
+
+    let select = document.getElementById('filtro-categoria');
+
+    categorias.forEach(categoria => {
+        let option = document.createElement('option');
+        option.value = categoria.nome;
         option.textContent = categoria.nome;
         select.appendChild(option);
     });

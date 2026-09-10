@@ -1,14 +1,57 @@
-import { API_PONTO_URL, criarBotaoFavorito, apiFetch } from '../main.js';
+import { API_PONTO_URL, API_CATEGORIA_URL, criarBotaoFavorito, apiFetch } from '../main.js';
+
+let paginaAtual = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await carregarCategorias();
     await listarPontosAprovados();
+
+    document.getElementById('form-filtro-pontos').addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        paginaAtual = 1;
+        await listarPontosAprovados();
+    });
 });
+
+async function carregarCategorias() {
+    let resposta = await apiFetch(API_CATEGORIA_URL);
+    let categorias = await resposta.json();
+
+    let select = document.getElementById('filtro-categoria');
+
+    categorias.forEach(categoria => {
+        let option = document.createElement('option');
+        option.value = categoria.nome;
+        option.textContent = categoria.nome;
+        select.appendChild(option);
+    });
+}
+
+function montarQueryString() {
+    let busca = document.getElementById('filtro-busca').value.trim();
+    let categoria = document.getElementById('filtro-categoria').value;
+    let tipo = document.getElementById('filtro-tipo').value;
+    let localizacao = document.getElementById('filtro-localizacao').value.trim();
+
+    let parametros = new URLSearchParams();
+    parametros.set('status', 'aprovado');
+    parametros.set('page', paginaAtual);
+    parametros.set('limit', 9);
+
+    if (busca) parametros.set('busca', busca);
+    if (categoria) parametros.set('categoria', categoria);
+    if (tipo) parametros.set('tipo', tipo);
+    if (localizacao) parametros.set('localizacao', localizacao);
+
+    return parametros.toString();
+}
 
 async function listarPontosAprovados() {
     let container = document.getElementById('lista-pontos-aprovados');
     container.innerHTML = '';
 
-    let resposta = await apiFetch(`${API_PONTO_URL}/aprovados`);
+    let queryString = montarQueryString();
+    let resposta = await apiFetch(`${API_PONTO_URL}?${queryString}`);
     let dados = await resposta.json();
 
     let logado = dados.logado;
@@ -17,14 +60,51 @@ async function listarPontosAprovados() {
     if (pontos.length == 0) {
         let alerta = document.createElement('div');
         alerta.className = 'alert alert-secondary text-center';
-        alerta.textContent = 'Nenhum ponto turístico cadastrado.';
+        alerta.textContent = 'Nenhum ponto turístico encontrado.';
         container.appendChild(alerta);
+        renderizarPaginacao(dados.paginacao);
         return;
     }
 
     pontos.forEach(ponto => {
         container.appendChild(criarCardPonto(ponto, logado));
     });
+
+    renderizarPaginacao(dados.paginacao);
+}
+
+function renderizarPaginacao(paginacao) {
+    let nav = document.getElementById('paginacao-pontos');
+    nav.innerHTML = '';
+
+    if (!paginacao || paginacao.total_paginas <= 1) {
+        return;
+    }
+
+    let lista = document.createElement('ul');
+    lista.className = 'pagination justify-content-center';
+
+    for (let pagina = 1; pagina <= paginacao.total_paginas; pagina++) {
+        let item = document.createElement('li');
+        item.className = `page-item ${pagina == paginacao.page ? 'active' : ''}`;
+
+        let link = document.createElement('a');
+        link.className = 'page-link';
+        link.href = '#';
+        link.textContent = pagina;
+
+        link.addEventListener('click', async (evento) => {
+            evento.preventDefault();
+            paginaAtual = pagina;
+            await listarPontosAprovados();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        item.appendChild(link);
+        lista.appendChild(item);
+    }
+
+    nav.appendChild(lista);
 }
 
 function criarCardPonto(ponto, logado) {
