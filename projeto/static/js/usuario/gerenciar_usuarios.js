@@ -1,8 +1,11 @@
-import { API_USUARIO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_USUARIO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 let usuarioLogado = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     await listarUsuarios();
 });
 

@@ -1,6 +1,9 @@
-import { mostrarMensagem, API_REDEFINICAO_URL, apiFetch } from '../main.js';
+import { mostrarMensagem, API_REDEFINICAO_URL, apiFetch, protegerRota } from '../main.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let podeAcessar = await protegerRota('visitante');
+    if (!podeAcessar) return;
+
     let olho1 = document.getElementById('eye-reset_senha');
     let olho2 = document.getElementById('eye-reset_confirmar_senha');
     olho1.src = '/static/img/default/open_eye.svg';

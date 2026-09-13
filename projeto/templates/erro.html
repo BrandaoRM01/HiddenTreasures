@@ -6,7 +6,11 @@
 <div class="text-center mt-5">
     <h1 class="display-4 text-danger">Erro</h1>
     <p class="lead">Você não tem permissão para acessar essa página.</p>
-    <a href="{{ url_for('pontos.index') }}" class="btn btn-primary">Voltar para Home</a>
+    <a id="botao-voltar" class="btn btn-primary">Voltar para Home</a>
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/erro.js') }}"></script>
+{% endblock js %}

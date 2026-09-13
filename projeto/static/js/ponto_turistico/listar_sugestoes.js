@@ -1,8 +1,11 @@
-import { API_PONTO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 const API_SUGESTOES_URL = `${API_PONTO_URL}/sugestoes`;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     await listarSugestoes();
 });
 

@@ -1,7 +1,10 @@
-import { API_PROMOCAO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PROMOCAO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarPromocoes } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formPromocoes = document.getElementById('form-promocoes');
 
     formPromocoes.addEventListener('submit', async (e) => {

@@ -1,7 +1,10 @@
-import { API_PONTO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarSugestoes } from './listar_sugestoes_usuario.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota('user');
+    if (!usuario) return;
+
     let form = document.getElementById('form-sugestao');
 
     form.addEventListener('submit', async (e) => {

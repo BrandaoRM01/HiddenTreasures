@@ -1,6 +1,9 @@
-import { API_USUARIO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_USUARIO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota('logado');
+    if (!usuario) return;
+
     await carregarPerfil();
 
     let olho1 = document.getElementById('eye-perfil_senha');

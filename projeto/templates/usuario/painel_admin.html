@@ -84,3 +84,7 @@
 </div>
 
 {% endblock conteudo %}
+
+{% block js %}
+<script type="module" src="{{ url_for('static', filename='js/usuario/painel_admin.js') }}"></script>
+{% endblock js %}

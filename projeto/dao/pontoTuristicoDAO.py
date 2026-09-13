@@ -721,8 +721,7 @@ class PontoTuristicoDAO(BaseDAO):
         self.__remover_destaques_ponto(cursor, id_ponto)
         self.__salvar_destaques_ponto(cursor, id_ponto, destaques_ids)
 
-    def listar_pontos_busca(self, busca=None, categoria=None, tipo=None, localizacao=None,
-                   status=None, apenas_aprovados=True, page=1, limit=10):
+    def listar_pontos_busca(self, busca=None, categoria=None, tipo=None, localizacao=None, status=None, apenas_aprovados=True, page=1, limit=10):
         condicoes = []
         valores = []
 
@@ -752,8 +751,8 @@ class PontoTuristicoDAO(BaseDAO):
 
         if limit < 1:
             limit = 10
-        elif limit > 100:
-            limit = 100
+        elif limit > 50:
+            limit = 50
 
         if page < 1:
             page = 1

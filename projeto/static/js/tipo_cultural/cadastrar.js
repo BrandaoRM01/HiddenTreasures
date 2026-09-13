@@ -1,7 +1,10 @@
-import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarTiposCulturais } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formTipoCultural = document.getElementById('form-tipo-cultural');
 
     formTipoCultural.addEventListener('submit', async (e) => {

@@ -1,6 +1,8 @@
-import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
 
     let id = window.location.pathname.split('/').pop();
     let voltar = document.getElementById('voltar');

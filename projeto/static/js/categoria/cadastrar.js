@@ -1,7 +1,10 @@
-import { API_CATEGORIA_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_CATEGORIA_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarCategorias } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formCategoria = document.getElementById('form-categoria');
 
     formCategoria.addEventListener('submit', async (e) => {

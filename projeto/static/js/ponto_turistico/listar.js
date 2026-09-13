@@ -1,8 +1,11 @@
-import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, API_CATEGORIA_URL, API_PROMOCAO_URL, API_ECOSSISTEMA_URL, API_TIPO_CULTURAL_URL, API_DESTAQUE_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 let paginaAtual = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     await listarPontos();
     await carregarCategorias();
     await carregarCategoriasFiltro();

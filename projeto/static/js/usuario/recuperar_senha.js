@@ -1,6 +1,9 @@
-import { mostrarMensagem, API_RECUPERACAO_URL, apiFetch } from '../main.js';
+import { mostrarMensagem, API_RECUPERACAO_URL, apiFetch, protegerRota } from '../main.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let podeAcessar = await protegerRota('visitante');
+    if (!podeAcessar) return;
+
     let voltarLogin = document.getElementById('voltar');
     voltarLogin.href = '/login';
 

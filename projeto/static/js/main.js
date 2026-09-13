@@ -436,3 +436,49 @@ export function criarDropdownFiltroStatus(filtroAtual, aoSelecionar) {
 
     return dropdown;
 }
+
+export async function protegerRota(permissoesPermitidas) {
+    let permissoes = Array.isArray(permissoesPermitidas) ? permissoesPermitidas : [permissoesPermitidas];
+
+    let token = localStorage.getItem('token');
+
+    if (permissoes.includes('visitante')) {
+        if (!token) return true;
+
+        let resposta = await apiFetch(`${API_USUARIO_URL}/me`);
+
+        if (resposta.ok) {
+            window.location.href = '/';
+            return false;
+        }
+
+        localStorage.removeItem('token');
+        return true;
+    }
+
+    if (!token) {
+        window.location.href = '/login';
+        return false;
+    }
+
+    let resposta = await apiFetch(`${API_USUARIO_URL}/me`);
+
+    if (!resposta.ok) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return false;
+    }
+
+    let usuario = await resposta.json();
+
+    if (permissoes.includes('logado')) {
+        return usuario;
+    }
+
+    if (permissoes.includes(usuario.tipo_usuario)) {
+        return usuario;
+    }
+
+    window.location.href = '/erro';
+    return false;
+}

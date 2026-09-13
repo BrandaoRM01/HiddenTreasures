@@ -9,6 +9,10 @@ controller = PontoTuristicoController()
 def index():
     return controller.preparar_index()
 
+@pontos_bp.route('/erro')
+def erro():
+    return controller.preparar_erro()
+
 @pontos_bp.route('/sobre')
 def sobre():
     return controller.preparar_sobre()

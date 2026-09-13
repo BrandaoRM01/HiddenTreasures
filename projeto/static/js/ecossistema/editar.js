@@ -1,6 +1,9 @@
-import { API_ECOSSISTEMA_URL, mostrarMensagem, apiFetch } from "../main.js";
+import { API_ECOSSISTEMA_URL, mostrarMensagem, apiFetch, protegerRota } from "../main.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formEditar = document.getElementById('form-editar');
     const voltar = document.getElementById('voltar');
     voltar.href = '/admin/gerenciar-ecossistemas';

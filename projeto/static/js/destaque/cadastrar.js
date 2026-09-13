@@ -1,7 +1,10 @@
-import { API_DESTAQUE_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_DESTAQUE_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarDestaques } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formDestaques = document.getElementById('form-destaques');
 
     formDestaques.addEventListener('submit', async (e) => {

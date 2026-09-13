@@ -20,6 +20,9 @@ class PontoTuristicoController:
     def __status_valido(self, status):
         return status in ['aprovado', 'rejeitado', 'pendente']
 
+    def preparar_erro(self):
+        return render_template('erro.html')
+
     def preparar_index(self):
         return render_template('ponto_turistico/index.html')
 

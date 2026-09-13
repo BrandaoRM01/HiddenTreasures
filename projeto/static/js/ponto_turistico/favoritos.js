@@ -1,6 +1,9 @@
-import { API_USUARIO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito, apiFetch } from '../main.js';
+import { API_USUARIO_URL, criarFaixaDestaques, criarAvaliacao, criarPreco, criarBotaoDetalhes, criarBotaoFavorito, apiFetch, protegerRota } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota('logado');
+    if (!usuario) return;
+
     await listarFavoritos();
 });
 

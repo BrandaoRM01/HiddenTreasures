@@ -1,6 +1,9 @@
-import { apiFetch, API_USUARIO_URL, mostrarMensagem } from '../main.js';
+import { apiFetch, API_USUARIO_URL, mostrarMensagem, protegerRota } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let podeAcessar = await protegerRota('visitante');
+    if (!podeAcessar) return;
+
     let formLogin = document.getElementById('form-login');
 
     let cadastro = document.getElementById('cadastro');

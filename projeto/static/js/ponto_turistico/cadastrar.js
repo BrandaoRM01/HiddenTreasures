@@ -1,7 +1,10 @@
-import { API_PONTO_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_PONTO_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarPontos } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     let form = document.getElementById('form-pontos');
 
     form.addEventListener('submit', async (e) => {

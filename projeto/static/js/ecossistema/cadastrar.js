@@ -1,7 +1,10 @@
-import { API_ECOSSISTEMA_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_ECOSSISTEMA_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 import { listarEcossistemas } from './listar.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     const formEcossistemas = document.getElementById('form-ecossistemas');
 
     formEcossistemas.addEventListener('submit', async (e) => {

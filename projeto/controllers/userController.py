@@ -61,7 +61,7 @@ class UserController:
         favoritos = [ponto.to_dict() for ponto in usuario.pontos_favoritos]
         return jsonify(favoritos), 200
 
-    @superadmin_required
+    @admin_required
     def listar_usuarios(self, usuario_logado):
         lista = self.__dao_usuario.listar_usuarios()
         usuarios = []

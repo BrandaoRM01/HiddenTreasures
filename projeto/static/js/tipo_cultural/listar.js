@@ -1,6 +1,9 @@
-import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch } from '../main.js';
+import { API_TIPO_CULTURAL_URL, mostrarMensagem, apiFetch, protegerRota } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let usuario = await protegerRota(['admin', 'superadmin']);
+    if (!usuario) return;
+
     await listarTiposCulturais();
 });
 
