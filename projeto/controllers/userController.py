@@ -188,7 +188,7 @@ class UserController:
         self.__dao_usuario.excluir_usuario(email)
 
         if proprio_perfil:
-            return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 204
+            return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 200
 
         return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 200
 
