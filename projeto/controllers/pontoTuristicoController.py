@@ -346,7 +346,7 @@ class PontoTuristicoController:
 
         self.__dao_pontos.excluir_ponto(id_ponto)
 
-        return jsonify({'mensagem': 'Ponto turístico excluído com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Ponto turístico excluído com sucesso!', 'classe': 'success'}), 200
 
     @login_required
     def editar_ponto(self, usuario, id_ponto):

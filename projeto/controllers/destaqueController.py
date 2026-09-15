@@ -45,7 +45,7 @@ class DestaqueController:
     def remover_destaque(self, usuario, id_destaque):
         self.__dao.remover_destaque(id_destaque)
 
-        return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_destaque(self, id_destaque):
         return render_template('destaque/editar_destaque.html')

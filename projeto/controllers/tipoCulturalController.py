@@ -45,7 +45,7 @@ class TipoCulturalController:
     def remover_tipo_cultural(self, usuario, id_tipo):
         self.__dao.remover_tipo_cultural(id_tipo)
 
-        return jsonify({'mensagem': 'Tipo cultural removido com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Tipo cultural removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_tipo(self, id_tipo):
         return render_template('tipo_cultural/editar_tipo_cultural.html')

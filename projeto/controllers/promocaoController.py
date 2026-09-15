@@ -100,7 +100,7 @@ class PromocaoController:
             return jsonify({'mensagem': 'Promoção não encontrada.', 'classe': 'danger'}), 404
 
         self.__dao.deletar_promocao(id)
-        return jsonify({'mensagem': 'Promoção removida com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Promoção removida com sucesso!', 'classe': 'success'}), 200
 
     @admin_required
     def editar_promocao(self, usuario, id):

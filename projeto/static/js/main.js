@@ -241,16 +241,22 @@ export function criarBotaoFavorito(ponto, aoAlternar) {
     botao.appendChild(coracao);
 
     botao.addEventListener('click', async () => {
-        let resposta = await apiFetch(`${API_USUARIO_URL}/favoritos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ponto_id: ponto.id })
-        });
+        let jaFavoritado = ponto.favorito;
+
+        let resposta = jaFavoritado
+            ? await apiFetch(`${API_USUARIO_URL}/favoritos/${ponto.id}`, {
+                method: 'DELETE'
+            })
+            : await apiFetch(`${API_USUARIO_URL}/favoritos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ponto_id: ponto.id })
+            });
 
         let dadosResposta = await resposta.json();
 
         if (resposta.ok) {
-            ponto.favorito = dadosResposta.favorito;
+            ponto.favorito = !jaFavoritado;
             atualizarCoracao(coracao, ponto.favorito);
 
             if (aoAlternar) {

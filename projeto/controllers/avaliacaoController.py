@@ -176,4 +176,4 @@ class AvaliacaoController:
 
         self.__dao_avaliacao.remover_avaliacao(usuario_email, ponto_id)
 
-        return jsonify({'mensagem': 'Avaliação removida com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Avaliação removida com sucesso!', 'classe': 'success'}), 200

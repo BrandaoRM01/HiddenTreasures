@@ -45,7 +45,7 @@ class EcossistemaController:
     def remover_ecossistema(self, usuario, id_ecossistema):
         self.__dao.remover_ecossistema(id_ecossistema)
 
-        return jsonify({'mensagem': 'Ecossistema removido com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Ecossistema removido com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_ecossistema(self, id_ecossistema):
         return render_template('ecossistema/editar_ecossistema.html')

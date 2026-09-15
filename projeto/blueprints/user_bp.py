@@ -58,5 +58,9 @@ def api_usuarios_me():
 @user_bp.route('/api/usuarios/favoritos', methods=['GET', 'POST'])
 def api_favoritos():
     if request.method == 'POST':
-        return controller.alterar_favorito()
+        return controller.marcar_favorito()
     return controller.listar_favoritos()
+
+@user_bp.route('/api/usuarios/favoritos/<int:ponto_id>', methods=['DELETE'])
+def api_favoritos_param(ponto_id):
+    return controller.remover_favorito(ponto_id)

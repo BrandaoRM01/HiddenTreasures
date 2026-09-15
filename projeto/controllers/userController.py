@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify
-from projeto.dao import UserDAO, HistoricoSenhaDAO
+from projeto.dao import UserDAO, HistoricoSenhaDAO, PontoTuristicoDAO
 from projeto.factorys import UsuarioFactory
 from projeto.models import User, HistoricoSenha, usuario
 from projeto.config import Config
@@ -14,6 +14,7 @@ class UserController:
     def __init__(self):
         self.__dao_usuario = UserDAO()
         self.__dao_historico_senha = HistoricoSenhaDAO()
+        self.__dao_ponto = PontoTuristicoDAO()
 
     def __verificar_senha(self, usuario, senha, senha_hash):
         if len(senha) < 8:
@@ -189,7 +190,7 @@ class UserController:
         if proprio_perfil:
             return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 204
 
-        return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 200
 
     @login_required
     def editar_usuario(self, usuario_logado, email):
@@ -309,23 +310,33 @@ class UserController:
         return jsonify({'mensagem': 'Usuário atualizado com sucesso!', 'classe': 'success'}), 200
 
     @login_required
-    def alterar_favorito(self, usuario):
+    def marcar_favorito(self, usuario):
         dados = request.get_json()
         ponto_id = dados.get('ponto_id')
 
         if not ponto_id:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Informe o ponto turístico que deseja favoritar.', 'classe': 'danger'}), 400
+
+        ponto = self.__dao_ponto.buscar_ponto_por_id(ponto_id)
+
+        if not ponto:
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         if self.__dao_usuario.verificar_favorito(usuario.email, ponto_id):
-            self.__dao_usuario.deletar_favorito(usuario.email, ponto_id)
-            favorito = False
-            mensagem = 'Ponto turístico desfavoritado com sucesso'
-        else:
-            self.__dao_usuario.adicionar_favorito(ponto_id, usuario.email)
-            favorito = True
-            mensagem = 'Ponto turístico favoritado com sucesso!'
+            return jsonify({'mensagem': 'Este ponto turístico já está nos seus favoritos.', 'classe': 'danger'}), 409
 
-        return jsonify({'mensagem': mensagem, 'classe': 'success', 'favorito': favorito}), 200
+        self.__dao_usuario.adicionar_favorito(ponto_id, usuario.email)
+
+        return jsonify({'mensagem': 'Ponto turístico favoritado com sucesso!', 'classe': 'success', 'favorito': True}), 201
+
+    @login_required
+    def remover_favorito(self, usuario, ponto_id):
+        if not self.__dao_usuario.verificar_favorito(usuario.email, ponto_id):
+            return jsonify({'mensagem': 'Este ponto turístico não está nos seus favoritos.', 'classe': 'danger'}), 404
+
+        self.__dao_usuario.deletar_favorito(usuario.email, ponto_id)
+
+        return jsonify({'mensagem': 'Ponto turístico desfavoritado com sucesso.', 'classe': 'success', 'favorito': False}), 200
 
     @login_required
     def buscar_usuario_por_email(self, usuario_logado, email):

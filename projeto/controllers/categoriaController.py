@@ -50,7 +50,7 @@ class CategoriaController:
     def remover_categoria(self, usuario, id_categoria):
         self.__dao.remover_categoria(id_categoria)
 
-        return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 204
+        return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 200
 
     def preparar_editar_categoria(self, id_categoria):
         return render_template('categoria/editar_categoria.html')
