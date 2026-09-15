@@ -27,7 +27,7 @@ class AvaliacaoController:
         ponto = self.__dao_ponto.buscar_ponto_por_id(ponto_id)
 
         if not ponto:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         usuario_email = None
         avaliacao_usuario = None
@@ -72,12 +72,12 @@ class AvaliacaoController:
         ponto = self.__dao_ponto.buscar_ponto_por_id(ponto_id)
 
         if not ponto:
-            return jsonify({'mensagem': 'Usuário ou ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Usuário ou ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         avaliacao_existente = self.__dao_avaliacao.buscar_avaliacao(usuario.email, ponto_id)
 
         if avaliacao_existente:
-            return jsonify({'mensagem': 'Você já avaliou este ponto turístico. Edite a avaliação existente ou remova-a antes de criar uma nova.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Você já avaliou este ponto turístico. Edite a avaliação existente ou remova-a antes de criar uma nova.', 'classe': 'danger'}), 409
 
         if not nota:
             return jsonify({'mensagem': 'A nota é obrigatória para cadastrar uma avaliação.', 'classe': 'danger'}), 400
@@ -107,7 +107,7 @@ class AvaliacaoController:
 
         mensagem = 'Avaliação cadastrada com sucesso!'
 
-        return jsonify({'mensagem': mensagem, 'classe': 'success'}), 200
+        return jsonify({'mensagem': mensagem, 'classe': 'success'}), 201
 
     @login_required
     def atualizar_avaliacao(self, usuario, ponto_id):
@@ -124,7 +124,7 @@ class AvaliacaoController:
         avaliacao = self.__dao_avaliacao.buscar_avaliacao(usuario_email, ponto_id)
 
         if not avaliacao:
-            return jsonify({'mensagem': 'Avaliação não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Avaliação não encontrada.', 'classe': 'danger'}), 404
 
         if not nota:
             return jsonify({'mensagem': 'A nota é obrigatória para atualizar a avaliação.', 'classe': 'danger'}), 400
@@ -172,8 +172,8 @@ class AvaliacaoController:
         avaliacao = self.__dao_avaliacao.buscar_avaliacao(usuario_email, ponto_id)
 
         if not avaliacao:
-            return jsonify({'mensagem': 'Avaliação não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Avaliação não encontrada.', 'classe': 'danger'}), 404
 
         self.__dao_avaliacao.remover_avaliacao(usuario_email, ponto_id)
 
-        return jsonify({'mensagem': 'Avaliação removida com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Avaliação removida com sucesso!', 'classe': 'success'}), 204

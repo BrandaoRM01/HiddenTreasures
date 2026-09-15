@@ -22,7 +22,7 @@ class PromocaoController:
         promocao = self.__dao.pegar_promocao_por_id(id)
 
         if not promocao:
-            return jsonify({'mensagem': 'promocao não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'promocao não encontrada.', 'classe': 'danger'}), 404
 
         return jsonify(promocao.to_dict()), 200
 
@@ -74,7 +74,7 @@ class PromocaoController:
             descricao = descricao.capitalize().strip()
 
         if self.__dao.buscar_promocao_por_titulo(titulo):
-            return jsonify({'mensagem': 'Já existe uma promoção com este título.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe uma promoção com este título.', 'classe': 'danger'}), 409
 
         if data_inicio >= data_fim:
             return jsonify({'mensagem': 'A data de início deve ser anterior à data de fim.', 'classe': 'danger'}), 400
@@ -91,22 +91,22 @@ class PromocaoController:
         )
 
         self.__dao.cadastrar_promocao(nova_promocao)
-        return jsonify({'mensagem': 'Promoção cadastrada com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Promoção cadastrada com sucesso!', 'classe': 'success'}), 201
 
     @admin_required
     def remover_promocao(self, usuario, id):
         promocao = self.__dao.pegar_promocao_por_id(id)
         if not promocao:
-            return jsonify({'mensagem': 'Promoção não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Promoção não encontrada.', 'classe': 'danger'}), 404
 
         self.__dao.deletar_promocao(id)
-        return jsonify({'mensagem': 'Promoção removida com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Promoção removida com sucesso!', 'classe': 'success'}), 204
 
     @admin_required
     def editar_promocao(self, usuario, id):
         promocao_atualizada = self.__dao.pegar_promocao_por_id(id)
         if not promocao_atualizada:
-            return jsonify({'mensagem': 'Promoção não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Promoção não encontrada.', 'classe': 'danger'}), 404
 
         dados = request.get_json()
         titulo = dados.get('titulo')
@@ -136,7 +136,7 @@ class PromocaoController:
 
         promocao_existente = self.__dao.buscar_promocao_por_titulo(titulo)
         if promocao_existente and promocao_existente.id != id:
-            return jsonify({'mensagem': 'Já existe uma promoção com este título.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe uma promoção com este título.', 'classe': 'danger'}), 409
 
         if data_inicio >= data_fim:
             return jsonify({'mensagem': 'A data de início deve ser anterior à data de fim.', 'classe': 'danger'}), 400

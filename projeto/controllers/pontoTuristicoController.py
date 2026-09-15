@@ -159,7 +159,7 @@ class PontoTuristicoController:
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         return jsonify(ponto.to_dict()), 200
 
@@ -174,7 +174,7 @@ class PontoTuristicoController:
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         favorito = False
         if usuario:
@@ -216,7 +216,7 @@ class PontoTuristicoController:
         nomes_pontos = self.__dao_pontos.buscar_nomes_pontos()
 
         if nome.capitalize().strip() in nomes_pontos:
-            return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 409
 
         if not custo_entrada:
             custo_entrada = 0.0
@@ -253,7 +253,7 @@ class PontoTuristicoController:
         categoria_dados = self.__dao_categorias.buscar_categoria_por_id(categoria_id)
 
         if not categoria_dados:
-            return jsonify({'mensagem': 'Categoria selecionada não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Categoria selecionada não encontrada.', 'classe': 'danger'}), 404
 
         categoria = CategoriaFactory.criar_categoria(
             id=categoria_dados['id'],
@@ -332,21 +332,21 @@ class PontoTuristicoController:
 
         self.__dao_pontos.cadastrar_ponto(novo_ponto, destaques_ids)
 
-        return jsonify({'mensagem': 'Ponto turístico cadastrado com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Ponto turístico cadastrado com sucesso!', 'classe': 'success'}), 201
 
     @login_required
     def remover_ponto(self, usuario, id_ponto):
         ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         if not usuario.pode_moderar() and usuario.email == ponto.sugerido_por and ponto.status == 'aprovado':
-            return jsonify({'mensagem': 'Você não pode excluir sua sugestão porque ela já foi aprovada!', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Você não pode excluir sua sugestão porque ela já foi aprovada!', 'classe': 'danger'}), 403
 
         self.__dao_pontos.excluir_ponto(id_ponto)
 
-        return jsonify({'mensagem': 'Ponto turístico excluído com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Ponto turístico excluído com sucesso!', 'classe': 'success'}), 204
 
     @login_required
     def editar_ponto(self, usuario, id_ponto):
@@ -392,13 +392,13 @@ class PontoTuristicoController:
         ponto_existente = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
 
         if not ponto_existente:
-            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         nomes_pontos = self.__dao_pontos.buscar_nomes_pontos()
         nome_atual = ponto_existente.nome
 
         if nome.capitalize().strip() in nomes_pontos and nome.capitalize().strip() != nome_atual:
-            return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Nome já cadastrado no sistema, tente outro!', 'classe': 'danger'}), 409
 
         if not usuario.pode_moderar():
             ponto_existente.status = 'pendente'
@@ -457,7 +457,7 @@ class PontoTuristicoController:
         categoria_dados = self.__dao_categorias.buscar_categoria_por_id(categoria_id)
 
         if not categoria_dados:
-            return jsonify({'mensagem': 'Categoria selecionada não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Categoria selecionada não encontrada.', 'classe': 'danger'}), 404
 
         categoria = CategoriaFactory.criar_categoria(
             id=categoria_dados['id'],

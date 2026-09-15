@@ -32,7 +32,7 @@ class CategoriaController:
             return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_categorias:
-            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         if not descricao:
             descricao = "Sem descrição"
@@ -44,13 +44,13 @@ class CategoriaController:
 
         self.__dao.cadastrar_categoria(nova_categoria)
 
-        return jsonify({'mensagem': 'Categoria cadastrada com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Categoria cadastrada com sucesso!', 'classe': 'success'}), 201
 
     @admin_required
     def remover_categoria(self, usuario, id_categoria):
         self.__dao.remover_categoria(id_categoria)
 
-        return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 204
 
     def preparar_editar_categoria(self, id_categoria):
         return render_template('categoria/editar_categoria.html')
@@ -60,7 +60,7 @@ class CategoriaController:
         categoria = self.__dao.buscar_categoria_por_id(id_categoria)
 
         if not categoria:
-            return jsonify({'mensagem': 'Categoria não encontrada.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Categoria não encontrada.', 'classe': 'danger'}), 404
 
         return jsonify(categoria), 200
 
@@ -78,7 +78,7 @@ class CategoriaController:
             return jsonify({'mensagem': 'O campo nome da categoria é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_categorias and nome.capitalize().strip() != categoria_atual['nome']:
-            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe uma categoria com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         if not descricao:
             descricao = "Sem descrição"

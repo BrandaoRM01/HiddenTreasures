@@ -31,7 +31,7 @@ class EcossistemaController:
             return jsonify({'mensagem': 'O campo nome do ecossistema é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_ecossistemas:
-            return jsonify({'mensagem': 'Já existe um ecossistema com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe um ecossistema com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         novo_ecossistema = EcossistemaFactory.criar_ecossistema(
             nome=nome.capitalize().strip()
@@ -39,13 +39,13 @@ class EcossistemaController:
 
         self.__dao.cadastrar_ecossistema(novo_ecossistema)
 
-        return jsonify({'mensagem': 'Ecossistema cadastrado com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Ecossistema cadastrado com sucesso!', 'classe': 'success'}), 201
 
     @admin_required
     def remover_ecossistema(self, usuario, id_ecossistema):
         self.__dao.remover_ecossistema(id_ecossistema)
 
-        return jsonify({'mensagem': 'Ecossistema removido com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Ecossistema removido com sucesso!', 'classe': 'success'}), 204
 
     def preparar_editar_ecossistema(self, id_ecossistema):
         return render_template('ecossistema/editar_ecossistema.html')
@@ -55,7 +55,7 @@ class EcossistemaController:
         ecossistema = self.__dao.buscar_ecossistema_por_id(id)
 
         if not ecossistema:
-            return jsonify({'mensagem': 'Ecossistema não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Ecossistema não encontrado.', 'classe': 'danger'}), 404
 
         return jsonify(ecossistema.to_dict()), 200
 
@@ -72,7 +72,7 @@ class EcossistemaController:
             return jsonify({'mensagem': 'O campo nome do ecossistema é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_ecossistemas and nome.capitalize().strip() != ecossistema_atual.nome:
-            return jsonify({'mensagem': 'Já existe um ecossistema com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe um ecossistema com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         ecossistema_atualizado = EcossistemaFactory.criar_ecossistema(
             nome=nome.capitalize().strip(),

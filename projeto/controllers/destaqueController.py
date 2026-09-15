@@ -31,7 +31,7 @@ class DestaqueController:
             return jsonify({'mensagem': 'O campo nome do destaque é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_destaques:
-            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         novo_destaque = DestaqueFactory.criar_destaque(
             nome=nome.capitalize().strip()
@@ -39,13 +39,13 @@ class DestaqueController:
 
         self.__dao.cadastrar_destaque(novo_destaque)
 
-        return jsonify({'mensagem': 'Destaque cadastrado com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Destaque cadastrado com sucesso!', 'classe': 'success'}), 201
 
     @admin_required
     def remover_destaque(self, usuario, id_destaque):
         self.__dao.remover_destaque(id_destaque)
 
-        return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 204
 
     def preparar_editar_destaque(self, id_destaque):
         return render_template('destaque/editar_destaque.html')
@@ -55,7 +55,7 @@ class DestaqueController:
         destaque = self.__dao.buscar_destaque_por_id(id)
 
         if not destaque:
-            return jsonify({'mensagem': 'Destaque não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Destaque não encontrado.', 'classe': 'danger'}), 404
 
         return jsonify(destaque.to_dict()), 200
 
@@ -72,7 +72,7 @@ class DestaqueController:
             return jsonify({'mensagem': 'O campo nome do destaque é obrigatório.', 'classe': 'danger'}), 400
 
         if nome.capitalize().strip() in nomes_destaques and nome.capitalize().strip() != destaque_atual.nome:
-            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Já existe um destaque com esse nome. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         destaque_atualizado = DestaqueFactory.criar_destaque(
             id=id_destaque,

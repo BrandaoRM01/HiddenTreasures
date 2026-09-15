@@ -88,7 +88,7 @@ class UserController:
         lista_usernames = self.__dao_usuario.pegar_usernames()
 
         if usuario:
-            return jsonify({'mensagem': 'Email já cadastrado. Por favor, use outro email ou faça login.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Email já cadastrado. Por favor, use outro email ou faça login.', 'classe': 'danger'}), 409
 
         if not email or not senha or not confirmar_senha or not username:
             return jsonify({'mensagem': 'Informe os campos que são obrigatórios.', 'classe': 'danger'}), 400
@@ -97,7 +97,7 @@ class UserController:
             return jsonify({'mensagem': 'Email inválido. Por favor, informe um email válido.', 'classe': 'danger'}), 400
 
         if username.capitalize().strip() in lista_usernames:
-            return jsonify({'mensagem': 'Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Nome de usuário já cadastrado. Por favor, escolha outro nome.', 'classe': 'danger'}), 409
 
         if senha != confirmar_senha:
             return jsonify({'mensagem': 'As senhas não coincidem. Por favor, tente novamente.', 'classe': 'danger'}), 400
@@ -136,7 +136,7 @@ class UserController:
         historico = HistoricoSenha(novo_usuario, senha_hash)
         self.__dao_historico_senha.inserir_nova_senha(historico)
 
-        return jsonify({'mensagem': 'Cadastro realizado com sucesso! Faça login para continuar.', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Cadastro realizado com sucesso! Faça login para continuar.', 'classe': 'success'}), 201
 
     def autenticar_usuario(self):
         dados = request.get_json()
@@ -152,13 +152,13 @@ class UserController:
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            return jsonify({'mensagem': 'Usuário não encontrado. Por favor, verifique o email e tente novamente.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Usuário não encontrado. Por favor, verifique o email e tente novamente.', 'classe': 'danger'}), 404
 
         if check_password_hash(usuario.senha_hash, senha):
             token = JWT.gerar_token(usuario)
             return jsonify({'mensagem': f'Bem vindo, {usuario.username}!', 'classe': 'success', 'token': token}), 200
 
-        return jsonify({'mensagem': 'Usuário ou senha incorretos. Por favor, tente novamente.', 'classe': 'danger'}), 400
+        return jsonify({'mensagem': 'Usuário ou senha incorretos. Por favor, tente novamente.', 'classe': 'danger'}), 401
 
     def logout_usuario(self):
         return jsonify({'mensagem': 'Logout realizado com sucesso.', 'classe': 'success'}), 200
@@ -179,7 +179,7 @@ class UserController:
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 404
 
         if not proprio_perfil and usuario.tipo_usuario() == 'superadmin':
             return jsonify({'mensagem': 'Não é possível excluir um superadmin.', 'classe': 'danger'}), 400
@@ -187,9 +187,9 @@ class UserController:
         self.__dao_usuario.excluir_usuario(email)
 
         if proprio_perfil:
-            return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 200
+            return jsonify({'mensagem': 'Perfil excluído com sucesso.', 'classe': 'success'}), 204
 
-        return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 200
+        return jsonify({'mensagem': 'Usuário excluído com sucesso.', 'classe': 'success'}), 204
 
     @login_required
     def editar_usuario(self, usuario_logado, email):
@@ -203,7 +203,7 @@ class UserController:
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 404
 
         tipo_usuario_recebido = request.form.get('tipo_usuario')
 
@@ -234,7 +234,7 @@ class UserController:
         username_ajustado = username.capitalize().strip()
 
         if username_ajustado in lista_usernames and username_ajustado != usuario.username:
-            return jsonify({'mensagem': 'Username já está em uso por outro usuário. Tente outro nome.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Username já está em uso por outro usuário. Tente outro nome.', 'classe': 'danger'}), 409
 
         senha_hash = usuario.senha_hash
         senha_alterada = False
@@ -334,6 +334,6 @@ class UserController:
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
 
         if not usuario:
-            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Usuário não encontrado.', 'classe': 'danger'}), 404
 
         return jsonify(usuario.to_dict()), 200

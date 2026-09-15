@@ -117,7 +117,7 @@ class HistoricoSenhaController:
         usuario = self.__dao.buscar_por_token(token)
 
         if not usuario:
-            return jsonify({'mensagem': 'Token inválido.', 'classe': 'danger'}), 400
+            return jsonify({'mensagem': 'Token inválido.', 'classe': 'danger'}), 404
 
         if usuario.token_expiracao and datetime.now() > usuario.token_expiracao:
             return jsonify({'mensagem': 'Token expirado.', 'classe': 'danger'}), 400
