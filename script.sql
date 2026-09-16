@@ -123,6 +123,9 @@ CREATE TABLE IF NOT EXISTS favoritos (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- VIEWS
+
+-- Lista todos os pontos turísticos com informações de categoria, promoção, ecossistema, tipo cultural, avaliações e destaques
 CREATE OR REPLACE VIEW vw_pontos_turisticos AS
 SELECT 
     p.id,
@@ -182,6 +185,7 @@ SELECT
         LEFT JOIN usuarios AS u ON a.usuario_email = u.email
         LEFT JOIN promocoes AS pr ON p.promocao_id = pr.id;
 
+-- Lista todas as avaliações com informações do usuário e do ponto turístico
 CREATE OR REPLACE VIEW vw_avaliacoes AS
 SELECT
     a.usuario_email,
@@ -202,6 +206,7 @@ SELECT
         INNER JOIN usuarios u ON a.usuario_email = u.email
         INNER JOIN pontos_turisticos p ON a.ponto_id = p.id;
 
+-- Lista apenas as informações básicas dos usuários
 CREATE OR REPLACE VIEW vw_usuarios_basicos AS
 SELECT 
     email,
@@ -210,6 +215,143 @@ SELECT
     tipo_usuario,
     senha_hash
 FROM usuarios;
+
+-- PROCEDURES
+
+-- Aprova ou rejeita um ponto turístico sugerido
+DELIMITER $$
+CREATE PROCEDURE alterar_status_ponto(IN p_id INT, IN p_status VARCHAR(20))
+BEGIN
+    IF p_status NOT IN ('pendente', 'aprovado', 'rejeitado') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro: status inválido. Use pendente, aprovado ou rejeitado.';
+    END IF;
+
+    UPDATE pontos_turisticos
+    SET status = p_status
+    WHERE id = p_id;
+END$$
+DELIMITER ;
+
+-- Altera o tipo de um usuário (user, admin ou superadmin)
+DELIMITER $$
+CREATE PROCEDURE alterar_tipo_usuario(IN p_email VARCHAR(150), IN p_novo_tipo VARCHAR(20))
+BEGIN
+    IF p_novo_tipo NOT IN ('user', 'admin', 'superadmin') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro: tipo de usuário inválido.';
+    END IF;
+
+    UPDATE usuarios
+    SET tipo_usuario = p_novo_tipo
+    WHERE email = p_email;
+END$$
+DELIMITER ;
+
+-- Lista os pontos turísticos aprovados de uma categoria
+DELIMITER $$
+CREATE PROCEDURE listar_pontos_por_categoria(IN p_categoria_id INT)
+BEGIN
+    SELECT p.nome, p.localizacao, p.custo_entrada, c.nome AS categoria
+    FROM pontos_turisticos AS p
+        INNER JOIN categorias AS c ON c.id = p.categoria_id
+    WHERE p.categoria_id = p_categoria_id
+        AND p.status = 'aprovado';
+END$$
+DELIMITER ;
+
+-- FUNCTIONS
+
+-- Média das avaliações aprovadas de um ponto turístico
+DELIMITER $$
+CREATE FUNCTION media_avaliacoes_ponto(p_ponto_id INT)
+RETURNS DECIMAL(3,2)
+DETERMINISTIC
+BEGIN
+    RETURN (
+        SELECT ROUND(AVG(nota), 2)
+        FROM avaliacoes
+        WHERE ponto_id = p_ponto_id
+            AND status = 'aprovado'
+    );
+END$$
+DELIMITER ;
+
+-- Quantidade de vezes que um ponto foi favoritado
+DELIMITER $$
+CREATE FUNCTION qtd_favoritos_ponto(p_ponto_id INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    RETURN (
+        SELECT COUNT(*)
+        FROM favoritos
+        WHERE ponto_id = p_ponto_id
+    );
+END$$
+DELIMITER ;
+
+-- Verifica se um ponto está com promoção ativa hoje
+DELIMITER $$
+CREATE FUNCTION ponto_em_promocao(p_ponto_id INT)
+RETURNS TINYINT(1)
+DETERMINISTIC
+BEGIN
+    DECLARE em_promocao TINYINT(1);
+
+    SELECT COUNT(*) > 0 INTO em_promocao
+    FROM pontos_turisticos AS p
+        INNER JOIN promocoes AS pr ON pr.id = p.promocao_id
+    WHERE p.id = p_ponto_id
+        AND CURDATE() BETWEEN pr.data_inicio AND IFNULL(pr.data_fim, CURDATE());
+
+    RETURN em_promocao;
+END$$
+DELIMITER ;
+
+-- TRIGGERS
+
+-- Impede cadastrar ponto turístico com custo de entrada negativo
+DELIMITER $$
+CREATE TRIGGER before_insert_custo_entrada
+BEFORE INSERT ON pontos_turisticos
+FOR EACH ROW
+BEGIN
+    IF NEW.custo_entrada < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro: custo de entrada não pode ser negativo.';
+    END IF;
+END$$
+DELIMITER ;
+
+-- Corrige automaticamente uma nota de avaliação fora do intervalo permitido
+DELIMITER $$
+CREATE TRIGGER before_update_nota_avaliacao
+BEFORE UPDATE ON avaliacoes
+FOR EACH ROW
+BEGIN
+    IF NEW.nota > 5 THEN
+        SET NEW.nota = 5;
+    ELSEIF NEW.nota < 1 THEN
+        SET NEW.nota = 1;
+    END IF;
+END$$
+DELIMITER ;
+
+-- Impede favoritar um ponto turístico que ainda não foi aprovado
+DELIMITER $$
+CREATE TRIGGER before_insert_favorito
+BEFORE INSERT ON favoritos
+FOR EACH ROW
+BEGIN
+    IF (SELECT status FROM pontos_turisticos WHERE id = NEW.ponto_id) <> 'aprovado' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro: só é possível favoritar pontos turísticos aprovados.';
+    END IF;
+END$$
+DELIMITER ;
+
+-- PERMISSÕES DE ACESSO DE USUÁRIOS
 
 CREATE USER 'superadmin'@'localhost'
 IDENTIFIED BY 'Super@dmin'; 
