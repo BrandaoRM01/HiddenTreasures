@@ -3,7 +3,6 @@ from flask import request, jsonify
 from projeto.config import JWT
 from projeto.dao import UserDAO
 
-
 def __extrair_usuario_do_token():
     auth_header = request.headers.get('Authorization')
 
