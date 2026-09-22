@@ -79,7 +79,7 @@ class PontoTuristicoDAO(BaseDAO):
         sql = """
             SELECT AVG(nota) AS media_avaliacao
             FROM avaliacoes
-            WHERE ponto_id = %s
+            WHERE ponto_id = %s AND status = 'aprovado'
         """
         valor = [ponto_id]
         media_avaliacao = None

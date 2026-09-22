@@ -463,6 +463,10 @@ export async function protegerRota(permissoesPermitidas) {
     }
 
     if (!token) {
+        sessionStorage.setItem('mensagemPendente', JSON.stringify({
+            mensagem: 'Você precisa estar logado para acessar essa página.',
+            classe: 'warning'
+        }));
         window.location.href = '/login';
         return false;
     }
@@ -471,6 +475,10 @@ export async function protegerRota(permissoesPermitidas) {
 
     if (!resposta.ok) {
         localStorage.removeItem('token');
+        sessionStorage.setItem('mensagemPendente', JSON.stringify({
+            mensagem: 'Sua sessão expirou. Faça login novamente.',
+            classe: 'warning'
+        }));
         window.location.href = '/login';
         return false;
     }
