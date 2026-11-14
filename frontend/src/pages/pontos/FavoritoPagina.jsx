@@ -14,7 +14,7 @@ function FavoritoPagina() {
             try {
                 setErro(null);
                 const res = await api.get("/api/usuarios/favoritos");
-                setPontos(res.data.map(ponto => ({...ponto, favorito: true})));
+                setPontos(res.data.map(ponto => ({ ...ponto, favorito: true })));
             } catch (error) {
                 setErro(mensagemDeErro(error));
             }
@@ -23,7 +23,7 @@ function FavoritoPagina() {
     }, [])
 
     function removerDaLista(idPonto, favorito) {
-        if(!favorito) {
+        if (!favorito) {
             setPontos(pontos.filter(p => p.id != idPonto));
         }
     }
