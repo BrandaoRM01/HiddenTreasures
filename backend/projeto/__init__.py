@@ -3,10 +3,12 @@ from projeto.config import Config
 from projeto.models import HistoricoSenha
 from projeto.dao import UserDAO, PromocaoDAO, HistoricoSenhaDAO
 from werkzeug.security import generate_password_hash
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
     from projeto.blueprints import user_bp, pontos_bp, categorias_bp, avaliacoes_bp, promocoes_bp, historico_senhas_bp, ecossistemas_bp, tipos_culturais_bp, destaques_bp
 
