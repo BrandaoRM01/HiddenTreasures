@@ -22,16 +22,16 @@ function PontoAdminPagina() {
             try {
                 setErro(null);
 
-                const params = {page: pagina, limit: 10};
+                const params = { page: pagina, limit: 10 };
 
                 Object.entries(filtros).forEach(([chave, valor]) => {
-                    if(valor) params[chave] = valor;
+                    if (valor) params[chave] = valor;
                 });
 
-                const res = await api.get("/api/pontos", {params});
+                const res = await api.get("/api/pontos", { params });
 
                 // apagou o último ponto de uma página que não é a primeira: volta uma página
-                if(res.data.pontos.length == 0 && pagina > 1) {
+                if (res.data.pontos.length == 0 && pagina > 1) {
                     setPagina(pagina - 1);
                     return;
                 }
@@ -53,7 +53,7 @@ function PontoAdminPagina() {
     }
 
     async function excluir(ponto) {
-        if(!window.confirm(`Tem certeza que deseja excluir o ponto turístico ${ponto.nome}?`)) {
+        if (!window.confirm(`Tem certeza que deseja excluir o ponto turístico ${ponto.nome}?`)) {
             return;
         }
 
@@ -68,15 +68,15 @@ function PontoAdminPagina() {
     }
 
     function renderizarLista() {
-        if(carregando) {
+        if (carregando) {
             return (<p className="text-muted mb-0">Carregando...</p>);
         }
 
-        if(erro) {
+        if (erro) {
             return null;
         }
 
-        if(pontos.length == 0) {
+        if (pontos.length == 0) {
             return (
                 <div className="text-center py-5">
                     <i className="bi bi-geo-alt display-1 text-secondary"></i>
