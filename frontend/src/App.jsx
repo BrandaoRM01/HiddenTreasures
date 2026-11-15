@@ -11,6 +11,9 @@ import PaginaErro from "./pages/geral/PaginaErro";
 import PontoPagina from "./pages/pontos/PontoPagina";
 import FavoritoPagina from "./pages/pontos/FavoritoPagina";
 import PontoAdminPagina from "./pages/pontos/PontoAdminPagina";
+import DetalhesPontoPagina from "./pages/pontos/DetalhesPontoPagina";
+import AvaliacoesPontoPagina from "./pages/avaliacoes/AvaliacoesPontoPagina";
+import EditarAvaliacaoPagina from "./pages/avaliacoes/EditarAvaliacaoPagina";
 import PontoCadastro from "./pages/pontos/PontoCadastro";
 import PontoAtualizar from "./pages/pontos/PontoAtualizar";
 import SugerirPontoPagina from "./pages/pontos/SugerirPontoPagina";
@@ -51,9 +54,9 @@ function App() {
           {/* Públicas (qualquer pessoa) */}
           <Route path="/" element={<HomePagina />} />
           <Route path="/pontos" element={<PontoPagina />} />
-          <Route path="/pontos/:id" element={<EmConstrucao titulo="Detalhes do Ponto" />} />
-          <Route path="/pontos/:id/avaliacoes" element={<EmConstrucao titulo="Avaliações do Ponto" />} />
-          <Route path="/pontos/:id/avaliacao/editar" element={<EmConstrucao titulo="Editar Avaliação" />} />
+          <Route path="/pontos/:id" element={<DetalhesPontoPagina />} />
+          <Route path="/pontos/:id/avaliacoes" element={<AvaliacoesPontoPagina />} />
+          <Route path="/pontos/:id/avaliacao/editar" element={<EditarAvaliacaoPagina />} />
           <Route path="/sobre" element={<SobrePagina />} />
           <Route path="/erro" element={<PaginaErro />} />
 
