@@ -1,14 +1,13 @@
 import { useState } from "react";
 
-// Input de senha com botão de mostrar/ocultar (substitui o toggle-password + olho do main.js)
-function CampoSenha({id, name, rotulo, valor, onChange, autoComplete}) {
+function CampoSenha({ id, name, rotulo, valor, onChange, autoComplete, obrigatorio = true }) {
     const [visivel, setVisivel] = useState(false);
 
     return (
         <>
             <div className="mb-3">
                 <label className="form-label" htmlFor={id}>
-                    {rotulo} <span className="text-danger">*</span>
+                    {rotulo} {obrigatorio && <span className="text-danger">*</span>}
                 </label>
 
                 <div className="input-group">

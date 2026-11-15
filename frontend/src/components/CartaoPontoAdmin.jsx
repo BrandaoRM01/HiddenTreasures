@@ -1,24 +1,20 @@
 import { urlEstatico } from "../services/api";
 import BadgeStatus from "./BadgeStatus";
 
-// Cartão de ponto das telas de admin (Pontos Turísticos e Sugestões): mesma estrutura do listar.js.
-//   detalhes:      linhas extras abaixo do tipo (promoção/avaliação nos pontos, "sugerido por" nas sugestões)
-//   classeBotoes:  classes do container dos botões (cada tela usa um alinhamento ligeiramente diferente)
-//   children:      os botões de ação
-function CartaoPontoAdmin({ponto, detalhes, classeBotoes, children}) {
+function CartaoPontoAdmin({ ponto, detalhes, classeBotoes, classeCartao = "card shadow-sm border-0", children }) {
     const tipoLabel = ponto.tipo_ponto.charAt(0).toUpperCase() + ponto.tipo_ponto.slice(1);
 
     return (
         <>
             <div className="col-12">
-                <div className="card shadow-sm border-0">
+                <div className={classeCartao}>
                     <div className="card-body">
                         <div className="row align-items-center">
 
                             <div className="col-lg-8">
                                 <div className="d-flex align-items-center gap-3">
                                     <img src={urlEstatico(ponto.url_imagem)} alt={ponto.nome} className="rounded shadow-sm"
-                                        style={{width: "100px", height: "100px", objectFit: "cover"}} />
+                                        style={{ width: "100px", height: "100px", objectFit: "cover" }} />
 
                                     <div>
                                         <h5 className="fw-bold mb-1">{ponto.nome}</h5>
