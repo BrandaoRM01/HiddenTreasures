@@ -37,7 +37,7 @@ function CategoriaAtualizar() {
     async function atualizar(dados) {
         const res = await api.put(`/api/categorias/${id}`, dados);
 
-        navigate("/admin/categorias", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/categorias", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     function categoriaParaForm(categoria) {
@@ -56,7 +56,6 @@ function CategoriaAtualizar() {
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {categoria && <CategoriaForm valorInicial={categoria} textoBotao="Salvar Alterações" onSalvar={atualizar} />}
             </div>
         </>

@@ -1,10 +1,9 @@
-// Recebe o objeto "paginacao" devolvido pela API ({ page, limit, total, total_paginas }).
-function Paginacao({paginacao, onMudar}) {
-    if(!paginacao || paginacao.total_paginas <= 1) {
+function Paginacao({ paginacao, onMudar }) {
+    if (!paginacao || paginacao.total_paginas <= 1) {
         return null;
     }
 
-    const paginas = Array.from({length: paginacao.total_paginas}, (_, i) => i + 1);
+    const paginas = Array.from({ length: paginacao.total_paginas }, (_, i) => i + 1);
 
     return (
         <>

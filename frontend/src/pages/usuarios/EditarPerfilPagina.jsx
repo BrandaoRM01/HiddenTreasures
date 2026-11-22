@@ -9,7 +9,7 @@ function EditarPerfilPagina() {
     const navigate = useNavigate();
 
     const [usuario, setUsuario] = useState(null);
-    const [form, setForm] = useState({username: "", senha: "", confirmar_senha: ""});
+    const [form, setForm] = useState({ username: "", senha: "", confirmar_senha: "" });
     const [foto, setFoto] = useState(null);
     const [preview, setPreview] = useState(null);
     const [carregando, setCarregando] = useState(false);
@@ -23,7 +23,7 @@ function EditarPerfilPagina() {
                 const res = await api.get("/api/usuarios/me");
 
                 setUsuario(res.data);
-                setForm(atual => ({...atual, username: res.data.username}));
+                setForm(atual => ({ ...atual, username: res.data.username }));
             } catch (error) {
                 setErro(mensagemDeErro(error));
             }
@@ -31,9 +31,8 @@ function EditarPerfilPagina() {
         carregarPerfil();
     }, [])
 
-    // preview da foto escolhida (e libera a URL temporária quando troca/sai da página)
     useEffect(() => {
-        if(!foto) {
+        if (!foto) {
             setPreview(null);
             return;
         }
@@ -45,29 +44,26 @@ function EditarPerfilPagina() {
     }, [foto])
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     async function salvar(e) {
         e.preventDefault();
 
-        // o backend lê request.form + request.files, então vai como FormData
         const dados = new FormData();
         Object.entries(form).forEach(([chave, valor]) => dados.append(chave, valor));
 
-        if(foto) {
+        if (foto) {
             dados.append("foto", foto);
         }
 
         try {
             setCarregando(true);
 
-            // "me" é o próprio usuário logado (o backend troca pelo email do token)
             const res = await api.put("/api/usuarios/me", dados);
 
-            // a NavBar busca o usuário de novo ao mudar de página, então já mostra o novo nome/foto
-            navigate("/", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+            navigate("/", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
         } catch (error) {
             mostrarMensagem(mensagemDeErro(error), "danger");
         } finally {
@@ -98,9 +94,9 @@ function EditarPerfilPagina() {
                                 <form onSubmit={salvar}>
 
                                     <div className="text-center mb-4">
-                                        <label htmlFor="foto-imagem" style={{cursor: "pointer"}}>
+                                        <label htmlFor="foto-imagem" style={{ cursor: "pointer" }}>
                                             <img src={preview ?? urlEstatico(usuario.url_foto)} alt="Foto de perfil" className="rounded-circle shadow"
-                                                style={{width: "110px", height: "110px", objectFit: "cover", objectPosition: "top"}} />
+                                                style={{ width: "110px", height: "110px", objectFit: "cover", objectPosition: "top" }} />
                                         </label>
 
                                         <input name="foto" type="file" hidden id="foto-imagem" accept="image/*"

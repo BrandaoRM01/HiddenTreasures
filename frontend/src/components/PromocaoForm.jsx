@@ -11,18 +11,13 @@ export const FORM_VAZIO = {
     data_fim: '',
 }
 
-// Formulário compartilhado do cadastro e da edição de promoção (igual ao editar_promocao.html).
-//   valorInicial: valores iniciais do form (a edição só renderiza depois de carregar a promoção)
-//   textoBotao:   texto do botão de salvar
-//   onSalvar:     async (dados) => ... ; se der erro, a mensagem do backend aparece como toast
-//                 (desconto fora de 1-100, datas inválidas, título repetido etc. vêm do backend)
-function PromocaoForm({valorInicial = FORM_VAZIO, textoBotao, onSalvar}) {
+function PromocaoForm({ valorInicial = FORM_VAZIO, textoBotao, onSalvar }) {
     const [form, setForm] = useState(valorInicial);
     const [carregando, setCarregando] = useState(false);
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     async function enviarForm(e) {

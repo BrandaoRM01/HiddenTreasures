@@ -1,9 +1,6 @@
 import { useState } from "react";
 
-// As 5 estrelas de nota (inicializarEstrelas do main.js): clique escolhe a nota e o mouse mostra uma prévia.
-//   valor:    nota atual (1 a 5, ou '' quando ainda não escolheu)
-//   onChange: recebe a nota escolhida
-function EstrelasNota({valor, onChange}) {
+function EstrelasNota({ valor, onChange }) {
     const [hover, setHover] = useState(null);
 
     const ativo = hover ?? (Number(valor) || 0);

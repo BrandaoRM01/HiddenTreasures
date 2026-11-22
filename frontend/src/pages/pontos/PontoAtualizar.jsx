@@ -5,9 +5,7 @@ import TituloAdmin from "../../components/TituloAdmin";
 import PontoForm, { pontoParaForm } from "../../components/PontoForm";
 import Alerta from "../../components/Alerta";
 
-// Edição de ponto (admin). A edição de sugestão do usuário reaproveita esta página
-// mudando só o título e a rota de volta (veja SugestaoAtualizar.jsx).
-function PontoAtualizar({titulo = "Editar Ponto Turístico", rotaVoltar = "/admin/pontos"}) {
+function PontoAtualizar({ titulo = "Editar Ponto Turístico", rotaVoltar = "/admin/pontos" }) {
     const navigate = useNavigate();
 
     const { id } = useParams();
@@ -39,7 +37,7 @@ function PontoAtualizar({titulo = "Editar Ponto Turístico", rotaVoltar = "/admi
     async function atualizar(dados) {
         const res = await api.put(`/api/pontos/${id}`, dados);
 
-        navigate(rotaVoltar, {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate(rotaVoltar, { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     return (
@@ -51,7 +49,6 @@ function PontoAtualizar({titulo = "Editar Ponto Turístico", rotaVoltar = "/admi
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {ponto && (
                     <PontoForm valorInicial={pontoParaForm(ponto)} imagemInicial={ponto.url_imagem} textoFoto="Trocar foto"
                         textoBotao="Salvar Alterações" rotaVoltar={rotaVoltar} onSalvar={atualizar} />

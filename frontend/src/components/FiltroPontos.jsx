@@ -13,7 +13,6 @@ function FiltroPontos({ onFiltrar }) {
                 const res = await api.get("/api/categorias");
                 setCategorias(res.data);
             } catch (error) {
-                // sem as categorias o filtro continua funcionando, só fica sem as opções do select
             }
         }
         carregarCategorias();

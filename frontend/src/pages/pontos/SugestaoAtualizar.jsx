@@ -1,6 +1,5 @@
 import PontoAtualizar from "./PontoAtualizar";
 
-// Mesma tela de edição do ponto, só que para o usuário comum editar a própria sugestão.
 function SugestaoAtualizar() {
     return (
         <>

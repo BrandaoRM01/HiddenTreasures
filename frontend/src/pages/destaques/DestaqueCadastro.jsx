@@ -9,8 +9,7 @@ function DestaqueCadastro() {
     async function salvar(dados) {
         const res = await api.post("/api/destaques", dados);
 
-        // volta para a lista e mostra a mensagem do backend como toast
-        navigate("/admin/destaques", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/destaques", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     return (

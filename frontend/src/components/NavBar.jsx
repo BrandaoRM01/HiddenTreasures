@@ -7,17 +7,15 @@ function NavBar() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // undefined = ainda carregando, null = visitante, objeto = usuário logado
     const [usuario, setUsuario] = useState(undefined);
     const [menuAberto, setMenuAberto] = useState(false);
     const [dropdownAberto, setDropdownAberto] = useState(false);
 
-    // Igual ao nav.js do sistema atual: a cada página, confere o token em /api/usuarios/me
     useEffect(() => {
         let ativo = true;
 
         async function carregarUsuario() {
-            if(!localStorage.getItem("token")) {
+            if (!localStorage.getItem("token")) {
                 setUsuario(null);
                 return;
             }
@@ -25,15 +23,15 @@ function NavBar() {
             try {
                 const res = await api.get("/api/usuarios/me");
 
-                if(ativo) {
+                if (ativo) {
                     setUsuario(res.data);
                 }
             } catch (error) {
-                if(error.response) {
+                if (error.response) {
                     localStorage.removeItem("token");
                 }
 
-                if(ativo) {
+                if (ativo) {
                     setUsuario(null);
                 }
             }
@@ -52,25 +50,23 @@ function NavBar() {
     async function sair(e) {
         e.preventDefault();
 
-        // o logout no sistema é só limpar o token; se a API falhar, sai do mesmo jeito
-        let aviso = {mensagem: "Logout realizado com sucesso.", classe: "success"};
+        let aviso = { mensagem: "Logout realizado com sucesso.", classe: "success" };
 
         try {
             const res = await api.post("/logout");
-            aviso = {mensagem: res.data.mensagem, classe: res.data.classe};
+            aviso = { mensagem: res.data.mensagem, classe: res.data.classe };
         } catch (error) {
-            // mantém a mensagem padrão
         }
 
         localStorage.removeItem("token");
         setUsuario(null);
-        navigate("/", {state: aviso});
+        navigate("/", { state: aviso });
     }
 
     async function excluirPerfil(e) {
         e.preventDefault();
 
-        if(!window.confirm("Tem certeza que deseja excluir seu perfil?")) {
+        if (!window.confirm("Tem certeza que deseja excluir seu perfil?")) {
             return;
         }
 
@@ -79,7 +75,7 @@ function NavBar() {
 
             localStorage.removeItem("token");
             setUsuario(null);
-            navigate("/", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+            navigate("/", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
         } catch (error) {
             mostrarMensagem(mensagemDeErro(error), "danger");
         }
@@ -128,7 +124,6 @@ function NavBar() {
                             )}
                         </ul>
 
-                        {/* botões usam Link (e não NavLink): o NavLink põe a classe "active" e o botão fica azul/pressionado */}
                         {usuario === null && (
                             <div className="d-flex gap-2">
                                 <Link to="/login" className="btn btn-outline-primary">Login</Link>
@@ -141,7 +136,7 @@ function NavBar() {
                                 <a href="#" className="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                                     onClick={(e) => { e.preventDefault(); setDropdownAberto(!dropdownAberto); }}>
                                     <img src={urlEstatico(usuario.url_foto)} alt="Foto de perfil" className="rounded-circle"
-                                        width="38" height="38" style={{objectFit: "cover"}} />
+                                        width="38" height="38" style={{ objectFit: "cover" }} />
                                     <span className="ms-2">{usuario.username}</span>
                                 </a>
 

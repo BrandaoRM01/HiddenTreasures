@@ -28,7 +28,6 @@ function SugerirPontoPagina() {
         carregarSugestoes();
     }, [recarregar])
 
-    // o backend cadastra como "pendente" (quem não é admin só consegue sugerir)
     async function sugerir(dados) {
         const res = await api.post("/api/pontos", dados);
 
@@ -37,7 +36,7 @@ function SugerirPontoPagina() {
     }
 
     async function excluir(ponto) {
-        if(!window.confirm(`Tem certeza que deseja excluir a sugestão ${ponto.nome}?`)) {
+        if (!window.confirm(`Tem certeza que deseja excluir a sugestão ${ponto.nome}?`)) {
             return;
         }
 
@@ -61,15 +60,15 @@ function SugerirPontoPagina() {
     );
 
     function renderizarLista() {
-        if(carregando) {
+        if (carregando) {
             return (<p className="text-muted mb-0">Carregando...</p>);
         }
 
-        if(erro) {
+        if (erro) {
             return null;
         }
 
-        if(sugestoes.length == 0) {
+        if (sugestoes.length == 0) {
             return (
                 <div className="text-center py-5">
                     <i className="bi bi-map display-1 text-secondary"></i>

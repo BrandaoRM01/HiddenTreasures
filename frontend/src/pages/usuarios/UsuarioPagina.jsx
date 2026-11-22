@@ -36,14 +36,13 @@ function UsuarioPagina() {
     async function alterarPermissao(usuario) {
         let novoTipo = usuario.tipo_usuario == "admin" ? "user" : "admin";
 
-        // o backend lê o tipo pelo request.form, então vai como FormData
         let dados = new FormData();
         dados.append("tipo_usuario", novoTipo);
 
         try {
             const res = await api.put(`/api/usuarios/${usuario.email}`, dados);
 
-            setUsuarios(usuarios.map(u => u.email == usuario.email ? {...u, tipo_usuario: novoTipo} : u));
+            setUsuarios(usuarios.map(u => u.email == usuario.email ? { ...u, tipo_usuario: novoTipo } : u));
             mostrarMensagem(res.data.mensagem, res.data.classe);
         } catch (error) {
             mostrarMensagem(mensagemDeErro(error), "danger");
@@ -51,7 +50,7 @@ function UsuarioPagina() {
     }
 
     async function excluir(usuario) {
-        if(!window.confirm(`Tem certeza que deseja excluir o usuário ${usuario.username}?`)) {
+        if (!window.confirm(`Tem certeza que deseja excluir o usuário ${usuario.username}?`)) {
             return;
         }
 
@@ -65,11 +64,10 @@ function UsuarioPagina() {
         }
     }
 
-    // só o superadmin gerencia, e nunca outro superadmin
     function acoesDoUsuario(usuario) {
         let podeGerenciar = usuarioLogado?.tipo_usuario == "superadmin" && usuario.tipo_usuario != "superadmin";
 
-        if(!podeGerenciar) {
+        if (!podeGerenciar) {
             return null;
         }
 
@@ -88,15 +86,15 @@ function UsuarioPagina() {
     }
 
     function renderizarLista() {
-        if(carregando) {
+        if (carregando) {
             return (<p className="text-muted mb-0">Carregando...</p>);
         }
 
-        if(erro) {
+        if (erro) {
             return null;
         }
 
-        if(listaFiltrada.length == 0) {
+        if (listaFiltrada.length == 0) {
             return (<p className="text-muted text-center py-4 mb-0">Nenhum usuário encontrado.</p>);
         }
 
@@ -104,7 +102,7 @@ function UsuarioPagina() {
             <LinhaLista key={usuario.email} py="py-2" acoes={acoesDoUsuario(usuario)}>
                 <div className="d-flex align-items-center">
                     <img src={urlEstatico(usuario.url_foto)} alt={usuario.username} width="40" height="40"
-                        style={{objectFit: "cover"}} className="rounded-circle me-2" />
+                        style={{ objectFit: "cover" }} className="rounded-circle me-2" />
 
                     <div>
                         <strong>{usuario.username}</strong><br />

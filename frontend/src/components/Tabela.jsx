@@ -1,12 +1,7 @@
 import { NavLink } from "react-router-dom";
 
-// Tabela genérica usada por todas as listagens do sistema.
-//   colunas:    [{ titulo, campo }] ou [{ titulo, render: (item) => JSX }]
-//   rotaEditar: (item) => "/rota" (se devolver vazio, o botão Editar não aparece naquela linha)
-//   onDelete:   (item) => void (se não for passado, a coluna Excluir não existe)
-function Tabela({colunas, itens, rotaEditar, onDelete, vazio = "Nenhum registro encontrado."}) {
-    if(itens.length == 0)
-    {
+function Tabela({ colunas, itens, rotaEditar, onDelete, vazio = "Nenhum registro encontrado." }) {
+    if (itens.length == 0) {
         return (<><p className="text-muted">{vazio}</p></>);
     }
 
@@ -24,21 +19,21 @@ function Tabela({colunas, itens, rotaEditar, onDelete, vazio = "Nenhum registro 
                         </tr>
                     </thead>
                     <tbody>
-                    {
-                        itens.map(item => {
-                            const rota = rotaEditar ? rotaEditar(item) : null;
+                        {
+                            itens.map(item => {
+                                const rota = rotaEditar ? rotaEditar(item) : null;
 
-                            return (
-                                <tr key={item.id ?? item.email}>
-                                    {colunas.map(coluna => (
-                                        <td key={coluna.titulo}>{coluna.render ? coluna.render(item) : item[coluna.campo]}</td>
-                                    ))}
-                                    {rotaEditar && <td>{rota && <NavLink className="btn btn-warning" to={rota}>Editar</NavLink>}</td>}
-                                    {onDelete && <td><button onClick={() => onDelete(item)} className="btn btn-danger">Excluir</button></td>}
-                                </tr>
-                            );
-                        })
-                    }
+                                return (
+                                    <tr key={item.id ?? item.email}>
+                                        {colunas.map(coluna => (
+                                            <td key={coluna.titulo}>{coluna.render ? coluna.render(item) : item[coluna.campo]}</td>
+                                        ))}
+                                        {rotaEditar && <td>{rota && <NavLink className="btn btn-warning" to={rota}>Editar</NavLink>}</td>}
+                                        {onDelete && <td><button onClick={() => onDelete(item)} className="btn btn-danger">Excluir</button></td>}
+                                    </tr>
+                                );
+                            })
+                        }
                     </tbody>
                 </table>
             </div>

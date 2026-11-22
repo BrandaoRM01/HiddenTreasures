@@ -16,7 +16,6 @@ function PontoAdminPagina() {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
 
-    // busca e paginação são feitas pela API; só consulta de novo ao clicar em "Filtrar" ou trocar de página
     useEffect(() => {
         async function carregarPontos() {
             try {
@@ -30,7 +29,6 @@ function PontoAdminPagina() {
 
                 const res = await api.get("/api/pontos", { params });
 
-                // apagou o último ponto de uma página que não é a primeira: volta uma página
                 if (res.data.pontos.length == 0 && pagina > 1) {
                     setPagina(pagina - 1);
                     return;

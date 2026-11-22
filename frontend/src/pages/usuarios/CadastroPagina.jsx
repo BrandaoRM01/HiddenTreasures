@@ -20,9 +20,8 @@ function CadastroPagina() {
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(false);
 
-    // preview da foto escolhida (e libera a URL temporária quando troca/sai da página)
     useEffect(() => {
-        if(!foto) {
+        if (!foto) {
             setPreview(null);
             return;
         }
@@ -34,19 +33,17 @@ function CadastroPagina() {
     }, [foto])
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     async function cadastrar(e) {
         e.preventDefault();
 
-        // o backend lê request.form + request.files, então vai como FormData
-        // (o axios coloca o Content-Type multipart sozinho)
         const dados = new FormData();
         Object.entries(form).forEach(([chave, valor]) => dados.append(chave, valor));
 
-        if(foto) {
+        if (foto) {
             dados.append("foto", foto);
         }
 
@@ -56,7 +53,7 @@ function CadastroPagina() {
 
             const res = await api.post("/api/usuarios", dados);
 
-            navigate("/login", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+            navigate("/login", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
         } catch (error) {
             setErro(mensagemDeErro(error));
         } finally {
@@ -76,10 +73,10 @@ function CadastroPagina() {
                         <form onSubmit={cadastrar}>
                             <div className="row align-items-start mb-3">
                                 <div className="col-md-4 text-center mb-3 mb-md-0">
-                                    <label htmlFor="foto" style={{cursor: "pointer"}}>
+                                    <label htmlFor="foto" style={{ cursor: "pointer" }}>
                                         <img src={preview ?? urlEstatico("img/default/user_foto.webp")} alt="Foto de perfil"
                                             className="rounded-circle shadow"
-                                            style={{width: 100, height: 100, objectFit: "cover", objectPosition: "top"}} />
+                                            style={{ width: 100, height: 100, objectFit: "cover", objectPosition: "top" }} />
                                     </label>
 
                                     <input id="foto" type="file" hidden accept="image/*"

@@ -4,11 +4,11 @@ import CardPonto from "../../components/CardPonto";
 import Paginacao from "../../components/Paginacao";
 import Alerta from "../../components/Alerta";
 
-const FILTROS_VAZIOS = {busca: "", categoria: "", tipo: "", localizacao: ""};
+const FILTROS_VAZIOS = { busca: "", categoria: "", tipo: "", localizacao: "" };
 
 function PontoPagina() {
-    const [form, setForm] = useState(FILTROS_VAZIOS);        // o que está digitado
-    const [filtros, setFiltros] = useState(FILTROS_VAZIOS);  // o que foi aplicado (botão Filtrar)
+    const [form, setForm] = useState(FILTROS_VAZIOS);
+    const [filtros, setFiltros] = useState(FILTROS_VAZIOS);
     const [pagina, setPagina] = useState(1);
 
     const [categorias, setCategorias] = useState([]);
@@ -34,13 +34,13 @@ function PontoPagina() {
             try {
                 setErro(null);
 
-                const params = {status: "aprovado", page: pagina, limit: 9};
-                if(filtros.busca.trim()) params.busca = filtros.busca.trim();
-                if(filtros.categoria) params.categoria = filtros.categoria;
-                if(filtros.tipo) params.tipo = filtros.tipo;
-                if(filtros.localizacao.trim()) params.localizacao = filtros.localizacao.trim();
+                const params = { status: "aprovado", page: pagina, limit: 9 };
+                if (filtros.busca.trim()) params.busca = filtros.busca.trim();
+                if (filtros.categoria) params.categoria = filtros.categoria;
+                if (filtros.tipo) params.tipo = filtros.tipo;
+                if (filtros.localizacao.trim()) params.localizacao = filtros.localizacao.trim();
 
-                const res = await api.get("/api/pontos", {params});
+                const res = await api.get("/api/pontos", { params });
 
                 setPontos(res.data.pontos);
                 setLogado(res.data.logado);
@@ -53,8 +53,8 @@ function PontoPagina() {
     }, [filtros, pagina])
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     function filtrar(e) {
@@ -65,7 +65,7 @@ function PontoPagina() {
 
     function mudarPagina(novaPagina) {
         setPagina(novaPagina);
-        window.scrollTo({top: 0, behavior: "smooth"});
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     return (

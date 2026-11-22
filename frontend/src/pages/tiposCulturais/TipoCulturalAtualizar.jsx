@@ -37,7 +37,7 @@ function TipoCulturalAtualizar() {
     async function atualizar(dados) {
         const res = await api.put(`/api/tipos_culturais/${id}`, dados);
 
-        navigate("/admin/tipos-culturais", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/tipos-culturais", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     function tipoCulturalParaForm(tipoCultural) {
@@ -55,7 +55,6 @@ function TipoCulturalAtualizar() {
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {tipoCultural && <TipoCulturalForm valorInicial={tipoCultural} textoBotao="Salvar Alterações" onSalvar={atualizar} />}
             </div>
         </>

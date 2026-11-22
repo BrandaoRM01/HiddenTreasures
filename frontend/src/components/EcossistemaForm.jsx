@@ -7,17 +7,13 @@ export const FORM_VAZIO = {
     nome: '',
 }
 
-// Formulário compartilhado do cadastro e da edição de ecossistema (igual ao editar_ecossistema.html).
-//   valorInicial: valores iniciais do form (a edição só renderiza depois de carregar o registro)
-//   textoBotao:   texto do botão de salvar
-//   onSalvar:     async (dados) => ... ; se der erro, a mensagem do backend aparece como toast
-function EcossistemaForm({valorInicial = FORM_VAZIO, textoBotao, onSalvar}) {
+function EcossistemaForm({ valorInicial = FORM_VAZIO, textoBotao, onSalvar }) {
     const [form, setForm] = useState(valorInicial);
     const [carregando, setCarregando] = useState(false);
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     async function enviarForm(e) {

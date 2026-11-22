@@ -6,14 +6,10 @@ import BadgeAvaliacao from "./BadgeAvaliacao";
 function formatarData(dataIso) {
     const data = new Date(dataIso);
 
-    return `${data.toLocaleDateString("pt-BR")} ${data.toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"})}`;
+    return `${data.toLocaleDateString("pt-BR")} ${data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
-// Card de uma avaliação (usado nos detalhes do ponto e na lista de avaliações).
-//   souVoce:       é a avaliação do usuário logado (borda azul, "(Você)", editar e excluir)
-//   usuarioAdmin:  quem está vendo é admin (vê o status, aprova/rejeita as pendentes e exclui qualquer uma)
-//   aoExcluir(email, username) / aoAlterarStatus(avaliacao, status): ações (o pai recarrega a lista)
-function CardAvaliacao({avaliacao, idPonto, souVoce = false, usuarioAdmin = false, aoExcluir, aoAlterarStatus}) {
+function CardAvaliacao({ avaliacao, idPonto, souVoce = false, usuarioAdmin = false, aoExcluir, aoAlterarStatus }) {
     const usuario = avaliacao.usuario;
 
     return (
@@ -24,7 +20,7 @@ function CardAvaliacao({avaliacao, idPonto, souVoce = false, usuarioAdmin = fals
                     <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center mb-2">
                             <img src={urlEstatico(usuario.url_foto)} alt={usuario.username} className="rounded-circle me-2"
-                                width="40" height="40" style={{objectFit: "cover"}} />
+                                width="40" height="40" style={{ objectFit: "cover" }} />
 
                             <div>
                                 <strong>{souVoce ? `${usuario.username} (Você)` : usuario.username}</strong><br />
@@ -51,12 +47,14 @@ function CardAvaliacao({avaliacao, idPonto, souVoce = false, usuarioAdmin = fals
                                 {avaliacao.status == "pendente" && (
                                     <Dropdown classeBotao="btn btn-sm btn-light" rotuloBotao={<i className="bi bi-three-dots-vertical"></i>}
                                         itens={[
-                                            {texto: "Aprovar", classe: "text-success", onClick: () => aoAlterarStatus(avaliacao, "aprovado")},
-                                            {texto: "Rejeitar", classe: "text-danger", onClick: () => {
-                                                if(window.confirm(`Deseja realmente rejeitar a avaliação de ${usuario.username}?`)) {
-                                                    aoAlterarStatus(avaliacao, "rejeitado");
+                                            { texto: "Aprovar", classe: "text-success", onClick: () => aoAlterarStatus(avaliacao, "aprovado") },
+                                            {
+                                                texto: "Rejeitar", classe: "text-danger", onClick: () => {
+                                                    if (window.confirm(`Deseja realmente rejeitar a avaliação de ${usuario.username}?`)) {
+                                                        aoAlterarStatus(avaliacao, "rejeitado");
+                                                    }
                                                 }
-                                            }},
+                                            },
                                         ]} />
                                 )}
 

@@ -1,5 +1,4 @@
-// Cabeçalho das páginas "Gerenciar ..." (h1 centralizado, igual aos templates).
-function TituloAdmin({titulo, subtitulo}) {
+function TituloAdmin({ titulo, subtitulo }) {
     return (
         <>
             <div className="text-center mb-5">

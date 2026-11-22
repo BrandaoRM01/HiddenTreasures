@@ -37,7 +37,7 @@ function DestaqueAtualizar() {
     async function atualizar(dados) {
         const res = await api.put(`/api/destaques/${id}`, dados);
 
-        navigate("/admin/destaques", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/destaques", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     function destaqueParaForm(destaque) {
@@ -55,7 +55,6 @@ function DestaqueAtualizar() {
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {destaque && <DestaqueForm valorInicial={destaque} textoBotao="Salvar Alterações" onSalvar={atualizar} />}
             </div>
         </>

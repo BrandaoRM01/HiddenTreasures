@@ -14,35 +14,34 @@ function capitalizar(texto) {
     return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-// as datas da promoção chegam como YYYY-MM-DD; formatar pela string evita o "dia a menos" do new Date() no fuso do Brasil
 function formatarDataSimples(dataIso) {
     const [ano, mes, dia] = dataIso.slice(0, 10).split("-");
     return `${dia}/${mes}/${ano}`;
 }
 
-function Linha({rotulo, valor}) {
+function Linha({ rotulo, valor }) {
     return (<p><strong>{rotulo}: </strong>{valor}</p>);
 }
 
-function BlocoPromocao({promocao, custoEntrada}) {
+function BlocoPromocao({ promocao, custoEntrada }) {
     return (
-        <div className="mt-2 p-3" style={{backgroundColor: "#f8f9fa", borderLeft: "4px solid #d63384", borderRadius: "8px"}}>
+        <div className="mt-2 p-3" style={{ backgroundColor: "#f8f9fa", borderLeft: "4px solid #d63384", borderRadius: "8px" }}>
             <h5 className="mb-1"><strong>{promocao.titulo}</strong></h5>
 
             <p className="mb-1">{promocao.descricao || "Sem descrição"}</p>
 
-            <p style={{fontSize: "0.9rem", color: "#555", marginTop: "4px"}}>
+            <p style={{ fontSize: "0.9rem", color: "#555", marginTop: "4px" }}>
                 Promoção válida de {formatarDataSimples(promocao.data_inicio)} até {formatarDataSimples(promocao.data_fim)}
             </p>
 
             <p className="mb-0">
                 {custoEntrada ? (
                     <>
-                        <span style={{textDecoration: "line-through", color: "#999"}}>R$ {custoEntrada.toFixed(2)}</span>
-                        <span style={{color: "#d63384", fontWeight: "bold"}}> R$ {(custoEntrada * (1 - Number(promocao.desconto) / 100)).toFixed(2)}</span>
+                        <span style={{ textDecoration: "line-through", color: "#999" }}>R$ {custoEntrada.toFixed(2)}</span>
+                        <span style={{ color: "#d63384", fontWeight: "bold" }}> R$ {(custoEntrada * (1 - Number(promocao.desconto) / 100)).toFixed(2)}</span>
                     </>
                 ) : (
-                    <span style={{color: "#d63384", fontWeight: "bold"}}>Gratuito</span>
+                    <span style={{ color: "#d63384", fontWeight: "bold" }}>Gratuito</span>
                 )}
             </p>
         </div>
@@ -64,7 +63,6 @@ function DetalhesPontoPagina() {
     const [filtroStatus, setFiltroStatus] = useState("");
     const [recarregar, setRecarregar] = useState(0);
 
-    // formulário "Avaliar este lugar"
     const [nota, setNota] = useState("");
     const [comentario, setComentario] = useState("");
 
@@ -78,9 +76,8 @@ function DetalhesPontoPagina() {
                 setPonto(res.data);
             }
             catch (error) {
-                // ponto inexistente: volta para a lista, como no sistema atual
-                if(error.response) {
-                    navigate("/pontos", {replace: true});
+                if (error.response) {
+                    navigate("/pontos", { replace: true });
                     return;
                 }
 
@@ -94,20 +91,18 @@ function DetalhesPontoPagina() {
         carregarPonto();
     }, [id])
 
-    // avaliações (só de ponto aprovado). Quem não é admin só recebe as aprovadas
     useEffect(() => {
-        if(!ponto || ponto.status != "aprovado" || moderador === null) {
+        if (!ponto || ponto.status != "aprovado" || moderador === null) {
             return;
         }
 
         async function carregarAvaliacoes() {
             try {
-                const params = moderador ? {} : {status: "aprovado"};
-                const res = await api.get(`/api/avaliacoes/ponto/${id}`, {params});
+                const params = moderador ? {} : { status: "aprovado" };
+                const res = await api.get(`/api/avaliacoes/ponto/${id}`, { params });
 
                 setDadosAvaliacoes(res.data);
             } catch (error) {
-                // sem as avaliações a página continua funcionando, só não mostra a seção
             }
         }
 
@@ -117,13 +112,13 @@ function DetalhesPontoPagina() {
     async function enviarAvaliacao(e) {
         e.preventDefault();
 
-        if(!nota) {
+        if (!nota) {
             mostrarMensagem("Selecione uma nota antes de enviar.", "danger");
             return;
         }
 
         try {
-            const res = await api.post(`/api/avaliacoes/ponto/${id}`, {nota, comentario});
+            const res = await api.post(`/api/avaliacoes/ponto/${id}`, { nota, comentario });
 
             mostrarMensagem(res.data.mensagem, res.data.classe);
             setRecarregar(recarregar + 1);
@@ -133,13 +128,13 @@ function DetalhesPontoPagina() {
     }
 
     async function excluir(email, username) {
-        if(await excluirAvaliacao(id, email, username)) {
+        if (await excluirAvaliacao(id, email, username)) {
             setRecarregar(recarregar + 1);
         }
     }
 
     async function alterarStatus(avaliacao, status) {
-        if(await alterarStatusAvaliacao(id, avaliacao, status)) {
+        if (await alterarStatusAvaliacao(id, avaliacao, status)) {
             setRecarregar(recarregar + 1);
         }
     }
@@ -148,8 +143,10 @@ function DetalhesPontoPagina() {
         return (
             <div className="position-relative">
                 {ponto.promocao && (
-                    <span style={{position: "absolute", top: "10px", left: "10px", backgroundColor: "#d63384", color: "white",
-                        padding: "5px 10px", borderRadius: "8px", fontWeight: "bold", zIndex: 2}}>
+                    <span style={{
+                        position: "absolute", top: "10px", left: "10px", backgroundColor: "#d63384", color: "white",
+                        padding: "5px 10px", borderRadius: "8px", fontWeight: "bold", zIndex: 2
+                    }}>
                         -{Math.trunc(Number(ponto.promocao.desconto))}%
                     </span>
                 )}
@@ -158,7 +155,7 @@ function DetalhesPontoPagina() {
 
                 {ponto.destaques && ponto.destaques.length > 0 && (
                     <div className="position-absolute bottom-0 start-0 w-100 p-2 d-flex flex-wrap gap-1"
-                        style={{background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent)"}}>
+                        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent)" }}>
                         {ponto.destaques.map(destaque => (
                             <span key={destaque.id} className="badge bg-dark bg-opacity-75 text-white">#{destaque.nome}</span>
                         ))}
@@ -207,11 +204,11 @@ function DetalhesPontoPagina() {
     }
 
     function renderizarSecaoAvaliar() {
-        if(ponto.status != "aprovado") {
+        if (ponto.status != "aprovado") {
             return null;
         }
 
-        if(!ponto.logado) {
+        if (!ponto.logado) {
             return (
                 <div className="alert alert-info text-center mb-4">
                     Faça <NavLink className="alert-link" to="/login">login</NavLink> para avaliar este lugar.
@@ -244,7 +241,7 @@ function DetalhesPontoPagina() {
     }
 
     function renderizarAvaliacoes() {
-        if(ponto.status != "aprovado" || !dadosAvaliacoes) {
+        if (ponto.status != "aprovado" || !dadosAvaliacoes) {
             return null;
         }
 

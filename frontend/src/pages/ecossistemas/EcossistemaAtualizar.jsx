@@ -37,7 +37,7 @@ function EcossistemaAtualizar() {
     async function atualizar(dados) {
         const res = await api.put(`/api/ecossistemas/${id}`, dados);
 
-        navigate("/admin/ecossistemas", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/ecossistemas", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     function ecossistemaParaForm(ecossistema) {
@@ -55,7 +55,6 @@ function EcossistemaAtualizar() {
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {ecossistema && <EcossistemaForm valorInicial={ecossistema} textoBotao="Salvar Alterações" onSalvar={atualizar} />}
             </div>
         </>

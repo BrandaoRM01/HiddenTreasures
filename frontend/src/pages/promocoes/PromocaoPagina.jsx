@@ -36,7 +36,7 @@ function PromocaoPagina() {
     let listaFiltrada = promocoes.filter(p => p.titulo.toLowerCase().includes(busca.toLowerCase()));
 
     async function excluir(promocao) {
-        if(!window.confirm(`Tem certeza que deseja excluir a promoção ${promocao.titulo}?`)) {
+        if (!window.confirm(`Tem certeza que deseja excluir a promoção ${promocao.titulo}?`)) {
             return;
         }
 
@@ -51,15 +51,15 @@ function PromocaoPagina() {
     }
 
     function renderizarLista() {
-        if(carregando) {
+        if (carregando) {
             return (<p className="text-muted mb-0">Carregando...</p>);
         }
 
-        if(erro) {
+        if (erro) {
             return null;
         }
 
-        if(promocoes.length == 0) {
+        if (promocoes.length == 0) {
             return (
                 <ListaVazia
                     icone="bi-tags"
@@ -71,7 +71,7 @@ function PromocaoPagina() {
             );
         }
 
-        if(listaFiltrada.length == 0) {
+        if (listaFiltrada.length == 0) {
             return (<p className="text-muted text-center py-4 mb-0">Nenhum resultado para a busca.</p>);
         }
 

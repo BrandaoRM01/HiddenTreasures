@@ -8,11 +8,6 @@ const ICONES = {
     info: "bi-info-circle-fill",
 };
 
-// Toasts do sistema (mesmas classes .alerta-toast / #container-alertas do index.css).
-// Duas formas de disparar um toast:
-//   1) mostrarMensagem(mensagem, classe)                    -> de qualquer lugar (services/mensagem.js)
-//   2) navigate("/rota", {state: {mensagem, classe}})       -> aparece na página de destino
-//      (a RotaProtegida já usa esse formato)
 function MensagemFlash() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -25,21 +20,18 @@ function MensagemFlash() {
     function adicionar(mensagem, classe = "info") {
         const id = Date.now() + Math.random();
 
-        setAvisos(atuais => [...atuais, {id, mensagem, classe}]);
+        setAvisos(atuais => [...atuais, { id, mensagem, classe }]);
         setTimeout(() => remover(id), 4000);
     }
 
-    // mensagem vinda de navigate(..., {state})
     useEffect(() => {
-        if(location.state?.mensagem) {
+        if (location.state?.mensagem) {
             adicionar(location.state.mensagem, location.state.classe);
 
-            // limpa o state da navegação para a mensagem não reaparecer ao dar F5
-            navigate(location.pathname + location.search, {replace: true, state: null});
+            navigate(location.pathname + location.search, { replace: true, state: null });
         }
     }, [location.key])
 
-    // mensagem vinda de mostrarMensagem()
     useEffect(() => {
         function aoReceber(e) {
             adicionar(e.detail.mensagem, e.detail.classe);

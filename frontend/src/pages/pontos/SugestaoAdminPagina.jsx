@@ -6,9 +6,6 @@ import LayoutLista from "../../components/LayoutLista";
 import FiltroPontos from "../../components/FiltroPontos";
 import CartaoPontoAdmin from "../../components/CartaoPontoAdmin";
 
-// A API de sugestões devolve tudo de uma vez (sem filtros nem paginação),
-// então o mesmo filtro da tela de pontos é aplicado aqui na própria lista.
-// Mesmas regras do backend: busca/categoria/localização "contém", tipo e status exatos.
 function filtrarSugestoes(lista, filtros) {
     const contem = (texto, trecho) => (texto ?? "").toLowerCase().includes(trecho.toLowerCase());
 
@@ -45,10 +42,9 @@ function SugestaoAdminPagina() {
 
     let listaFiltrada = filtrarSugestoes(sugestoes, filtros);
 
-    // aprovar/rejeitar usa o mesmo PUT de edição do ponto, com todos os campos + o novo status
     async function alterarStatus(ponto, status) {
-        if(status == "rejeitado") {
-            if(!window.confirm(`Deseja realmente rejeitar a sugestão ${ponto.nome}?`)) {
+        if (status == "rejeitado") {
+            if (!window.confirm(`Deseja realmente rejeitar a sugestão ${ponto.nome}?`)) {
                 return;
             }
         }
@@ -65,17 +61,17 @@ function SugestaoAdminPagina() {
         dados.append("tipo_ponto", ponto.tipo_ponto);
         dados.append("status", status);
 
-        if(ponto.promocao) {
+        if (ponto.promocao) {
             dados.append("promocao", ponto.promocao.id);
         }
 
-        if(ponto.tipo_ponto == "cultural") {
-            if(ponto.tipo_cultural) {
+        if (ponto.tipo_ponto == "cultural") {
+            if (ponto.tipo_cultural) {
                 dados.append("tipo_cultural", ponto.tipo_cultural.id);
             }
             dados.append("ano_fundacao", texto(ponto.ano_fundacao));
         } else {
-            if(ponto.ecossistema) {
+            if (ponto.ecossistema) {
                 dados.append("ecossistema", ponto.ecossistema.id);
             }
             dados.append("area_km", texto(ponto.area_km));
@@ -96,7 +92,7 @@ function SugestaoAdminPagina() {
     }
 
     async function excluir(ponto) {
-        if(!window.confirm(`Tem certeza que deseja excluir o ponto turístico ${ponto.nome}?`)) {
+        if (!window.confirm(`Tem certeza que deseja excluir o ponto turístico ${ponto.nome}?`)) {
             return;
         }
 
@@ -111,15 +107,15 @@ function SugestaoAdminPagina() {
     }
 
     function renderizarLista() {
-        if(carregando) {
+        if (carregando) {
             return (<p className="text-muted mb-0">Carregando...</p>);
         }
 
-        if(erro) {
+        if (erro) {
             return null;
         }
 
-        if(sugestoes.length == 0) {
+        if (sugestoes.length == 0) {
             return (
                 <div className="text-center py-5">
                     <i className="bi bi-check2-circle display-1 text-success"></i>
@@ -129,7 +125,7 @@ function SugestaoAdminPagina() {
             );
         }
 
-        if(listaFiltrada.length == 0) {
+        if (listaFiltrada.length == 0) {
             return (
                 <div className="text-center py-5">
                     <i className="bi bi-geo-alt display-1 text-secondary"></i>

@@ -9,8 +9,7 @@ function PontoCadastro() {
     async function salvar(dados) {
         const res = await api.post("/api/pontos", dados);
 
-        // volta para a lista e mostra a mensagem do backend como toast
-        navigate("/admin/pontos", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/pontos", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     const avisoSemCategoria = (

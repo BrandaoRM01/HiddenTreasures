@@ -9,8 +9,7 @@ function TipoCulturalCadastro() {
     async function salvar(dados) {
         const res = await api.post("/api/tipos_culturais", dados);
 
-        // volta para a lista e mostra a mensagem do backend como toast
-        navigate("/admin/tipos-culturais", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/tipos-culturais", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
     return (

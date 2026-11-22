@@ -37,10 +37,9 @@ function PromocaoAtualizar() {
     async function atualizar(dados) {
         const res = await api.put(`/api/promocoes/${id}`, dados);
 
-        navigate("/admin/promocoes", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+        navigate("/admin/promocoes", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
     }
 
-    // as datas já chegam em YYYY-MM-DD, que é o formato do input type="date"
     function promocaoParaForm(promocao) {
         return {
             titulo: promocao.titulo,
@@ -60,7 +59,6 @@ function PromocaoAtualizar() {
 
                 {carregando && <p className="text-muted">Carregando...</p>}
 
-                {/* o form só aparece depois de carregar: o useState dele lê o valorInicial uma única vez */}
                 {promocao && <PromocaoForm valorInicial={promocao} textoBotao="Salvar Alterações" onSalvar={atualizar} />}
             </div>
         </>

@@ -1,20 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
-// Dropdown do Bootstrap controlado pelo React (o app não carrega o JS do Bootstrap).
-//   classeBotao / rotuloBotao: aparência do botão que abre o menu
-//   itens: [{texto, classe, onClick}]
-function Dropdown({classeBotao, rotuloBotao, itens}) {
+function Dropdown({ classeBotao, rotuloBotao, itens }) {
     const [aberto, setAberto] = useState(false);
     const ref = useRef(null);
 
-    // fecha ao clicar fora
     useEffect(() => {
-        if(!aberto) {
+        if (!aberto) {
             return;
         }
 
         function aoClicarFora(e) {
-            if(ref.current && !ref.current.contains(e.target)) {
+            if (ref.current && !ref.current.contains(e.target)) {
                 setAberto(false);
             }
         }

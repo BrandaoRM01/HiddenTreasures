@@ -22,8 +22,6 @@ export const FORM_VAZIO = {
     destaques: [],
 }
 
-// Converte o ponto devolvido pela API (GET /api/pontos/:id) para os valores do formulário.
-// "Não informado" (que o backend grava quando o campo fica vazio) volta como campo vazio.
 export function pontoParaForm(ponto) {
     const vazio = (valor) => !valor || String(valor).trim().toLowerCase() == "não informado";
 
@@ -44,18 +42,8 @@ export function pontoParaForm(ponto) {
     }
 }
 
-// Formulário compartilhado de ponto turístico. Serve para 4 telas:
-// cadastro (admin), edição (admin), sugerir ponto e editar sugestão.
-//   valorInicial:       valores do form (a edição só renderiza depois de carregar o ponto)
-//   imagemInicial:      caminho da imagem atual (ponto.url_imagem); sem ele mostra a logo padrão
-//   textoFoto:          "Carregar foto" (cadastro) ou "Trocar foto" (edição)
-//   textoBotao:         texto do botão de salvar
-//   rotaVoltar:         se passada, mostra o botão "Voltar" ao lado do salvar
-//   limparAposSalvar:   limpa o formulário depois de salvar (usado no sugerir, que fica na mesma página)
-//   avisoSemCategoria:  card mostrado no lugar do form quando ainda não existe nenhuma categoria
-//   onSalvar:           async (FormData) => ... ; se der erro, a mensagem do backend aparece como toast
-function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, textoFoto = "Carregar foto", textoBotao,
-    rotaVoltar, limparAposSalvar = false, avisoSemCategoria, onSalvar}) {
+function PontoForm({ valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, textoFoto = "Carregar foto", textoBotao,
+    rotaVoltar, limparAposSalvar = false, avisoSemCategoria, onSalvar }) {
 
     const [form, setForm] = useState(valorInicial);
     const [foto, setFoto] = useState(null);
@@ -63,11 +51,10 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
     const [chaveFoto, setChaveFoto] = useState(0);
     const [carregando, setCarregando] = useState(false);
 
-    const [opcoes, setOpcoes] = useState({categorias: [], promocoes: [], ecossistemas: [], tiposCulturais: [], destaques: []});
+    const [opcoes, setOpcoes] = useState({ categorias: [], promocoes: [], ecossistemas: [], tiposCulturais: [], destaques: [] });
     const [carregandoOpcoes, setCarregandoOpcoes] = useState(true);
     const [erroOpcoes, setErroOpcoes] = useState(null);
 
-    // as listas dos selects/destaques (promoções: só as ativas, como no sistema atual)
     useEffect(() => {
         async function carregarOpcoes() {
             try {
@@ -95,9 +82,8 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
         carregarOpcoes();
     }, [])
 
-    // preview da foto escolhida (e libera a URL temporária quando troca/sai da página)
     useEffect(() => {
-        if(!foto) {
+        if (!foto) {
             setPreview(null);
             return;
         }
@@ -109,37 +95,36 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
     }, [foto])
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     function alternarDestaque(id) {
         const idTexto = String(id);
 
-        if(form.destaques.includes(idTexto)) {
-            setForm({...form, destaques: form.destaques.filter(d => d != idTexto)});
+        if (form.destaques.includes(idTexto)) {
+            setForm({ ...form, destaques: form.destaques.filter(d => d != idTexto) });
             return;
         }
 
-        if(form.destaques.length >= 3) {
+        if (form.destaques.length >= 3) {
             mostrarMensagem("Você pode selecionar no máximo 3 destaques.", "danger");
             return;
         }
 
-        setForm({...form, destaques: [...form.destaques, idTexto]});
+        setForm({ ...form, destaques: [...form.destaques, idTexto] });
     }
 
     async function enviarForm(e) {
         e.preventDefault();
 
-        // o backend lê request.form + request.files, então vai como FormData (igual ao new FormData(form) do sistema atual)
         const dados = new FormData();
 
         dados.append("nome", form.nome);
         dados.append("localizacao", form.localizacao);
         dados.append("descricao", form.descricao);
         dados.append("horario_funcionamento", form.horario_funcionamento);
-        dados.append("custo_entrada", form.custo_entrada.replace(",", ".")); // aceita "20,00" como no placeholder
+        dados.append("custo_entrada", form.custo_entrada.replace(",", "."));
         dados.append("promocao", form.promocao);
         dados.append("categoria", form.categoria);
         dados.append("tipo_ponto", form.tipo_ponto);
@@ -149,7 +134,7 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
         dados.append("ano_fundacao", form.ano_fundacao);
         form.destaques.forEach(id => dados.append("destaques", id));
 
-        if(foto) {
+        if (foto) {
             dados.append("foto", foto);
         }
 
@@ -157,7 +142,7 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
             setCarregando(true);
             await onSalvar(dados);
 
-            if(limparAposSalvar) {
+            if (limparAposSalvar) {
                 setForm(FORM_VAZIO);
                 setFoto(null);
                 setChaveFoto(chaveFoto + 1);
@@ -171,15 +156,15 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
         }
     }
 
-    if(carregandoOpcoes) {
+    if (carregandoOpcoes) {
         return (<p className="text-muted">Carregando...</p>);
     }
 
-    if(erroOpcoes) {
+    if (erroOpcoes) {
         return (<Alerta mensagem={erroOpcoes} />);
     }
 
-    if(opcoes.categorias.length == 0) {
+    if (opcoes.categorias.length == 0) {
         return avisoSemCategoria ?? (
             <div className="card p-4 mb-4 shadow">
                 <div className="alert alert-info text-center mb-0">Nenhuma categoria cadastrada.</div>
@@ -195,9 +180,9 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
                 <form onSubmit={enviarForm}>
 
                     <div className="text-center mb-4">
-                        <label htmlFor="foto-imagem" style={{cursor: "pointer"}}>
+                        <label htmlFor="foto-imagem" style={{ cursor: "pointer" }}>
                             <img src={preview ?? urlEstatico(imagemInicial)} alt="Imagem do ponto" className="rounded shadow"
-                                style={{width: "150px", height: "150px", objectFit: "cover"}} />
+                                style={{ width: "150px", height: "150px", objectFit: "cover" }} />
                         </label>
 
                         <input key={chaveFoto} name="foto" type="file" hidden id="foto-imagem" accept="image/*"

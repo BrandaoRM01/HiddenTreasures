@@ -19,9 +19,8 @@ function AvaliacoesPontoPagina() {
     const [filtroStatus, setFiltroStatus] = useState("");
     const [recarregar, setRecarregar] = useState(0);
 
-    // quem não é admin só recebe as aprovadas; o admin pode filtrar por status
     useEffect(() => {
-        if(moderador === null) {
+        if (moderador === null) {
             return;
         }
 
@@ -29,19 +28,18 @@ function AvaliacoesPontoPagina() {
             try {
                 const params = {};
 
-                if(!moderador) {
+                if (!moderador) {
                     params.status = "aprovado";
-                } else if(filtroStatus) {
+                } else if (filtroStatus) {
                     params.status = filtroStatus;
                 }
 
-                const res = await api.get(`/api/avaliacoes/ponto/${id}`, {params});
+                const res = await api.get(`/api/avaliacoes/ponto/${id}`, { params });
 
                 setDados(res.data);
             } catch (error) {
-                // ponto inexistente: página de erro, como no sistema atual
-                if(error.response?.status == 404) {
-                    navigate("/erro", {replace: true});
+                if (error.response?.status == 404) {
+                    navigate("/erro", { replace: true });
                     return;
                 }
 
@@ -53,13 +51,13 @@ function AvaliacoesPontoPagina() {
     }, [id, moderador, filtroStatus, recarregar])
 
     async function excluir(email, username) {
-        if(await excluirAvaliacao(id, email, username)) {
+        if (await excluirAvaliacao(id, email, username)) {
             setRecarregar(recarregar + 1);
         }
     }
 
     async function alterarStatus(avaliacao, status) {
-        if(await alterarStatusAvaliacao(id, avaliacao, status)) {
+        if (await alterarStatusAvaliacao(id, avaliacao, status)) {
             setRecarregar(recarregar + 1);
         }
     }

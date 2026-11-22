@@ -7,16 +7,15 @@ import CampoSenha from "../../components/CampoSenha";
 function RedefinirSenhaPagina() {
     const navigate = useNavigate();
 
-    // vem da rota /redefinir-senha/:token (é o link que chega no email)
     const { token } = useParams();
 
-    const [form, setForm] = useState({senha: "", confirmar_senha: ""});
+    const [form, setForm] = useState({ senha: "", confirmar_senha: "" });
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(false);
 
     function alterarCampo(e) {
-        const {name, value} = e.target;
-        setForm({...form, [name]: value});
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     async function redefinir(e) {
@@ -28,7 +27,7 @@ function RedefinirSenhaPagina() {
 
             const res = await api.post(`/api/redefinir-senha/${token}`, form);
 
-            navigate("/login", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
+            navigate("/login", { state: { mensagem: res.data.mensagem, classe: res.data.classe } });
         } catch (error) {
             setErro(mensagemDeErro(error));
         } finally {
