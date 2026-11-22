@@ -8,7 +8,7 @@ from flask_cors import CORS
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+    CORS(app, resources={r"/api/*": {"origins": Config.FRONTEND_URL if Config.FRONTEND_URL else "http://localhost:5173"}})
 
     from projeto.blueprints import user_bp, pontos_bp, categorias_bp, avaliacoes_bp, promocoes_bp, historico_senhas_bp, ecossistemas_bp, tipos_culturais_bp, destaques_bp
 
