@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, mensagemDeErro } from "../../services/api";
 import { mostrarMensagem } from "../../services/mensagem";
 import { alterarStatusAvaliacao, excluirAvaliacao } from "../../services/avaliacoes";
@@ -98,7 +98,7 @@ function AvaliacoesPontoPagina() {
                     </>
                 )}
 
-                <NavLink to={`/pontos/${id}`} className="btn btn-secondary mt-3">Voltar</NavLink>
+                <Link to={`/pontos/${id}`} className="btn btn-secondary mt-3">Voltar</Link>
             </div>
         </>
     )

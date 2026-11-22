@@ -1,4 +1,4 @@
-from flask import request, jsonify, render_template
+from flask import request, jsonify
 from projeto.dao import AvaliacaoDAO, UserDAO, PontoTuristicoDAO
 from projeto.factorys import AvaliacaoFactory
 from projeto.decoradores import login_required, usuario_opcional
@@ -10,17 +10,6 @@ class AvaliacaoController:
         self.__dao_avaliacao = AvaliacaoDAO()
         self.__dao_ponto = PontoTuristicoDAO()
         self.__dao_user = UserDAO()
-
-    def preparar_avaliacoes_ponto(self, ponto_id):
-        ponto = self.__dao_ponto.buscar_ponto_por_id(ponto_id)
-
-        if not ponto:
-            return render_template('erro.html')
-
-        return render_template('avaliacao/avaliacoes_ponto.html')
-
-    def preparar_editar_avaliacao(self, ponto_id):
-        return render_template('avaliacao/editar_avaliacao.html')
 
     @usuario_opcional
     def listar_avaliacoes_ponto(self, usuario, ponto_id):

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { mensagemDeErro } from "../services/api";
 import { mostrarMensagem } from "../services/mensagem";
 
@@ -56,9 +56,9 @@ function DestaqueForm({valorInicial = FORM_VAZIO, textoBotao, onSalvar}) {
                             {carregando ? "Salvando..." : textoBotao}
                         </button>
 
-                        <NavLink to="/admin/destaques" className="btn btn-secondary w-100">
+                        <Link to="/admin/destaques" className="btn btn-secondary w-100">
                             Voltar
-                        </NavLink>
+                        </Link>
                     </div>
                 </form>
             </div>

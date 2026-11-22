@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import UserDAO, HistoricoSenhaDAO, PontoTuristicoDAO
 from projeto.factorys import UsuarioFactory
 from projeto.models import User, HistoricoSenha, usuario
@@ -38,25 +38,7 @@ class UserController:
         except EmailNotValidError as e:
             print(f'Email inválido: {str(e)}')
             return True
-
-    def preparar_cadastro(self):
-        return render_template('usuario/cadastro.html')
-
-    def preparar_login(self):
-        return render_template('usuario/login.html')
-
-    def preparar_editar_perfil(self):
-        return render_template('usuario/editar_perfil.html')
-
-    def preparar_painel_admin(self):
-        return render_template('usuario/painel_admin.html')
-
-    def preparar_gerenciar_usuarios(self):
-        return render_template('usuario/gerenciar_usuarios.html')
-
-    def preparar_favoritos(self):
-        return render_template('ponto_turistico/favoritos.html')
-
+        
     @login_required
     def listar_favoritos(self, usuario):
         favoritos = [ponto.to_dict() for ponto in usuario.pontos_favoritos]

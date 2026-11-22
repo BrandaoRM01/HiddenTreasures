@@ -5,34 +5,6 @@ user_bp = Blueprint('user', __name__)
 
 controller = UserController()
 
-@user_bp.route('/login')
-def login():
-    return controller.preparar_login()
-
-@user_bp.route('/cadastro')
-def cadastro():
-    return controller.preparar_cadastro()
-
-@user_bp.route('/editar-perfil')
-def editar_perfil():
-    return controller.preparar_editar_perfil()
-
-@user_bp.route('/logout', methods=['POST'])
-def logout():
-    return controller.logout_usuario()
-
-@user_bp.route('/admin/painel-admin')
-def painel_admin():
-    return controller.preparar_painel_admin()
-
-@user_bp.route('/admin/gerenciar-usuarios')
-def gerenciar_usuarios():
-    return controller.preparar_gerenciar_usuarios()
-
-@user_bp.route('/favoritos')
-def favoritos():
-    return controller.preparar_favoritos()
-
 @user_bp.route('/api/usuarios', methods=['GET', 'POST'])
 def api_usuarios():
     if request.method == 'POST':

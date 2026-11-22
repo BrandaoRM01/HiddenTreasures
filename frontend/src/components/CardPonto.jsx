@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { api, mensagemDeErro, urlEstatico } from "../services/api";
+import { mostrarMensagem } from "../services/mensagem";
 
 function classeRanking(posicao) {
     if(posicao == 1) return "gold";
@@ -15,7 +16,6 @@ function classeRanking(posicao) {
 //   onFavoritoAlterado: (idPonto, favorito) => void
 function CardPonto({ponto, logado, ranking, onFavoritoAlterado}) {
     const [favorito, setFavorito] = useState(Boolean(ponto.favorito));
-    const [erro, setErro] = useState(null);
 
     const tipo = ponto.tipo_ponto.charAt(0).toUpperCase() + ponto.tipo_ponto.slice(1);
     const media = ponto.media_avaliacao !== null && ponto.media_avaliacao !== undefined ? Number(ponto.media_avaliacao) : null;
@@ -23,21 +23,19 @@ function CardPonto({ponto, logado, ranking, onFavoritoAlterado}) {
 
     async function alternarFavorito() {
         try {
-            setErro(null);
-
-            if(favorito) {
-                await api.delete(`/api/usuarios/favoritos/${ponto.id}`);
-            } else {
-                await api.post("/api/usuarios/favoritos", {ponto_id: ponto.id});
-            }
+            const res = favorito
+                ? await api.delete(`/api/usuarios/favoritos/${ponto.id}`)
+                : await api.post("/api/usuarios/favoritos", {ponto_id: ponto.id});
 
             setFavorito(!favorito);
 
             if(onFavoritoAlterado) {
                 onFavoritoAlterado(ponto.id, !favorito);
             }
+
+            mostrarMensagem(res.data.mensagem, res.data.classe);
         } catch (error) {
-            setErro(mensagemDeErro(error));
+            mostrarMensagem(mensagemDeErro(error), "danger");
         }
     }
 
@@ -105,8 +103,6 @@ function CardPonto({ponto, logado, ranking, onFavoritoAlterado}) {
                                 </button>
                             )}
                         </div>
-
-                        {erro && <small className="text-danger">{erro}</small>}
 
                         <NavLink className="btn btn-primary w-100 mt-2" to={`/pontos/${ponto.id}`}>Ver detalhes</NavLink>
                     </div>

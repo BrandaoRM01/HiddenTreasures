@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, mensagemDeErro } from "../../services/api";
 import { mostrarMensagem } from "../../services/mensagem";
 import EstrelasNota from "../../components/EstrelasNota";
@@ -83,7 +83,7 @@ function EditarAvaliacaoPagina() {
                                     {salvando ? "Salvando..." : "Salvar"}
                                 </button>
 
-                                <NavLink to={`/pontos/${id}`} className="btn btn-secondary">Voltar</NavLink>
+                                <Link to={`/pontos/${id}`} className="btn btn-secondary">Voltar</Link>
                             </form>
                         </div>
                     </div>

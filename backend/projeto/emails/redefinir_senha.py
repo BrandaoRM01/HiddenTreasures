@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+from markupsafe import escape
+
+HTML_REDEFINIR_SENHA = """<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -130,4 +132,8 @@
     </div>
 </body>
 
-</html>
+</html>"""
+
+
+def montar_email_redefinir_senha(link):
+    return HTML_REDEFINIR_SENHA.replace("{{ link }}", str(escape(link)))

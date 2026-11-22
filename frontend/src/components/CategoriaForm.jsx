@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { mensagemDeErro } from "../services/api";
 import { mostrarMensagem } from "../services/mensagem";
 
@@ -8,13 +8,17 @@ export const FORM_VAZIO = {
     descricao: '',
 }
 
-function CategoriaForm({ valorInicial = FORM_VAZIO, textoBotao, onSalvar }) {
+// Formulário compartilhado do cadastro e da edição de categoria (igual ao editar_categoria.html).
+//   valorInicial: valores iniciais do form (a edição só renderiza depois de carregar a categoria)
+//   textoBotao:   texto do botão de salvar
+//   onSalvar:     async (dados) => ... ; se der erro, a mensagem do backend aparece como toast
+function CategoriaForm({valorInicial = FORM_VAZIO, textoBotao, onSalvar}) {
     const [form, setForm] = useState(valorInicial);
     const [carregando, setCarregando] = useState(false);
 
     function alterarCampo(e) {
-        const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
+        const {name, value} = e.target;
+        setForm({...form, [name]: value});
     }
 
     async function enviarForm(e) {
@@ -62,9 +66,9 @@ function CategoriaForm({ valorInicial = FORM_VAZIO, textoBotao, onSalvar }) {
                             {carregando ? "Salvando..." : textoBotao}
                         </button>
 
-                        <NavLink to="/admin/categorias" className="btn btn-secondary w-100">
+                        <Link to="/admin/categorias" className="btn btn-secondary w-100">
                             Voltar
-                        </NavLink>
+                        </Link>
                     </div>
                 </form>
             </div>

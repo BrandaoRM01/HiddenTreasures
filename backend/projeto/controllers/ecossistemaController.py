@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import EcossistemaDAO
 from projeto.factorys import EcossistemaFactory
 from projeto.decoradores import admin_required
@@ -16,9 +16,6 @@ class EcossistemaController:
             ecossistemas.append(obj.to_dict())
 
         return jsonify(ecossistemas), 200
-
-    def preparar_gerenciar_ecossistemas(self):
-        return render_template('ecossistema/gerenciar_ecossistemas.html')
 
     @admin_required
     def cadastrar_ecossistema(self, usuario):
@@ -46,9 +43,6 @@ class EcossistemaController:
         self.__dao.remover_ecossistema(id_ecossistema)
 
         return jsonify({'mensagem': 'Ecossistema removido com sucesso!', 'classe': 'success'}), 200
-
-    def preparar_editar_ecossistema(self, id_ecossistema):
-        return render_template('ecossistema/editar_ecossistema.html')
 
     @admin_required
     def buscar_ecossistema_por_id(self, usuario, id):

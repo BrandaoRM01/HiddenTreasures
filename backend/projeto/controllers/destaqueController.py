@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import DestaqueDAO
 from projeto.factorys import DestaqueFactory
 from projeto.decoradores import admin_required
@@ -16,9 +16,6 @@ class DestaqueController:
             destaques.append(obj.to_dict())
 
         return jsonify(destaques), 200
-
-    def preparar_gerenciar_destaques(self):
-        return render_template('destaque/gerenciar_destaques.html')
 
     @admin_required
     def cadastrar_destaque(self, usuario):
@@ -46,9 +43,6 @@ class DestaqueController:
         self.__dao.remover_destaque(id_destaque)
 
         return jsonify({'mensagem': 'Destaque removido com sucesso!', 'classe': 'success'}), 200
-
-    def preparar_editar_destaque(self, id_destaque):
-        return render_template('destaque/editar_destaque.html')
 
     @admin_required
     def buscar_destaque_por_id(self, usuario, id):

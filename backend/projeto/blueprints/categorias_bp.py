@@ -5,14 +5,6 @@ categorias_bp = Blueprint('categorias', __name__)
 
 controller = CategoriaController()
 
-@categorias_bp.route('/admin/gerenciar-categorias')
-def gerenciar_categorias():
-    return controller.preparar_gerenciar_categorias()
-
-@categorias_bp.route('/admin/atualizar-categoria/<int:id>')
-def atualizar_categoria(id):
-    return controller.preparar_editar_categoria(id)
-
 @categorias_bp.route('/api/categorias', methods=['GET', 'POST'])
 def api_categorias():
     if request.method == 'POST':

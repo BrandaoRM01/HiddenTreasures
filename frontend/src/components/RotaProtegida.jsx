@@ -50,7 +50,8 @@ function RotaProtegida({permissoes}) {
             }
 
             if(ativo) {
-                setResultado(novo);
+                // guarda a rota a que esse resultado pertence (veja a explicação mais abaixo)
+                setResultado({...novo, caminho: location.pathname});
             }
         }
 
@@ -60,7 +61,12 @@ function RotaProtegida({permissoes}) {
         return () => { ativo = false; };
     }, [chave, location.pathname])
 
-    if(!resultado) {
+    // O React reaproveita esta mesma instância ao trocar de uma rota protegida para outra
+    // (ex.: /favoritos -> /login), então o "resultado" da rota anterior ainda estaria no state
+    // por uma renderização. Sem esta checagem ele renderizava o <Navigate> antigo de novo
+    // (o toast aparecia duas vezes) e podia exibir por um instante a página de outro grupo
+    // (ex.: o painel admin para quem não é admin). Só vale o resultado da rota atual.
+    if(!resultado || resultado.caminho != location.pathname) {
         return (<><p className="text-muted">Carregando...</p></>);
     }
 

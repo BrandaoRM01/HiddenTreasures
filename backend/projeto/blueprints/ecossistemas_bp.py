@@ -5,14 +5,6 @@ ecossistemas_bp = Blueprint('ecossistemas', __name__)
 
 controller = EcossistemaController()
 
-@ecossistemas_bp.route('/admin/gerenciar-ecossistemas')
-def gerenciar_ecossistemas():
-    return controller.preparar_gerenciar_ecossistemas()
-
-@ecossistemas_bp.route('/admin/atualizar-ecossistema/<int:id>')
-def atualizar_ecossistema(id):
-    return controller.preparar_editar_ecossistema(id)
-
 @ecossistemas_bp.route('/api/ecossistemas', methods=['GET', 'POST'])
 def api_ecossistemas():
     if request.method == 'POST':

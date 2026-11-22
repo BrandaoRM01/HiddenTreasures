@@ -5,14 +5,6 @@ destaques_bp = Blueprint('destaques', __name__)
 
 controller = DestaqueController()
 
-@destaques_bp.route('/admin/gerenciar-destaques')
-def gerenciar_destaques():
-    return controller.preparar_gerenciar_destaques()
-
-@destaques_bp.route('/admin/atualizar-destaque/<int:id>')
-def atualizar_destaque(id):
-    return controller.preparar_editar_destaque(id)
-
 @destaques_bp.route('/api/destaques', methods=['GET', 'POST'])
 def api_destaques():
     if request.method == 'POST':

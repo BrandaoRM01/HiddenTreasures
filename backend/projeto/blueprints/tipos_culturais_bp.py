@@ -5,14 +5,6 @@ tipos_culturais_bp = Blueprint('tipos_culturais', __name__)
 
 controller = TipoCulturalController()
 
-@tipos_culturais_bp.route('/admin/gerenciar-tipos-culturais')
-def gerenciar_tipos_culturais():
-    return controller.preparar_gerenciar_tipos()
-
-@tipos_culturais_bp.route('/admin/atualizar-tipo-cultural/<int:id>')
-def atualizar_tipo_cultural(id):
-    return controller.preparar_editar_tipo(id)
-
 @tipos_culturais_bp.route('/api/tipos_culturais', methods=['GET', 'POST'])
 def api_tipos_culturais():
     if request.method == 'POST':

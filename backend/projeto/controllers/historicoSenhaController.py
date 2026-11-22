@@ -1,6 +1,7 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.config import Config
 from projeto.dao import UserDAO, HistoricoSenhaDAO
+from projeto.emails import montar_email_redefinir_senha
 from projeto.factorys import UsuarioFactory, HistoricoSenhaFactory
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
@@ -38,10 +39,7 @@ class HistoricoSenhaController:
             return True
 
     def __enviar_email_brevo(self, email_destino, link):
-        html = render_template(
-            "usuario/email_redefinir_senha.html",
-            link=link
-        )
+        html = montar_email_redefinir_senha(link)
 
         api_client = ApiClient(Config.BREVO_CONFIG)
         api_instance = TransactionalEmailsApi(api_client)
@@ -63,20 +61,6 @@ class HistoricoSenhaController:
             print("Erro ao enviar email:", e)
             return False
 
-    def preparar_recuperar_senha(self):
-        return render_template('usuario/recuperar_senha.html')
-
-    def preparar_redefinir_senha(self, token):
-        usuario = self.__dao.buscar_por_token(token)
-
-        if not usuario:
-            return render_template('erro.html')
-
-        if usuario.token_expiracao and datetime.now() > usuario.token_expiracao:
-            return render_template('erro.html')
-
-        return render_template('usuario/redefinir_senha.html', token=token)
-
     def enviar_recuperacao(self):
         dados = request.get_json()
         email = dados.get('email')
@@ -97,7 +81,7 @@ class HistoricoSenhaController:
 
         self.__dao.salvar_token_recuperacao(email, token, expiracao)
 
-        link = f"http://localhost:5000/redefinir-senha/{token}"
+        link = f"{Config.FRONTEND_URL}/redefinir-senha/{token}"
 
         self.__enviar_email_brevo(email, link)
 

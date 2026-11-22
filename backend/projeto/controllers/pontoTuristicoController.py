@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, jsonify
+from flask import redirect, url_for, request, jsonify
 from projeto.dao import PontoTuristicoDAO, CategoriaDAO, UserDAO, PromocaoDAO, TipoCulturalDAO, EcossistemaDAO, DestaqueDAO
 from projeto.factorys import PontoTuristicoFactory, CategoriaFactory, PromocaoFactory, TipoCulturalFactory, EcossistemaFactory
 from projeto.config import Config
@@ -19,12 +19,6 @@ class PontoTuristicoController:
 
     def __status_valido(self, status):
         return status in ['aprovado', 'rejeitado', 'pendente']
-
-    def preparar_erro(self):
-        return render_template('erro.html')
-
-    def preparar_index(self):
-        return render_template('ponto_turistico/index.html')
 
     @usuario_opcional
     def listar_pontos(self, usuario):
@@ -117,15 +111,6 @@ class PontoTuristicoController:
 
         return jsonify(dados), 200
 
-    def preparar_sobre(self):
-        return render_template('ponto_turistico/sobre.html')
-
-    def preparar_gerenciar_pontos(self):
-        return render_template('ponto_turistico/gerenciar_pontos.html')
-
-    def preparar_gerenciar_sugestoes(self):
-        return render_template('ponto_turistico/gerenciar_sugestoes.html')
-
     @admin_required
     def listar_sugestoes(self, usuario):
         lista = self.__dao_pontos.listar_pontos_sugeridos()
@@ -133,26 +118,12 @@ class PontoTuristicoController:
 
         return jsonify(sugestoes), 200
 
-    def preparar_sugerir_ponto(self):
-        return render_template('ponto_turistico/sugerir_ponto.html')
-
     @login_required
     def listar_sugestoes_usuario(self, usuario):
         lista = self.__dao_pontos.listar_sugestoes_usuario(usuario.email)
         sugestoes = [obj.to_dict() for obj in lista]
 
         return jsonify(sugestoes), 200
-
-    def preparar_editar_ponto(self, id_ponto):
-        ponto = self.__dao_pontos.buscar_ponto_por_id(id_ponto)
-
-        if ponto and ponto.sugerido_por:
-            return redirect(url_for('pontos.editar_sugestao', id=id_ponto))
-
-        return render_template('ponto_turistico/editar_ponto.html')
-
-    def preparar_editar_sugestao(self, id_ponto):
-        return render_template('ponto_turistico/editar_sugestao.html')
 
     @login_required
     def buscar_ponto(self, usuario, id_ponto):
@@ -162,12 +133,6 @@ class PontoTuristicoController:
             return jsonify({'mensagem': 'Ponto turístico não encontrado.', 'classe': 'danger'}), 404
 
         return jsonify(ponto.to_dict()), 200
-
-    def preparar_pontos_turisticos(self):
-        return render_template('ponto_turistico/pontos.html')
-
-    def preparar_detalhes_ponto(self):
-        return render_template('ponto_turistico/detalhes_ponto.html')
 
     @usuario_opcional
     def detalhes_ponto_api(self, usuario, id_ponto):

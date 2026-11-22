@@ -10,6 +10,9 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = os.getenv('DEBUG')
 
+    # Endereço do front-end React
+    FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+
     # Caminhos para upload
     BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { api, mensagemDeErro, urlEstatico } from "../services/api";
+import { mostrarMensagem } from "../services/mensagem";
 
 function NavBar() {
     const navigate = useNavigate();
@@ -51,15 +52,19 @@ function NavBar() {
     async function sair(e) {
         e.preventDefault();
 
+        // o logout no sistema é só limpar o token; se a API falhar, sai do mesmo jeito
+        let aviso = {mensagem: "Logout realizado com sucesso.", classe: "success"};
+
         try {
-            await api.post("/logout");
+            const res = await api.post("/logout");
+            aviso = {mensagem: res.data.mensagem, classe: res.data.classe};
         } catch (error) {
-            // o logout no sistema é só limpar o token; se a API falhar, sai do mesmo jeito
+            // mantém a mensagem padrão
         }
 
         localStorage.removeItem("token");
         setUsuario(null);
-        navigate("/");
+        navigate("/", {state: aviso});
     }
 
     async function excluirPerfil(e) {
@@ -70,13 +75,13 @@ function NavBar() {
         }
 
         try {
-            await api.delete("/api/usuarios/me");
+            const res = await api.delete("/api/usuarios/me");
 
             localStorage.removeItem("token");
             setUsuario(null);
-            navigate("/");
+            navigate("/", {state: {mensagem: res.data.mensagem, classe: res.data.classe}});
         } catch (error) {
-            window.alert(mensagemDeErro(error));
+            mostrarMensagem(mensagemDeErro(error), "danger");
         }
     }
 
@@ -123,10 +128,11 @@ function NavBar() {
                             )}
                         </ul>
 
+                        {/* botões usam Link (e não NavLink): o NavLink põe a classe "active" e o botão fica azul/pressionado */}
                         {usuario === null && (
                             <div className="d-flex gap-2">
-                                <NavLink to="/login" className="btn btn-outline-primary">Login</NavLink>
-                                <NavLink to="/cadastro" className="btn btn-primary">Cadastrar</NavLink>
+                                <Link to="/login" className="btn btn-outline-primary">Login</Link>
+                                <Link to="/cadastro" className="btn btn-primary">Cadastrar</Link>
                             </div>
                         )}
 

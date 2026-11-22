@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import PromocaoDAO
 from projeto.factorys import PromocaoFactory
 from projeto.decoradores import admin_required
@@ -8,14 +8,6 @@ class PromocaoController:
 
     def __init__(self):
         self.__dao = PromocaoDAO()
-
-    def preparar_gerenciar_promocoes(self):
-        self.__dao.deletar_promocoes_expiradas()
-
-        return render_template('promocao/gerenciar_promocoes.html')
-
-    def preparar_editar_promocao(self, id):
-        return render_template('promocao/editar_promocao.html')
 
     @admin_required
     def buscar_promocao_por_id(self, usuario, id):

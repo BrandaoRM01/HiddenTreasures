@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import CategoriaDAO
 from projeto.factorys import CategoriaFactory
 from projeto.decoradores import admin_required
@@ -16,9 +16,6 @@ class CategoriaController:
             categorias.append(obj.to_dict())
 
         return jsonify(categorias), 200
-
-    def preparar_gerenciar_categorias(self):
-        return render_template('categoria/gerenciar_categorias.html')
 
     @admin_required
     def cadastrar_categoria(self, usuario):
@@ -51,9 +48,6 @@ class CategoriaController:
         self.__dao.remover_categoria(id_categoria)
 
         return jsonify({'mensagem': 'Categoria removida com sucesso!', 'classe': 'success'}), 200
-
-    def preparar_editar_categoria(self, id_categoria):
-        return render_template('categoria/editar_categoria.html')
 
     @admin_required
     def buscar_categoria_por_id(self, usuario, id_categoria):

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { api, mensagemDeErro, urlEstatico } from "../services/api";
 import { mostrarMensagem } from "../services/mensagem";
 import Alerta from "./Alerta";
@@ -336,7 +336,7 @@ function PontoForm({valorInicial = FORM_VAZIO, imagemInicial = IMAGEM_PADRAO, te
                                 {carregando ? "Salvando..." : textoBotao}
                             </button>
 
-                            <NavLink to={rotaVoltar} className="btn btn-secondary w-100">Voltar</NavLink>
+                            <Link to={rotaVoltar} className="btn btn-secondary w-100">Voltar</Link>
                         </div>
                     ) : (
                         <button type="submit" className="btn btn-primary w-100" disabled={carregando}>

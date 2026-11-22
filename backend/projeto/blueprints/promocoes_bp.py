@@ -5,14 +5,6 @@ promocoes_bp = Blueprint('promocoes', __name__)
 
 controller = PromocaoController()
 
-@promocoes_bp.route('/admin/gerenciar-promocoes')
-def gerenciar_promocoes():
-    return controller.preparar_gerenciar_promocoes()
-
-@promocoes_bp.route('/admin/editar-promocao/<int:id>')
-def editar_promocao(id):
-    return controller.preparar_editar_promocao(id)
-
 @promocoes_bp.route('/api/promocoes', methods=['GET', 'POST'])
 def api_promocoes():
     if request.method == 'POST':

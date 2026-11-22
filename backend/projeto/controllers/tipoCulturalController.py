@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import request, jsonify
 from projeto.dao import TipoCulturalDAO
 from projeto.factorys import TipoCulturalFactory
 from projeto.decoradores import admin_required
@@ -16,9 +16,6 @@ class TipoCulturalController:
             tipos_culturais.append(obj.to_dict())
 
         return jsonify(tipos_culturais), 200
-
-    def preparar_gerenciar_tipos(self):
-        return render_template('tipo_cultural/gerenciar_tipos_culturais.html')
 
     @admin_required
     def cadastrar_tipo_cultural(self, usuario):
@@ -46,9 +43,6 @@ class TipoCulturalController:
         self.__dao.remover_tipo_cultural(id_tipo)
 
         return jsonify({'mensagem': 'Tipo cultural removido com sucesso!', 'classe': 'success'}), 200
-
-    def preparar_editar_tipo(self, id_tipo):
-        return render_template('tipo_cultural/editar_tipo_cultural.html')
 
     @admin_required
     def buscar_tipo_cultural_por_id(self, usuario, id_tipo):
